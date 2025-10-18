@@ -2060,7 +2060,7 @@ const Editor = () => {
 ```js
 useLayoutEffect(() => {
   const el = ref.current;
-  el && editor.onMount(el);
+  el && editor.mount(el);
   return () => {
     editor.destroy();
   };
@@ -2122,7 +2122,7 @@ export const Editable: React.FC<{
 
   useLayoutEffect(() => {
     const el = ref.current;
-    el && editor.onMount(el);
+    el && editor.mount(el);
     return () => {
       editor.onUnmount();
       !preventDestroy && editor.destroy();
