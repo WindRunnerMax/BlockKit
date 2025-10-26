@@ -1,128 +1,151 @@
-import { isArray, isNil, isObject } from "./is";
+import { isArray, isNil, isUndef } from "./is";
 import type { Array, O, P } from "./types";
 
 export class Collection {
   /**
    * Pick
-   * @param {Object.Any} target
-   * @param {string} keys
+   * @param target
+   * @param keys
    */
   public static pick<T extends O.Any, K extends keyof T>(target: T, keys: K | K[]): Pick<T, K> {
-    const set: Set<unknown> = new Set(isArray(keys) ? keys : [keys]);
+    const picks = isArray(keys) ? keys : [keys];
     const next = {} as O.Map<unknown>;
-    for (const key of Object.keys(target)) {
-      if (!set.has(key)) continue;
-      next[key] = target[key];
+    for (const key of picks) {
+      if (isUndef(target[key])) continue;
+      next[key as string] = target[key];
     }
     return next as T;
   }
 
   /**
    * Omit
-   * @param {Array.Any | Object.Any} target
-   * @param {Array.Any} keys
+   * @param target
+   * @param keys
    */
   public static omit<T extends Array.Any>(target: T, keys: T): T;
   public static omit<T extends O.Any, K extends keyof T>(target: T, keys: K | K[]): Omit<T, K>;
   public static omit<T extends Array.Any | O.Any>(target: T, keys: Array.Any): T | O.Any {
-    const set = new Set(isArray(keys) ? keys : [keys]);
-    if (isObject(target)) {
-      const next = {} as O.Unknown;
-      for (const key of Object.keys(target)) {
-        if (set.has(key)) continue;
-        next[key] = target[key];
-      }
-      return next;
+    const copied = { ...target } as O.Unknown;
+    const omits = isArray(keys) ? keys : [keys];
+    for (const key of omits) {
+      delete copied[key as string];
     }
-    return target.filter(item => !set.has(item));
+    return copied as T;
   }
 
   /**
    * Patch 差异
-   * @param {Set<T> | T[]} a
-   * @param {Set<T> | T[]} b
+   * @param a
+   * @param b
    */
-  public static patch<T>(a: Set<T> | T[], b: Set<T> | T[]) {
-    const prev = a instanceof Set ? a : new Set(a);
-    const next = b instanceof Set ? b : new Set(b);
+  public static patch<T>(
+    a: Set<T> | T[],
+    b: Set<T> | T[]
+  ): { effects: Set<T>; added: Set<T>; removed: Set<T> } {
+    const set1 = a instanceof Set ? a : new Set(a);
+    const set2 = b instanceof Set ? b : new Set(b);
     const effects = new Set<T>();
     const added = new Set<T>();
     const removed = new Set<T>();
-    for (const id of next) {
-      if (!prev.has(id)) {
-        added.add(id);
-        effects.add(id);
-      }
+    for (const el of set2) {
+      if (set1.has(el)) continue;
+      added.add(el);
+      effects.add(el);
     }
-    for (const id of prev) {
-      if (!next.has(id)) {
-        removed.add(id);
-        effects.add(id);
-      }
+    for (const el of set1) {
+      if (set2.has(el)) continue;
+      removed.add(el);
+      effects.add(el);
     }
     return { effects, added, removed };
   }
 
   /**
    * Union 并集
-   * @param {Set<T> | T[]} a
-   * @param {Set<T> | T[]} b
+   * @param a
+   * @param b
    */
-  public static union<T>(a: Set<T> | T[], b: Set<T> | T[]) {
-    return new Set([...a, ...b]);
+  public static union<T>(a: Set<T> | T[], b: Set<T> | T[]): Set<T> {
+    const merged = new Set<T>(a);
+    for (const item of b) {
+      merged.add(item);
+    }
+    return merged;
   }
 
   /**
    * Intersect 交集
-   * @param {Set<T> | T[]} a
-   * @param {Set<T> | T[]} b
+   * @param a
+   * @param b
    */
-  public static intersect<T>(a: Set<T> | T[], b: Set<T> | T[]) {
-    const prev = [...a];
-    const next = b instanceof Set ? b : new Set(b);
-    return new Set([...prev].filter(id => next.has(id)));
+  public static intersect<T>(a: Set<T> | T[], b: Set<T> | T[]): Set<T> {
+    let set1 = a instanceof Set ? a : new Set(a);
+    let set2 = b instanceof Set ? b : new Set(b);
+    // 总是遍历较小的集合
+    if (set1.size > set2.size) {
+      [set1, set2] = [set2, set1];
+    }
+    const result = new Set<T>();
+    for (const item of set1) {
+      set2.has(item) && result.add(item);
+    }
+    return result;
   }
 
   /**
    * Subset 判断是否子集
    * - a 是否是 b 的子集
-   * @param {Set<T> | T[]} a
-   * @param {Set<T> | T[]} b
+   * @param a
+   * @param b
    */
-  public static subset<T>(a: Set<T> | T[], b: Set<T> | T[]) {
-    const prev = [...a];
-    const next = b instanceof Set ? b : new Set(b);
-    return prev.every(id => next.has(id));
+  public static subset<T>(a: Set<T> | T[], b: Set<T> | T[]): boolean {
+    const set1 = a instanceof Set ? a : new Set(a);
+    const set2 = b instanceof Set ? b : new Set(b);
+    // 如果 set1 的大小超过 set2, 肯定不是子集
+    if (set1.size > set2.size) return false;
+    for (const item of set1) {
+      if (!set2.has(item)) return false;
+    }
+    return true;
   }
 
   /**
    * Superset 判断是否超集
    * - a 是否是 b 的超集
-   * @param {Set<T> | T[]} a
-   * @param {Set<T> | T[]} b
+   * @param a
+   * @param b
    */
-  public static superset<T>(a: Set<T> | T[], b: Set<T> | T[]) {
-    const prev = a instanceof Set ? a : new Set(a);
-    const next = [...b];
-    return next.every(id => prev.has(id));
+  public static superset<T>(a: Set<T> | T[], b: Set<T> | T[]): boolean {
+    const set1 = a instanceof Set ? a : new Set(a);
+    const set2 = b instanceof Set ? b : new Set(b);
+    // 如果 set1 的大小小于 set2, 肯定不是超集
+    if (set1.size < set2.size) return false;
+    for (const item of set2) {
+      if (!set1.has(item)) return false;
+    }
+    return true;
   }
 
   /**
    * Symmetric 对等差集
    * - b 中存在而 a 中不存在的元素
-   * @param {Set<T> | T[]} a
-   * @param {Set<T> | T[]} b
+   * @param a
+   * @param b
    */
-  public static symmetric<T>(a: Set<T> | T[], b: Set<T> | T[]) {
-    const prev = a instanceof Set ? a : new Set(a);
-    const next = [...b];
-    return new Set(next.filter(id => !prev.has(id)));
+  public static symmetric<T>(a: Set<T> | T[], b: Set<T> | T[]): Set<T> {
+    const set1 = a instanceof Set ? a : new Set(a);
+    const set2 = b instanceof Set ? b : new Set(b);
+    const result = new Set<T>();
+    for (const item of set2) {
+      !set1.has(item) && result.add(item);
+    }
+    return result;
   }
 
   /**
    * 取数组索引值
-   * @param {T[] | P.Nil} target
-   * @param {number} index 支持负数
+   * @param target
+   * @param index 支持负数
    */
   public static at<T>(target: T[] | P.Nil, index: number): T | null {
     if (!target) return null;

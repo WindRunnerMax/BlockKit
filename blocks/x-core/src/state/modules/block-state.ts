@@ -120,28 +120,31 @@ export class BlockState {
    * 更新块结构元信息
    * @internal 仅编辑器内部使用
    */
-  public _updateMeta() {
+  public _updateMeta(): void {
     if (!this.isDirty) return void 0;
     this.isDirty = false;
+    // ============ Update Index ============
     // 更新子节点 index, 直接根据父节点的子节点重新计算
     // 注意这是更新该节点的子节点索引值, 而不是更新本身的索引值
     if (this.data.children) {
-      for (let i = 0, len = this.data.children.length; i < len; i++) {
+      const len = this.data.children.length;
+      for (let i = 0; i < len; i++) {
         const childId = this.data.children[i];
         const childBlock = this.state.getBlock(childId);
         childBlock && (childBlock.index = i);
       }
     }
+    // ============ Update Depth ============
     // 更新节点 depth, 不断查找父节点来确定深度
     // 数据结构通常是宽而浅的树形结构, 性能消耗通常可接受
     let depth = 0;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let current: BlockState | null = this;
     while (current) {
-      const currentParent = current.getParent();
-      if (!currentParent) break;
+      const parent = current.getParent();
+      if (!parent) break;
       depth++;
-      current = currentParent;
+      current = parent;
     }
     this.depth = depth;
   }
@@ -167,8 +170,7 @@ export class BlockState {
       // 若是 children 的新增变更, 则需要同步相关的 Block 状态
       if (op.p[0] === "children" && isString(op.li)) {
         const walker = createBlockTreeWalkerBFS(this.state.blocks, op.li);
-        const children = Array.from(walker);
-        for (const child of children) {
+        for (const child of walker) {
           child.restore();
           child._updateMeta();
           inserts.add(child.id);
@@ -177,8 +179,7 @@ export class BlockState {
       // 若是 children 的删除变更, 则需要同步相关的 Block 状态
       if (op.p[0] === "children" && isString(op.ld)) {
         const walker = createBlockTreeWalkerBFS(this.state.blocks, op.ld);
-        const children = Array.from(walker);
-        for (const child of children) {
+        for (const child of walker) {
           child.remove();
           deletes.add(child.id);
         }

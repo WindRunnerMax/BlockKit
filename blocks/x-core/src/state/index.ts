@@ -80,7 +80,7 @@ export class EditorState {
    * 获取 BlockState
    * @param id Block ID
    */
-  public getBlock(id: string) {
+  public getBlock(id: string): BlockState | null {
     return this.blocks[id] || null;
   }
 

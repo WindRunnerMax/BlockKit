@@ -6,7 +6,8 @@ import type { ApplyChange } from "../types";
 
 /**
  * 创建新 Block 的变更
- * @param block
+ * @param editor
+ * @param data
  */
 export const createNewBlockChange = (editor: BlockEditor, data: BlockDataField): ApplyChange => {
   let id = getId(20);
@@ -18,27 +19,31 @@ export const createNewBlockChange = (editor: BlockEditor, data: BlockDataField):
 };
 
 /**
- * 将 children 插入到指定 Block 位置的变更
- * @param id
+ * 创建 Block 并将其插入到指定 Block 位置的变更
+ * @param parentId
  * @param index
- * @param child
+ * @param childId
  */
-export const createInsertBlockChange = (id: string, index: number, child: string): ApplyChange => {
-  return { id, ops: [{ p: ["children", index], li: child }] };
+export const createInsertBlockChange = (
+  parentId: string,
+  index: number,
+  childId: string
+): ApplyChange => {
+  return { id: parentId, ops: [{ p: ["children", index], li: childId }] };
 };
 
 /**
  * 将 children 从指定 Block 位置删除的变更
  * @param editor
+ * @param parentId
  * @param index
- * @param child
  */
 export const createDeleteBlockChange = (
   editor: BlockEditor,
-  id: string,
+  parentId: string,
   index: number
 ): ApplyChange => {
-  const block = editor.state.getBlock(id);
+  const block = editor.state.getBlock(parentId);
   const child = block && block.data.children && block.data.children[index];
-  return { id, ops: [{ p: ["children", index], ld: child }] };
+  return { id: parentId, ops: [{ p: ["children", index], ld: child }] };
 };

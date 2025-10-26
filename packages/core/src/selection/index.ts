@@ -137,7 +137,7 @@ export class Selection {
 
   /**
    * 更新浏览器选区
-   * @param force [?=false] force 会忽略 MouseDown 状态检查
+   * @param force [?=false] 忽略 MouseDown 状态检查
    */
   public updateDOMSelection(force = false) {
     const range = this.current;

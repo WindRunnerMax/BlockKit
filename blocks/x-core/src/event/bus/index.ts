@@ -25,9 +25,9 @@ export type ContentWillChangeEvent = {
 export type ContentChangeEvent = ContentWillChangeEvent & {
   id: string;
   previous: Blocks;
-  inserts: string[];
-  updates: string[];
-  deletes: string[];
+  inserts: Set<string>;
+  updates: Set<string>;
+  deletes: Set<string>;
 };
 
 export type SelectionChangeEvent = {

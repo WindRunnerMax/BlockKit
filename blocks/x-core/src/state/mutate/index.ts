@@ -1,4 +1,5 @@
-import type { Block, BlocksChange, JSONOp } from "@block-kit/x-json";
+import { List } from "@block-kit/utils";
+import type { Block, BlocksChange } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../../editor";
 import type { EditorState } from "../index";
@@ -31,10 +32,10 @@ export class Mutate {
    */
   public apply(changes: BlocksChange) {
     for (const [changeId, ops] of Object.entries(changes)) {
-      const pre = this.state.getBlock(changeId);
+      let block = this.state.getBlock(changeId);
       // 如果不存在节点, 则需要检查是否需要新增 Block [Insert]
-      let insert: JSONOp | undefined = void 0;
-      if (!pre && (insert = ops.find(it => !it.p.length && it.oi))) {
+      const insert = !block && ops.find(it => !it.p.length && it.oi);
+      if (!block && insert) {
         this.inserts.add(changeId);
         const data: Block = {
           id: changeId,
@@ -44,22 +45,17 @@ export class Mutate {
         const newBlockState = new BlockState(data, this.state);
         this.state.blocks[changeId] = newBlockState;
         newBlockState._updateMeta();
+        block = newBlockState;
       }
-      // 重新获取 Block 节点
-      const block = this.state.getBlock(changeId);
       if (!block) continue;
       const result = block._apply(ops);
-      for (const id of result.inserts) {
-        this.inserts.add(id);
-      }
-      for (const id of result.deletes) {
-        this.deletes.add(id);
-      }
+      this.inserts = List.union(this.inserts, result.inserts);
+      this.deletes = List.union(this.deletes, result.deletes);
     }
     return {
-      inserts: Array.from(this.inserts),
-      updates: Array.from(this.updates),
-      deletes: Array.from(this.deletes),
+      inserts: this.inserts,
+      updates: this.updates,
+      deletes: this.deletes,
     };
   }
 }
