@@ -73,6 +73,20 @@ export class BlockState {
   }
 
   /**
+   * 获取指定深度的祖先节点
+   * @param depth 目标深度
+   */
+  public getAncestorAtDepth(depth: number): BlockState | null {
+    if (depth < 0) return null;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let current: BlockState | null = this;
+    while (current && current.depth > depth) {
+      current = current.getParent();
+    }
+    return current && current.depth === depth ? current : null;
+  }
+
+  /**
    * 获取文本编辑器实例
    * - 读取时会按需创建编辑器实例
    */

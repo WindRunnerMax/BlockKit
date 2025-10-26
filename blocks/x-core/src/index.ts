@@ -1,6 +1,6 @@
 export { BlockEditor } from "./editor/index";
 export type { EditorOptions } from "./editor/types";
-export { X_BLOCK_ID_KEY as BLOCK_ID_KEY, X_BLOCK_KEY as BLOCK_KEY, X_BLOCK_TYPE_KEY as BLOCK_TYPE_KEY } from "./model/types";
+export { X_BLOCK_ID_KEY, X_BLOCK_KEY, X_BLOCK_TYPE_KEY } from "./model/types";
 export { BlockState } from "./state/modules/block-state";
 export {
   createDeleteBlockChange,

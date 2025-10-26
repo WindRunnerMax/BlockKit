@@ -5,6 +5,7 @@ import { Plugin } from "../plugin";
 import { EditorState } from "../state";
 import { EDITOR_STATE } from "../state/types";
 import type { EditorOptions } from "./types";
+import { getInitialBlocks } from "./utils/constant";
 
 export class BlockEditor {
   /** 编辑器 DOM 容器 */
@@ -23,7 +24,7 @@ export class BlockEditor {
    * @param options
    */
   public constructor(options: EditorOptions = {}) {
-    const { initial = {}, logLevel = LOG_LEVEL.ERROR } = options;
+    const { initial = getInitialBlocks(), logLevel = LOG_LEVEL.ERROR } = options;
     this.container = null;
     this.state = new EditorState(this, initial);
     this.event = new Event(this);

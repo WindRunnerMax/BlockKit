@@ -10,6 +10,7 @@ import { RawPoint } from "@block-kit/core";
 
 import type { BlockEditor } from "../../editor";
 import { X_BLOCK_ID_KEY } from "../../model/types";
+import type { BlockState } from "../../state/modules/block-state";
 import { Range } from "../modules/range";
 import type { RangeNode } from "../types";
 import { POINT_TYPE } from "./constant";
@@ -100,6 +101,7 @@ export const normalizeModelRange = (
   const endState = editor.state.getBlock(end.id);
   if (!startState || !endState) return [];
   const { TEXT, BLOCK } = POINT_TYPE;
+  // ============== 同节点情况 ==============
   // 如果 id 相同, 则为独立的节点
   if (start.id === end.id) {
     return start.type === BLOCK || end.type === BLOCK
@@ -112,6 +114,7 @@ export const normalizeModelRange = (
   const endIndex = endState.index;
   const startParent = startState.getParent();
   const endParent = endState.getParent();
+  // ============== 同父节点情况 ==============
   // 如果端点深度相同, 且父节点相同, 则直接遍历同级节点
   if (startDepth === endDepth && startParent && startParent === endParent) {
     const children = startParent.data.children || [];
@@ -122,6 +125,46 @@ export const normalizeModelRange = (
       return { id, type: TEXT, start: 0, len };
     });
     return [start, ...between, end];
+  }
+  // ============== 不同深度情况 ==============
+  // 如果端点深度不同, 则需要提升到同一父节点上处理
+  const diff = Math.abs(endDepth - startDepth);
+  let newStartState: BlockState | null = startState;
+  let newEndState: BlockState | null = endState;
+  if (startDepth > endDepth) {
+    newStartState = newStartState.getAncestorAtDepth(diff);
+  } else {
+    newEndState = newEndState.getAncestorAtDepth(diff);
+  }
+  // 如果提升后的 id 相同, 则本身为嵌套关系, 例如 List
+  // if (newStartState && newEndState && newStartState.id === newEndState.id) {
+  //   return [start, end];
+  // }
+  // 如果提升后端点的同一父节点相同, 则可以按同级处理子节点
+  let newStartStateParent: BlockState | null = null;
+  let newEndStateParent: BlockState | null = null;
+  while (
+    newStartState &&
+    newEndState &&
+    (newStartStateParent = newStartState.getParent()) &&
+    (newEndStateParent = newEndState.getParent())
+  ) {
+    if (newStartStateParent.id !== newEndStateParent.id) {
+      newStartState = newStartStateParent;
+      newEndState = newEndStateParent;
+      continue;
+    }
+    const children = newStartStateParent.data.children || [];
+    const newStartIndex = newStartState.index;
+    const newEndIndex = newEndState.index;
+    return children.slice(newStartIndex, newEndIndex + 1).map(id => {
+      if (start.id === id) return start;
+      if (end.id === id) return end;
+      const block = editor.state.getBlock(id);
+      if (!block || !block.data.delta) return { id, type: BLOCK };
+      const len = block.getTextLength()!;
+      return { id, type: TEXT, start: 0, len };
+    });
   }
   return [];
 };
