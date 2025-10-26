@@ -39,8 +39,8 @@ export class Plugin {
     CorePlugin.editor = this.editor;
     /**
      * 批量注册插件
+     * - 仅支持单次批量注册
      * @param plugins
-     * @note 支持单次批量注册
      */
     function _register(this: Plugin, plugins: CorePlugin[]) {
       this.destroy();

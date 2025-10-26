@@ -11,12 +11,12 @@ export const isDeleteOp = (op: Op): op is DeleteOp => {
 };
 
 export const getOpLength = (op: Op): number => {
-  if (isDeleteOp(op)) {
-    return op.delete;
+  if (isInsertOp(op)) {
+    return op.insert.length;
   } else if (isRetainOp(op)) {
     return op.retain;
-  } else if (isInsertOp(op)) {
-    return op.insert.length;
+  } else if (isDeleteOp(op)) {
+    return op.delete;
   }
   console.trace("Unknown Op:", op);
   return 0;

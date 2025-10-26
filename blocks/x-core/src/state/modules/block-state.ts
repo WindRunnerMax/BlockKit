@@ -1,5 +1,5 @@
-import { Editor } from "@block-kit/core";
-import { Delta } from "@block-kit/delta";
+import type { Editor } from "@block-kit/core";
+import { Delta, getOpLength } from "@block-kit/delta";
 import { isString } from "@block-kit/utils";
 import type { Block, BlockDataField, DeltaOp, JSONOp } from "@block-kit/x-json";
 import { cloneSnapshot, createBlockTreeWalkerBFS, json } from "@block-kit/x-json";
@@ -17,24 +17,23 @@ export class BlockState {
   public deleted: boolean;
   /** Block 父节点索引 */
   public index: number;
-  /** 编辑器实例 */
-  public text: Editor | null;
   /** 块结构深度 */
   public depth: number;
   /** 标记更新节点 */
   public isDirty: boolean;
+  /** 编辑器实例 */
+  protected _text: Editor | null;
 
   /** 构造函数 */
   public constructor(block: Block, protected state: EditorState) {
     this.index = -1;
     this.depth = -1;
-    this.text = null;
+    this._text = null;
     this.id = block.id;
     this.isDirty = true;
     this.deleted = false;
     this.version = block.version;
     this.data = { ...block.data };
-    this.restore();
   }
 
   /**
@@ -74,21 +73,43 @@ export class BlockState {
   }
 
   /**
+   * 获取文本编辑器实例
+   * - 读取时会按需创建编辑器实例
+   */
+  public getTextEditor(): Editor | null {
+    if (!this.deleted && this.data.delta && !this._text) {
+      const initial = new Delta(this.data.delta);
+      const text = this.state.editor.plugin.createTextEditor(initial);
+      this._text = text;
+    }
+    return this._text;
+  }
+
+  /**
+   * 获取文本内容的长度
+   */
+  public getTextLength(): number | null {
+    if (this._text) {
+      return this._text.state.block.length;
+    }
+    if (this.data.delta) {
+      return this.data.delta.reduce((len, op) => {
+        return len + getOpLength(op);
+      }, 0);
+    }
+    return null;
+  }
+
+  /**
    * 块重新挂载
    */
   public restore() {
     this.deleted = false;
-    if (this.text && process.env.NODE_ENV === "development") {
+    if (this._text && process.env.NODE_ENV === "development") {
       console.warn("Text editor already exists.");
       return void 0;
     }
-    if (this.data.delta && !this.text) {
-      const options = this.state.editor.texts;
-      const initial = new Delta(this.data.delta);
-      const text = new Editor({ ...options.config, delta: initial });
-      options.plugin && text.plugin.register(options.plugin);
-      this.text = text;
-    }
+    this.getTextEditor();
   }
 
   /**
@@ -96,7 +117,7 @@ export class BlockState {
    */
   public remove() {
     this.deleted = true;
-    this.text = null;
+    this._text = null;
     this.isDirty = true;
   }
 
@@ -163,9 +184,9 @@ export class BlockState {
     const deletes: Set<string> = new Set();
     for (const op of ops) {
       // 若是文本编辑器字段的变更, 则需要同步更新编辑器实例
-      if (op.p[0] === "delta" && op.t === "delta" && this.text) {
+      if (op.p[0] === "delta" && op.t === "delta" && this._text) {
         const deltaOps = op.o as DeltaOp[];
-        this.text.state.apply(new Delta(deltaOps));
+        this._text.state.apply(new Delta(deltaOps));
       }
       // 若是 children 的新增变更, 则需要同步相关的 Block 状态
       if (op.p[0] === "children" && isString(op.li)) {

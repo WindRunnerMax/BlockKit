@@ -1,33 +1,34 @@
 import { LOG_LEVEL, Logger } from "@block-kit/core";
 
 import { Event } from "../event";
+import { Plugin } from "../plugin";
 import { EditorState } from "../state";
 import { EDITOR_STATE } from "../state/types";
-import type { EditorOptions, TextEditorOptions } from "./types";
+import type { EditorOptions } from "./types";
 
 export class BlockEditor {
   /** 编辑器 DOM 容器 */
   protected container: HTMLDivElement | null;
-  /** 文本编辑器选项 */
-  public texts: TextEditorOptions;
   /** 状态模块 */
   public state: EditorState;
   /** 日志模块 */
   public logger: Logger;
   /** 事件模块 */
   public event: Event;
+  /** 插件模块 */
+  public plugin: Plugin;
 
   /**
    * 构造函数
    * @param options
    */
   public constructor(options: EditorOptions = {}) {
-    const { initial = {}, logLevel = LOG_LEVEL.ERROR, texts = {} } = options;
-    this.texts = texts;
+    const { initial = {}, logLevel = LOG_LEVEL.ERROR } = options;
     this.container = null;
     this.state = new EditorState(this, initial);
     this.event = new Event(this);
     this.logger = new Logger(logLevel);
+    this.plugin = new Plugin(this);
   }
 
   /**

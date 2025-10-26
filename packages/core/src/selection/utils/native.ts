@@ -15,7 +15,7 @@ import {
 } from "../../model/types";
 import type { Point } from "../modules/point";
 import type { Range } from "../modules/range";
-import type { DOMPoint, DOMRange, DOMStaticRange } from "../types";
+import type { DOMPoint, DOMRange, DOMStaticRange, NormalizePointContext } from "../types";
 import { DIRECTION } from "../types";
 import { getEditableChildAndIndex, getTextNode, isEmbedZeroNode, isNotEditableNode } from "./dom";
 
@@ -24,15 +24,7 @@ import { getEditableChildAndIndex, getTextNode, isEmbedZeroNode, isNotEditableNo
  * @param domPoint DOM 节点
  * @param context 环境信息
  */
-export const normalizeDOMPoint = (
-  domPoint: DOMPoint,
-  context: {
-    /** 是否折叠 */
-    isCollapsed: boolean;
-    /** 是否是末尾节点(EndDOMPoint) */
-    isEndNode: boolean;
-  }
-): DOMPoint => {
+export const normalizeDOMPoint = (domPoint: DOMPoint, context: NormalizePointContext): DOMPoint => {
   let { node, offset } = domPoint;
   const { isCollapsed, isEndNode } = context;
 

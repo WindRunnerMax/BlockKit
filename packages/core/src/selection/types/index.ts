@@ -19,9 +19,30 @@ export const GRANULARITY = {
   LINE: "line",
 } as const;
 
+/** 节点 */
 export type DOMPoint = {
   node: Node | null;
   offset: number;
+};
+
+/** 标准化节点运行环境 */
+export type NormalizePointContext = {
+  /** 是否折叠 */
+  isCollapsed: boolean;
+  /** 是否是末尾节点(EndDOMPoint) */
+  isEndNode: boolean;
+};
+
+/** 编辑器节点运行环境 */
+export type ModelPointContext = {
+  /** 是否折叠 */
+  isCollapsed: boolean;
+  /** 是否是末尾节点(EndDOMPoint) */
+  isEndNode: boolean;
+  /** 原始选区容器 */
+  nodeContainer: Node;
+  /** 原始选区偏移 */
+  nodeOffset: number;
 };
 
 // NodeType https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType

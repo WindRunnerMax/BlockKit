@@ -23,6 +23,7 @@ const BlockView: FC<{
   editor: Editor;
   state: BlockState;
   placeholder?: React.ReactNode;
+  attributes?: Record<string, boolean | string>;
 }> = props => {
   const { editor, state } = props;
   const flushing = useRef(false);
@@ -121,7 +122,7 @@ const BlockView: FC<{
   }, [editor, elements]);
 
   return (
-    <div {...{ [BLOCK_KEY]: true, [BLOCK_ID_KEY]: state.key }} ref={setModel}>
+    <div {...{ [BLOCK_KEY]: true, [BLOCK_ID_KEY]: state.key, ...props.attributes }} ref={setModel}>
       {props.placeholder && lines.length === 1 && isEmptyLine(lines[0], true) && (
         <div
           {...{ [PLACEHOLDER_KEY]: true }}

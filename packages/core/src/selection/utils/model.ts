@@ -4,7 +4,7 @@ import type { Editor } from "../../editor";
 import { getLeafNode, getLineNode } from "../../model/utils/dom";
 import { Point } from "../modules/point";
 import { Range } from "../modules/range";
-import type { DOMPoint } from "../types";
+import type { DOMPoint, ModelPointContext } from "../types";
 import { isEmbedZeroNode, isEnterZeroNode, isVoidZeroNode } from "./dom";
 import { normalizeDOMPoint } from "./native";
 
@@ -14,20 +14,7 @@ import { normalizeDOMPoint } from "./native";
  * @param domPoint
  * @param context
  */
-export const toModelPoint = (
-  editor: Editor,
-  domPoint: DOMPoint,
-  context: {
-    /** 是否折叠 */
-    isCollapsed: boolean;
-    /** 是否是末尾节点(EndDOMPoint) */
-    isEndNode: boolean;
-    /** 原始选区容器 */
-    nodeContainer: Node;
-    /** 原始选区偏移 */
-    nodeOffset: number;
-  }
-) => {
+export const toModelPoint = (editor: Editor, domPoint: DOMPoint, context: ModelPointContext) => {
   const { offset, node } = domPoint;
   const { nodeContainer, nodeOffset, isCollapsed, isEndNode } = context;
 

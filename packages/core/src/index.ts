@@ -54,7 +54,8 @@ export {
   ZERO_SYMBOL,
   ZERO_VOID_KEY,
 } from "./model/types";
-export { getLeafNode, getLineNode } from "./model/utils/dom";
+export { getBlockNode, getLeafNode, getLineNode } from "./model/utils/dom";
+export { closestTo, isClosestTo } from "./model/utils/dom";
 export { Perform } from "./perform";
 export { Plugin } from "./plugin";
 export { CorePlugin } from "./plugin/modules/implement";
@@ -80,17 +81,23 @@ export type {
   DOMSelection,
   DOMStaticRange,
   DOMText,
+  ModelPointContext,
+  NormalizePointContext,
 } from "./selection/types/index";
 export { ALERT, DIRECTION, GRANULARITY } from "./selection/types/index";
 export {
+  getRootSelection,
+  getStaticSelection,
+  isBackwardDOMRange,
   isEmbedZeroNode,
   isEnterZeroNode,
+  isNeedIgnoreRangeDOM,
   isNotEditableNode,
   isVoidZeroNode,
   isZeroNode,
 } from "./selection/utils/dom";
 export { toModelPoint, toModelRange } from "./selection/utils/model";
-export { toDOMPoint, toDOMRange } from "./selection/utils/native";
+export { normalizeDOMPoint, toDOMPoint, toDOMRange } from "./selection/utils/native";
 export { EditorState } from "./state";
 export { BlockState } from "./state/modules/block-state";
 export { LeafState } from "./state/modules/leaf-state";
