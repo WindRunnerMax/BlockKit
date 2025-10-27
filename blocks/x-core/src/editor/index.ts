@@ -1,6 +1,7 @@
 import { LOG_LEVEL, Logger } from "@block-kit/core";
 
 import { Event } from "../event";
+import { Model } from "../model";
 import { Plugin } from "../plugin";
 import { EditorState } from "../state";
 import { EDITOR_STATE } from "../state/types";
@@ -18,6 +19,8 @@ export class BlockEditor {
   public event: Event;
   /** 插件模块 */
   public plugin: Plugin;
+  /** 模型映射 */
+  public model: Model;
 
   /**
    * 构造函数
@@ -30,6 +33,7 @@ export class BlockEditor {
     this.event = new Event(this);
     this.logger = new Logger(logLevel);
     this.plugin = new Plugin(this);
+    this.model = new Model();
   }
 
   /**

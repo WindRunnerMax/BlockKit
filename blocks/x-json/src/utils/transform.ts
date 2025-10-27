@@ -17,7 +17,7 @@ export const normalizeBatchOps = (ops: Op[]) => {
     for (let k = i + 1; k < len; k++) {
       const op = copied[k];
       if (!op) continue;
-      const nextOp = json.transform(op, base, SIDE.LEFT);
+      const nextOp = json.transform(op, base, SIDE.RIGHT);
       copied[k] = nextOp as Op;
     }
   }

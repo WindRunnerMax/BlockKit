@@ -17,19 +17,23 @@ export const createBlockTreeWalker = <T extends Blocks>(
 ): BlockTreeWalker<T> => {
   type BlockLike = T[string];
   const visited = new Set<string>();
-  function* traverse(nodeId: string): Generator<BlockLike> {
-    const node = blocks[nodeId];
-    if (!node || visited.has(nodeId)) {
-      return void 0;
-    }
-    visited.add(nodeId);
-    yield node as BlockLike;
-    const children = node.data.children || [];
-    for (const childId of children) {
-      yield* traverse(childId);
+  const stack: string[] = [rootId];
+  function* traverse(): Generator<BlockLike> {
+    while (stack.length > 0) {
+      const nodeId = stack.pop();
+      if (!nodeId || visited.has(nodeId) || !blocks[nodeId]) {
+        continue;
+      }
+      const node = blocks[nodeId];
+      visited.add(nodeId);
+      yield node as BlockLike;
+      const children = node.data.children || [];
+      for (let i = children.length - 1; i >= 0; i--) {
+        stack.push(children[i]);
+      }
     }
   }
-  const walker = traverse(rootId);
+  const walker = traverse();
   return {
     nextNode: (): BlockLike | null => walker.next().value || null,
     [Symbol.iterator]: () => walker[Symbol.iterator](),
@@ -51,12 +55,12 @@ export const createBlockTreeWalkerBFS = <T extends Blocks>(
   const queue: string[] = [rootId];
   function* traverse(): Generator<BlockLike> {
     while (queue.length > 0) {
-      const currentNodeId = queue.shift();
-      const node = currentNodeId && blocks[currentNodeId];
-      if (!currentNodeId || !node || visited.has(currentNodeId)) {
+      const nodeId = queue.shift();
+      const node = nodeId && blocks[nodeId];
+      if (!nodeId || !node || visited.has(nodeId)) {
         continue;
       }
-      visited.add(currentNodeId);
+      visited.add(nodeId);
       yield node as BlockLike;
       const children = node.data.children || [];
       for (const childId of children) {

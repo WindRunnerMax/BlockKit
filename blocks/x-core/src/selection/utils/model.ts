@@ -33,7 +33,7 @@ export const toModelPoint = (
   const { TEXT, BLOCK } = POINT_TYPE;
   const id = xBlock.getAttribute(X_BLOCK_ID_KEY)!;
   const blockState = isTextNode && editor.state.getBlock(id);
-  const text = blockState && blockState.getTextEditor();
+  const text = blockState && editor.model.getTextEditor(blockState);
   // 如果是文本类型的块节点
   if (isTextNode && text) {
     const startDOMPoint = normalizeDOMPoint(domPoint, context);
@@ -121,7 +121,7 @@ export const normalizeModelRange = (
     const between = children.slice(startIndex + 1, endIndex).map(id => {
       const block = editor.state.getBlock(id);
       if (!block || !block.data.delta) return { id, type: BLOCK };
-      const len = block.getTextLength()!;
+      const len = block.length!;
       return { id, type: TEXT, start: 0, len };
     });
     return [start, ...between, end];
@@ -162,7 +162,7 @@ export const normalizeModelRange = (
       if (end.id === id) return end;
       const block = editor.state.getBlock(id);
       if (!block || !block.data.delta) return { id, type: BLOCK };
-      const len = block.getTextLength()!;
+      const len = block.length!;
       return { id, type: TEXT, start: 0, len };
     });
   }

@@ -28,13 +28,13 @@ export class EditorState {
     this.status = {};
     this.blocks = {};
     // 建立 Blocks 树结构
-    Object.values(initial).forEach(block => {
+    for (const block of Object.values(initial)) {
       this.blocks[block.id] = new BlockState(block, this);
-    });
+    }
     // 建立完树结构后更新元信息
-    Object.values(this.blocks).forEach(state => {
+    for (const state of Object.values(this.blocks)) {
       state._updateMeta();
-    });
+    }
   }
 
   /**

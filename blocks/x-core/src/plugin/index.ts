@@ -1,6 +1,3 @@
-import { Editor } from "@block-kit/core";
-import type { Delta } from "@block-kit/delta";
-
 import type { BlockEditor } from "../editor";
 
 export class Plugin {
@@ -9,14 +6,6 @@ export class Plugin {
    * @param editor
    */
   constructor(protected editor: BlockEditor) {}
-
-  /**
-   * 创建编辑器实例 Hook
-   */
-  public createTextEditor(delta: Delta): Editor {
-    const text = new Editor({ delta });
-    return text;
-  }
 
   /**
    * 对外的插件注册方法
