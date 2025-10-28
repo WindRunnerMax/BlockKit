@@ -2492,23 +2492,23 @@ undoStack: [
 在这里突然想到了先前实现的`Canvas`简历编辑器的树结构管理模块，依然是通过空间换时间的方式来处理渲染顺序问题，并且实现按需读取。通过递归的形式直接读取单个节点的所有子节点进行`DFS`遍历，并且将其缓存下来，如果子节点发生变更则沿着`parent`清理所有的父节点缓存即可。
 
 ```js
-public getFlatNodes() {
-  if (this._flatNodes)  return this._flatNodes;
-  const nodes: Node[] = [];
-  for(const child of children) {
-    nodes.push(child);
-    nodes.push(...child.getFlatNodes());
+const getTreeNodes = (): BlockState[] => {
+  if (this._nodes) return this._nodes;
+  const nodes: BlockState[] = [this];
+  const children = this.data.children;
+  for (const id of children) {
+    const child = this.state.getOrCreateBlock(id);
+    nodes.push(...child.getTreeNodes());
   }
-  this._flatNodes = nodes;
+  this._nodes = nodes;
   return nodes;
 }
 
-public clearFlatNodeOnLink() {
-  this._flatNodes = null;
-  let node: Node | null = this.parent;
-  while (node) {
-    node._flatNodes = null;
-    node = node.parent;
+const clearTreeCache = (blockState: BlockState) => {
+  let parent: BlockState | null = blockState;
+  while (parent) {
+    parent._nodes = null;
+    parent = parent.parent;
   }
-}
+};
 ```

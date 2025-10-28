@@ -1,5 +1,6 @@
-import { getId } from "@block-kit/utils";
+import { getId, ROOT_BLOCK } from "@block-kit/utils";
 import type { Blocks } from "@block-kit/x-json";
+import type { Block } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../editor";
 import type { ContentChangeEvent } from "../event/bus";
@@ -15,6 +16,8 @@ export class EditorState {
   protected readonly status: Record<string, boolean>;
   /** Block 集合 */
   public readonly blocks: Record<string, BlockState>;
+  /** Root ID */
+  public readonly rootId: string;
   /** Block 集合缓存 */
   protected _cache: Blocks | null;
 
@@ -27,11 +30,15 @@ export class EditorState {
     this._cache = {};
     this.status = {};
     this.blocks = {};
-    // 建立 Blocks 树结构
+    this.rootId = "";
+    // 建立 Blocks 集合
     for (const block of Object.values(initial)) {
+      if (block.data.type === ROOT_BLOCK) {
+        this.rootId = block.id;
+      }
       this.blocks[block.id] = new BlockState(block, this);
     }
-    // 建立完树结构后更新元信息
+    // 建立树集合后更新元信息, 并构建树结构
     for (const state of Object.values(this.blocks)) {
       state._updateMeta();
     }
@@ -82,6 +89,23 @@ export class EditorState {
    */
   public getBlock(id: string): BlockState | null {
     return this.blocks[id] || null;
+  }
+
+  /**
+   * 获取 BlockState
+   * - 若是不存在则创建 BlockState
+   * @param id Block ID
+   */
+  public getOrCreateBlock(id: string): BlockState {
+    if (!this.blocks[id]) {
+      const textBlock: Block = {
+        id,
+        version: 1,
+        data: { parent: "", type: "text", delta: [], children: [] },
+      };
+      this.blocks[id] = new BlockState(textBlock, this);
+    }
+    return this.blocks[id];
   }
 
   /**

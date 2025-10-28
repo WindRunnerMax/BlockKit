@@ -11,6 +11,7 @@ import { RawPoint } from "@block-kit/core";
 import type { BlockEditor } from "../../editor";
 import { X_BLOCK_ID_KEY } from "../../model/types";
 import type { BlockState } from "../../state/modules/block-state";
+import { getAncestorAtDepth } from "../../state/utils/tree";
 import { Range } from "../modules/range";
 import type { RangeNode } from "../types";
 import { POINT_TYPE } from "./constant";
@@ -112,8 +113,8 @@ export const normalizeModelRange = (
   const endDepth = endState.depth;
   const startIndex = startState.index;
   const endIndex = endState.index;
-  const startParent = startState.getParent();
-  const endParent = endState.getParent();
+  const startParent = startState.parent;
+  const endParent = endState.parent;
   // ============== 同父节点情况 ==============
   // 如果端点深度相同, 且父节点相同, 则直接遍历同级节点
   if (startDepth === endDepth && startParent && startParent === endParent) {
@@ -132,9 +133,9 @@ export const normalizeModelRange = (
   let newStartState: BlockState | null = startState;
   let newEndState: BlockState | null = endState;
   if (startDepth > endDepth) {
-    newStartState = newStartState.getAncestorAtDepth(diff);
+    newStartState = getAncestorAtDepth(newStartState, diff);
   } else {
-    newEndState = newEndState.getAncestorAtDepth(diff);
+    newEndState = getAncestorAtDepth(newStartState, diff);
   }
   // 如果提升后的 id 相同, 则本身为嵌套关系, 例如 List
   // if (newStartState && newEndState && newStartState.id === newEndState.id) {
@@ -146,8 +147,8 @@ export const normalizeModelRange = (
   while (
     newStartState &&
     newEndState &&
-    (newStartStateParent = newStartState.getParent()) &&
-    (newEndStateParent = newEndState.getParent())
+    (newStartStateParent = newStartState.parent) &&
+    (newEndStateParent = newEndState.parent)
   ) {
     if (newStartStateParent.id !== newEndStateParent.id) {
       newStartState = newStartStateParent;

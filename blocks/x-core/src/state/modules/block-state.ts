@@ -1,9 +1,10 @@
 import { getOpLength } from "@block-kit/delta";
 import { isString } from "@block-kit/utils";
 import type { Block, BlockDataField, JSONOp } from "@block-kit/x-json";
-import { cloneSnapshot, createBlockTreeWalkerBFS, json } from "@block-kit/x-json";
+import { cloneSnapshot, json } from "@block-kit/x-json";
 
 import type { EditorState } from "../index";
+import { clearTreeCache } from "../utils/tree";
 
 export class BlockState {
   /** Block ID */
@@ -22,13 +23,22 @@ export class BlockState {
   public isDirty: boolean;
   /** delta 文本长度 */
   public length: number;
+  /** 父节点 */
+  public parent: BlockState | null;
+  /** 子节点 */
+  public children: BlockState[];
+  /** @internal 子树节点 */
+  public _nodes: BlockState[] | null;
 
   /** 构造函数 */
   public constructor(block: Block, protected state: EditorState) {
     this.index = -1;
     this.depth = -1;
     this.length = -1;
+    this._nodes = null;
+    this.children = [];
     this.id = block.id;
+    this.parent = null;
     this.isDirty = true;
     this.deleted = false;
     this.version = block.version;
@@ -36,26 +46,10 @@ export class BlockState {
   }
 
   /**
-   * 获取父节点
-   */
-  public getParent(): BlockState | null {
-    const parentId = this.data.parent;
-    return parentId ? this.state.getBlock(parentId) : null;
-  }
-
-  /**
-   * 获取子节点
-   */
-  public getChildren(): Array<BlockState | null> {
-    const childrenIds = this.data.children || [];
-    return childrenIds.map(id => this.state.getBlock(id));
-  }
-
-  /**
    * 获取上一个相邻节点
    */
   public prev(): BlockState | null {
-    const parent = this.getParent();
+    const parent = this.parent;
     if (!parent || !parent.data.children) return null;
     const prevId = parent.data.children[this.index - 1];
     return prevId ? this.state.getBlock(prevId) : null;
@@ -65,24 +59,10 @@ export class BlockState {
    * 获取下一个相邻节点
    */
   public next(): BlockState | null {
-    const parent = this.getParent();
+    const parent = this.parent;
     if (!parent || !parent.data.children) return null;
     const nextId = parent.data.children[this.index + 1];
     return nextId ? this.state.getBlock(nextId) : null;
-  }
-
-  /**
-   * 获取指定深度的祖先节点
-   * @param depth 目标深度
-   */
-  public getAncestorAtDepth(depth: number): BlockState | null {
-    if (depth < 0) return null;
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let current: BlockState | null = this;
-    while (current && current.depth > depth) {
-      current = current.getParent();
-    }
-    return current && current.depth === depth ? current : null;
   }
 
   /**
@@ -90,6 +70,7 @@ export class BlockState {
    */
   public restore() {
     this.deleted = false;
+    this._updateMeta();
   }
 
   /**
@@ -98,6 +79,22 @@ export class BlockState {
   public remove() {
     this.deleted = true;
     this.isDirty = true;
+  }
+
+  /**
+   * 获取树结构子节点的数据 [DFS]
+   * - 当前树节点所有子节点, 含自身节点
+   */
+  public getTreeNodes(): BlockState[] {
+    if (this._nodes) return this._nodes;
+    const nodes: BlockState[] = [this];
+    const children = this.data.children;
+    for (const id of children) {
+      const child = this.state.getOrCreateBlock(id);
+      nodes.push(...child.getTreeNodes());
+    }
+    this._nodes = nodes;
+    return nodes;
   }
 
   /**
@@ -127,12 +124,16 @@ export class BlockState {
     // 更新子节点 index, 直接根据父节点的子节点重新计算
     // 注意这是更新该节点的子节点索引值, 而不是更新本身的索引值
     {
+      const parent = this.state.getBlock(this.data.parent);
+      this.parent = parent || null;
       const len = this.data.children.length;
       for (let i = 0; i < len; i++) {
-        const childId = this.data.children[i];
-        const childBlock = this.state.getBlock(childId);
-        childBlock && (childBlock.index = i);
-        childBlock && (childBlock.data.parent = this.id);
+        const id = this.data.children[i];
+        const child = this.state.getOrCreateBlock(id);
+        child.index = i;
+        child.parent = this;
+        child.data.parent = this.id;
+        this.children[i] = child;
       }
     }
     // ============ Update Depth ============
@@ -143,7 +144,7 @@ export class BlockState {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       let current: BlockState | null = this;
       while (current) {
-        const parent = current.getParent();
+        const parent = this.parent;
         if (!parent) break;
         depth++;
         current = parent;
@@ -171,27 +172,32 @@ export class BlockState {
     // 空路径情况应该由父级状态管理调度 Insert 处理
     const changes = ops.filter(op => op && op.p.length);
     json.apply(this.data, changes);
+    let isChildrenChanged = false;
     const inserts: Set<string> = new Set();
     const deletes: Set<string> = new Set();
     for (const op of ops) {
       // 若是 children 的新增变更, 则需要同步相关的 Block 状态
       if (op.p[0] === "children" && isString(op.li)) {
-        const walker = createBlockTreeWalkerBFS(this.state.blocks, op.li);
-        for (const child of walker) {
+        isChildrenChanged = true;
+        const liBlock = this.state.getOrCreateBlock(op.li);
+        const nodes = liBlock.getTreeNodes();
+        for (const child of nodes) {
           child.restore();
-          child._updateMeta();
           inserts.add(child.id);
         }
       }
       // 若是 children 的删除变更, 则需要同步相关的 Block 状态
       if (op.p[0] === "children" && isString(op.ld)) {
-        const walker = createBlockTreeWalkerBFS(this.state.blocks, op.ld);
-        for (const child of walker) {
+        isChildrenChanged = true;
+        const ldBlock = this.state.getOrCreateBlock(op.ld);
+        const nodes = ldBlock.getTreeNodes();
+        for (const child of nodes) {
           child.remove();
           deletes.add(child.id);
         }
       }
     }
+    isChildrenChanged && clearTreeCache(this);
     this._updateMeta();
     return { inserts, deletes };
   }
