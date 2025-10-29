@@ -141,13 +141,16 @@ export class BlockState {
     // 数据结构通常是宽而浅的树形结构, 性能消耗通常可接受
     {
       let depth = 0;
+      const visited = new Set<BlockState>();
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       let current: BlockState | null = this;
       while (current) {
-        const parent = this.parent;
-        if (!parent) break;
+        if (!current.parent || visited.has(current)) {
+          break;
+        }
+        visited.add(current);
         depth++;
-        current = parent;
+        current = current.parent;
       }
       this.depth = depth;
     }

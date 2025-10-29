@@ -1,17 +1,41 @@
 import type { BlockState } from "../modules/block-state";
 
 /**
- * 获取指定深度的祖先节点
+ * 获取指定深度级的祖先节点
  * @param blockState
- * @param depth
+ * @param steps
  */
-export const getAncestorAtDepth = (blockState: BlockState, depth: number): BlockState | null => {
-  if (depth < 0) return null;
+export const getAncestorBySteps = (blockState: BlockState, steps: number): BlockState | null => {
   let current: BlockState | null = blockState;
-  while (current && current.depth > depth) {
+  while (steps-- > 0 && current) {
     current = current.parent;
   }
-  return current && current.depth === depth ? current : null;
+  return current;
+};
+
+/**
+ * 获取两个节点的公共祖先节点 LCA
+ * @param n1
+ * @param n2
+ */
+export const getLowestCommonAncestor = (n1: BlockState, n2: BlockState): BlockState | null => {
+  let depth1 = n1.depth;
+  let depth2 = n2.depth;
+  let current1: BlockState | null = n1;
+  let current2: BlockState | null = n2;
+  while (depth1 > depth2 && current1) {
+    current1 = current1.parent;
+    depth1--;
+  }
+  while (depth2 > depth1 && current2) {
+    current2 = current2.parent;
+    depth2--;
+  }
+  while (current1 && current2 && current1 !== current2) {
+    current1 = current1.parent;
+    current2 = current2.parent;
+  }
+  return current1 === current2 ? current1 : null;
 };
 
 /**
@@ -20,10 +44,15 @@ export const getAncestorAtDepth = (blockState: BlockState, depth: number): Block
  * @param blockState
  */
 export const clearTreeCache = (blockState: BlockState) => {
+  const visited = new Set<BlockState>();
   // eslint-disable-next-line @typescript-eslint/no-this-alias
-  let parent: BlockState | null = blockState;
-  while (parent) {
-    parent._nodes = null;
-    parent = parent.parent;
+  let current: BlockState | null = blockState;
+  while (current) {
+    if (visited.has(current)) {
+      break;
+    }
+    visited.add(current);
+    current._nodes = null;
+    current = current.parent;
   }
 };

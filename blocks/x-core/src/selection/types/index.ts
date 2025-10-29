@@ -20,4 +20,4 @@ export type TextPoint = {
 };
 
 /** 选区节点类型 */
-export type RangeNode = BlockPoint | TextPoint;
+export type RangePoint = BlockPoint | TextPoint;

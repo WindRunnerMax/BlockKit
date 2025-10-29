@@ -10,10 +10,9 @@ import { RawPoint } from "@block-kit/core";
 
 import type { BlockEditor } from "../../editor";
 import { X_BLOCK_ID_KEY } from "../../model/types";
-import type { BlockState } from "../../state/modules/block-state";
-import { getAncestorAtDepth } from "../../state/utils/tree";
+import { getLowestCommonAncestor } from "../../state/utils/tree";
 import { Range } from "../modules/range";
-import type { RangeNode } from "../types";
+import type { RangePoint } from "../types";
 import { POINT_TYPE } from "./constant";
 
 /**
@@ -26,7 +25,7 @@ export const toModelPoint = (
   editor: BlockEditor,
   domPoint: DOMPoint,
   context: NormalizePointContext
-): RangeNode | null => {
+): RangePoint | null => {
   const { node, offset } = domPoint;
   const isTextNode = isClosestTo(node, `[${BLOCK_KEY}]`);
   const xBlock = closestTo(node, `[${X_BLOCK_ID_KEY}]`);
@@ -60,8 +59,8 @@ export const toModelPoint = (
  */
 export const toModelRange = (editor: BlockEditor, staticSel: StaticRange, isBackward: boolean) => {
   const { startContainer, endContainer, collapsed, startOffset, endOffset } = staticSel;
-  let startRangePoint: RangeNode | null;
-  let endRangePoint: RangeNode | null;
+  let startRangePoint: RangePoint | null;
+  let endRangePoint: RangePoint | null;
   if (!collapsed) {
     const startPoint = { node: startContainer, offset: startOffset };
     const endPoint = { node: endContainer, offset: endOffset };
@@ -90,14 +89,15 @@ export const toModelRange = (editor: BlockEditor, staticSel: StaticRange, isBack
 
 /**
  * 将 RangeNode 转换为 Range
+ * - 务必注意 start 必须要在 end 节点前
  * @param start
  * @param end
  */
 export const normalizeModelRange = (
   editor: BlockEditor,
-  start: RangeNode,
-  end: RangeNode
-): RangeNode[] => {
+  start: RangePoint,
+  end: RangePoint
+): RangePoint[] => {
   const startState = editor.state.getBlock(start.id);
   const endState = editor.state.getBlock(end.id);
   if (!startState || !endState) return [];
@@ -128,44 +128,29 @@ export const normalizeModelRange = (
     return [start, ...between, end];
   }
   // ============== 不同深度情况 ==============
-  // 如果端点深度不同, 则需要提升到同一父节点上处理
-  const diff = Math.abs(endDepth - startDepth);
-  let newStartState: BlockState | null = startState;
-  let newEndState: BlockState | null = endState;
-  if (startDepth > endDepth) {
-    newStartState = getAncestorAtDepth(newStartState, diff);
-  } else {
-    newEndState = getAncestorAtDepth(newStartState, diff);
-  }
-  // 如果提升后的 id 相同, 则本身为嵌套关系, 例如 List
-  // if (newStartState && newEndState && newStartState.id === newEndState.id) {
-  //   return [start, end];
-  // }
-  // 如果提升后端点的同一父节点相同, 则可以按同级处理子节点
-  let newStartStateParent: BlockState | null = null;
-  let newEndStateParent: BlockState | null = null;
-  while (
-    newStartState &&
-    newEndState &&
-    (newStartStateParent = newStartState.parent) &&
-    (newEndStateParent = newEndState.parent)
-  ) {
-    if (newStartStateParent.id !== newEndStateParent.id) {
-      newStartState = newStartStateParent;
-      newEndState = newEndStateParent;
+  // 如果端点深度不同, 则更复杂, 需要提升到同一父节点上处理, DFS 序
+  const lca = getLowestCommonAncestor(startState, endState);
+  if (!lca) return [];
+  const nodes = lca.getTreeNodes();
+  const result: RangePoint[] = [];
+  let isInsideNode = false;
+  for (const node of nodes) {
+    if (node.id === start.id) {
+      isInsideNode = true;
       continue;
     }
-    const children = newStartStateParent.data.children || [];
-    const newStartIndex = newStartState.index;
-    const newEndIndex = newEndState.index;
-    return children.slice(newStartIndex, newEndIndex + 1).map(id => {
-      if (start.id === id) return start;
-      if (end.id === id) return end;
-      const block = editor.state.getBlock(id);
-      if (!block || !block.data.delta) return { id, type: BLOCK };
-      const len = block.length!;
-      return { id, type: TEXT, start: 0, len };
-    });
+    if (node.id === end.id) {
+      break;
+    }
+    if (!isInsideNode) {
+      continue;
+    }
+    if (!node.data.delta) {
+      result.push({ id: node.id, type: BLOCK });
+    } else {
+      const len = node.length;
+      result.push({ id: node.id, type: TEXT, start: 0, len });
+    }
   }
-  return [];
+  return [start, ...result, end];
 };

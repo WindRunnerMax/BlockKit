@@ -3,7 +3,7 @@ import type { Blocks } from "@block-kit/x-json";
 import { BlockEditor, createNewBlockChange } from "../../src";
 import { createDeleteBlockChange, createInsertBlockChange } from "../../src/state/utils/change";
 
-const blocks: Blocks = {
+const getBlocks = (): Blocks => ({
   root: {
     id: "root",
     version: 1,
@@ -24,18 +24,13 @@ const blocks: Blocks = {
     version: 1,
     data: { type: "text", children: [], delta: [], parent: "child1" },
   },
-};
+});
 
 describe("state mutate", () => {
   it("create block and insert to child2", () => {
-    const editor = new BlockEditor({ initial: blocks });
-    const newBlockChange = createNewBlockChange(editor, {
-      type: "text",
-      children: [],
-      delta: [],
-      parent: "child2",
-    });
-    const insertBlockChange = createInsertBlockChange("child2", 0, newBlockChange.id);
+    const editor = new BlockEditor({ initial: getBlocks() });
+    const newBlockChange = createNewBlockChange(editor, { type: "text", children: [], delta: [] });
+    const insertBlockChange = createInsertBlockChange("child2", 0, newBlockChange);
     editor.state.apply([newBlockChange, insertBlockChange]);
     const newBlocks = editor.state.toBlockSet();
     expect(newBlocks[newBlockChange.id]).toBeDefined();
@@ -46,7 +41,7 @@ describe("state mutate", () => {
   });
 
   it("delete child1", () => {
-    const editor = new BlockEditor({ initial: blocks });
+    const editor = new BlockEditor({ initial: getBlocks() });
     const deleteChange = createDeleteBlockChange(editor, "root", 0);
     editor.state.apply([deleteChange]);
     const newBlocks = editor.state.toBlockSet();
