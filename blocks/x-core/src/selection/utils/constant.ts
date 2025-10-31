@@ -1,4 +1,4 @@
-export const POINT_TYPE = {
+export const BLOCK_TYPE = {
   BLOCK: "B",
   TEXT: "T",
 } as const;

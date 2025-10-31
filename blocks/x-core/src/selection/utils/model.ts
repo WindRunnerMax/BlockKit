@@ -11,9 +11,11 @@ import { RawPoint } from "@block-kit/core";
 import type { BlockEditor } from "../../editor";
 import { X_BLOCK_ID_KEY } from "../../model/types";
 import { getLowestCommonAncestor } from "../../state/utils/tree";
+import { Entry } from "../modules/entry";
+import { Point } from "../modules/point";
 import { Range } from "../modules/range";
-import type { RangePoint } from "../types";
-import { POINT_TYPE } from "./constant";
+import type { BlockPoint, RangeEntry, RangePoint } from "../types";
+import { BLOCK_TYPE } from "./constant";
 
 /**
  * 将 DOMPoint 转换为 ModelPoint
@@ -30,7 +32,7 @@ export const toModelPoint = (
   const isTextNode = isClosestTo(node, `[${BLOCK_KEY}]`);
   const xBlock = closestTo(node, `[${X_BLOCK_ID_KEY}]`);
   if (!xBlock || !node) return null;
-  const { TEXT, BLOCK } = POINT_TYPE;
+  const { TEXT, BLOCK } = BLOCK_TYPE;
   const id = xBlock.getAttribute(X_BLOCK_ID_KEY)!;
   const blockState = isTextNode && editor.state.getBlock(id);
   const text = blockState && editor.model.getTextEditor(blockState);
@@ -44,7 +46,7 @@ export const toModelPoint = (
     });
     const raw = RawPoint.fromPoint(text, startRangePoint);
     if (raw) {
-      return { id, type: TEXT, start: raw.offset, len: 0 };
+      return { id, type: TEXT, offset: raw.offset };
     }
   }
   // 否则作为块节点处理
@@ -97,17 +99,17 @@ export const normalizeModelRange = (
   editor: BlockEditor,
   start: RangePoint,
   end: RangePoint
-): RangePoint[] => {
+): RangeEntry[] => {
   const startState = editor.state.getBlock(start.id);
   const endState = editor.state.getBlock(end.id);
   if (!startState || !endState) return [];
-  const { TEXT, BLOCK } = POINT_TYPE;
+  const { TEXT, BLOCK } = BLOCK_TYPE;
   // ============== 同节点情况 ==============
-  // 如果 id 相同, 则为独立的节点
+  // 如果 id 相同, 则为相同的块节点
   if (start.id === end.id) {
     return start.type === BLOCK || end.type === BLOCK
-      ? [start]
-      : [{ id: start.id, type: TEXT, start: start.start, len: end.start - start.start }];
+      ? [Entry.fromPoint(start as BlockPoint)]
+      : [Entry.fromPoint(start, start.offset, end.offset - start.offset)];
   }
   const startDepth = startState.depth;
   const endDepth = endState.depth;
@@ -115,24 +117,30 @@ export const normalizeModelRange = (
   const endIndex = endState.index;
   const startParent = startState.parent;
   const endParent = endState.parent;
+  const startRangeItem: RangeEntry = Point.isBlockPoint(start)
+    ? Entry.fromPoint(start)
+    : Entry.fromPoint(start, start.offset, startState.length - start.offset);
+  const endRangeItem: RangeEntry = Point.isBlockPoint(end)
+    ? Entry.fromPoint(end)
+    : Entry.fromPoint(end, 0, end.offset);
   // ============== 同父节点情况 ==============
   // 如果端点深度相同, 且父节点相同, 则直接遍历同级节点
   if (startDepth === endDepth && startParent && startParent === endParent) {
     const children = startParent.data.children || [];
     const between = children.slice(startIndex + 1, endIndex).map(id => {
       const block = editor.state.getBlock(id);
-      if (!block || !block.data.delta) return { id, type: BLOCK };
+      if (!block || !block.data.delta) return Entry.create(id, BLOCK);
       const len = block.length!;
-      return { id, type: TEXT, start: 0, len };
+      return Entry.create(id, TEXT, 0, len);
     });
-    return [start, ...between, end];
+    return [startRangeItem, ...between, endRangeItem];
   }
   // ============== 不同深度情况 ==============
   // 如果端点深度不同, 则更复杂, 需要提升到同一父节点上处理, DFS 序
   const lca = getLowestCommonAncestor(startState, endState);
   if (!lca) return [];
   const nodes = lca.getTreeNodes();
-  const result: RangePoint[] = [];
+  const between: RangeEntry[] = [];
   let isInsideNode = false;
   for (const node of nodes) {
     if (node.id === start.id) {
@@ -146,11 +154,11 @@ export const normalizeModelRange = (
       continue;
     }
     if (!node.data.delta) {
-      result.push({ id: node.id, type: BLOCK });
+      between.push(Entry.create(node.id, BLOCK));
     } else {
       const len = node.length;
-      result.push({ id: node.id, type: TEXT, start: 0, len });
+      between.push(Entry.create(node.id, TEXT, 0, len));
     }
   }
-  return [start, ...result, end];
+  return [startRangeItem, ...between, endRangeItem];
 };

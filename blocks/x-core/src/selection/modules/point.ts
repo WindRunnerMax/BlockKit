@@ -1,14 +1,22 @@
 import type { BlockEditor } from "../../editor";
-import type { BlockPoint, RangePoint, TextPoint } from "../types";
-import { POINT_TYPE } from "../utils/constant";
+import type { BlockPoint, BlockType, RangePoint, TextPoint } from "../types";
+import { BLOCK_TYPE } from "../utils/constant";
 
 export class Point {
+  /** 内建节点 */
+  public readonly node: RangePoint;
+
+  /** 构造函数 */
+  public constructor(node: RangePoint) {
+    this.node = node;
+  }
+
   /**
    * 判断块 Point
    * @param point
    */
   public static isBlockPoint(point: RangePoint): point is BlockPoint {
-    return point.type === POINT_TYPE.BLOCK;
+    return point.type === BLOCK_TYPE.BLOCK;
   }
 
   /**
@@ -16,7 +24,7 @@ export class Point {
    * @param point
    */
   public static isTextPoint(point: RangePoint): point is TextPoint {
-    return point.type === POINT_TYPE.TEXT;
+    return point.type === BLOCK_TYPE.TEXT;
   }
 
   /**
@@ -29,7 +37,7 @@ export class Point {
     if (!point1 || !point2) return false;
     const n1 = point1 as TextPoint;
     const n2 = point2 as TextPoint;
-    return n1.id === n2.id && n1.type === n2.type && n1.start === n2.start && n1.len === n2.len;
+    return n1.id === n2.id && n1.type === n2.type && n1.offset === n2.offset;
   }
 
   /**
@@ -47,7 +55,7 @@ export class Point {
     if (point1.id === point2.id) {
       if (point1.type !== point2.type) return false;
       if (Point.isBlockPoint(point1)) return true;
-      if (Point.isTextPoint(point1)) return point1.start < (<TextPoint>point2).start;
+      if (Point.isTextPoint(point1)) return point1.offset < (<TextPoint>point2).offset;
       return true;
     }
     const root = editor.state.getBlock(editor.state.rootId);
@@ -75,7 +83,7 @@ export class Point {
     if (point1.id === point2.id) {
       if (point1.type !== point2.type) return false;
       if (Point.isBlockPoint(point1)) return true;
-      if (Point.isTextPoint(point1)) return point1.start > (<TextPoint>point2).start;
+      if (Point.isTextPoint(point1)) return point1.offset > (<TextPoint>point2).offset;
       return true;
     }
     const root = editor.state.getBlock(editor.state.rootId);
@@ -86,5 +94,21 @@ export class Point {
       if (node.id === point2.id) return true;
     }
     return false;
+  }
+
+  /**
+   * 创建 Range Point
+   * @param id
+   * @param type
+   * @param offset
+   */
+  public static create(id: string, type: typeof BLOCK_TYPE.BLOCK): BlockPoint;
+  public static create(id: string, type: typeof BLOCK_TYPE.TEXT, offset: number): TextPoint;
+  public static create(id: string, type: BlockType, offset?: number): RangePoint {
+    if (type === BLOCK_TYPE.BLOCK) {
+      return { id, type } as BlockPoint;
+    } else {
+      return { id, type, offset } as TextPoint;
+    }
   }
 }

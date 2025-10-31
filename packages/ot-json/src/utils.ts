@@ -21,14 +21,11 @@ export const clone = <T>(value: T, cache = new WeakSet<O.Any>()): T => {
   if (cache.has(value)) {
     return value as T;
   }
-  cache.add(value); // 缓存当前对象
+  // 缓存当前对象
+  cache.add(value);
   // 处理数组
   if (Array.isArray(value)) {
-    const clonedArray: T[] = [];
-    for (const item of value) {
-      clonedArray.push(clone(item, cache));
-    }
-    return clonedArray as T;
+    return value.map(it => clone(it, cache)) as T;
   }
   // 处理普通对象
   const clonedObj: Record<string, T> = {};

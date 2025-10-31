@@ -158,9 +158,11 @@ export class BlockState {
     // 更新文本块 Delta 长度
     {
       if (this.data.delta) {
-        this.length = this.data.delta.reduce((len, op) => {
-          return len + getOpLength(op);
-        }, 0);
+        let len = 0;
+        for (const str of this.data.delta) {
+          len = len + getOpLength(str);
+        }
+        this.length = len;
       }
     }
   }
