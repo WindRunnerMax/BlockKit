@@ -83,7 +83,7 @@ export const getLCAWithChildren = (n1: BlockState, n2: BlockState) => {
       return { lca: parent1, child1: current1, child2: current2 } as LCATuple;
     }
     current1 = parent1;
-    current2 = parent1;
+    current2 = parent2;
   }
   return null;
 };

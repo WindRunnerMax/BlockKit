@@ -66,6 +66,14 @@ export class BlockState {
   }
 
   /**
+   * 判断是否为块级节点
+   * @returns
+   */
+  public isBlockNode() {
+    return !this.data.delta;
+  }
+
+  /**
    * 块重新挂载
    */
   public restore() {

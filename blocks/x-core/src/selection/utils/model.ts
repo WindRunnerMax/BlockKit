@@ -10,7 +10,7 @@ import { RawPoint } from "@block-kit/core";
 
 import type { BlockEditor } from "../../editor";
 import { X_BLOCK_ID_KEY } from "../../model/types";
-import { getLowestCommonAncestor } from "../../state/utils/tree";
+import { getLCAWithChildren } from "../../state/utils/tree";
 import { Entry } from "../modules/entry";
 import { Point } from "../modules/point";
 import { Range } from "../modules/range";
@@ -111,53 +111,54 @@ export const normalizeModelRange = (
       ? [Entry.create(start.id, BLOCK)]
       : [Entry.fromPoint(start, start.offset, end.offset - start.offset)];
   }
-  const startDepth = startState.depth;
-  const endDepth = endState.depth;
-  const startIndex = startState.index;
-  const endIndex = endState.index;
-  const startParent = startState.parent;
-  const endParent = endState.parent;
+  // ============== 不同节点情况 ==============
+  // 无论端点深度是否相同, 都需要提升到同一父节点上处理, DFS 序
   const startRangeItem: RangeEntry = Point.isBlockPoint(start)
     ? Entry.fromPoint(start)
-    : Entry.fromPoint(start, start.offset, startState.length - start.offset);
+    : Entry.fromPoint(start, start.offset, Math.max(startState.length - start.offset, 0));
   const endRangeItem: RangeEntry = Point.isBlockPoint(end)
     ? Entry.fromPoint(end)
     : Entry.fromPoint(end, 0, end.offset);
-  // ============== 同父节点情况 ==============
-  // 如果端点深度相同, 且父节点相同, 则直接遍历同级节点
-  if (startDepth === endDepth && startParent && startParent === endParent) {
-    const children = startParent.data.children || [];
-    const between = children.slice(startIndex + 1, endIndex).map(id => {
-      const block = editor.state.getBlock(id);
-      if (!block || !block.data.delta) return Entry.create(id, BLOCK);
-      const len = block.length!;
-      return Entry.create(id, TEXT, 0, len);
-    });
-    return [startRangeItem, ...between, endRangeItem];
-  }
-  // ============== 不同深度情况 ==============
-  // 如果端点深度不同, 则更复杂, 需要提升到同一父节点上处理, DFS 序
-  const lca = getLowestCommonAncestor(startState, endState);
-  if (!lca) return [];
+  const result = getLCAWithChildren(startState, endState);
+  if (!result) return [];
+  const { lca, child1 } = result;
   const nodes = lca.getTreeNodes();
   const between: RangeEntry[] = [];
   let isInsideNode = false;
+  let maxAccessLevel = Infinity;
+  // 如果起始节点是块节点, 则首先记录块节点
+  if (child1.isBlockNode()) {
+    maxAccessLevel = child1.depth;
+    between.push(Entry.create(child1.id, BLOCK));
+  }
   for (const node of nodes) {
+    // 遇到起始节点, 则开始记录
     if (node.id === start.id) {
       isInsideNode = true;
+      node.depth < maxAccessLevel && between.push(startRangeItem);
       continue;
     }
+    // 如果小于等于最大访问深度, 则认为已经越过先前的块节点, 恢复最大访问深度
+    if (isInsideNode && maxAccessLevel !== Infinity && node.depth <= maxAccessLevel) {
+      maxAccessLevel = Infinity;
+    }
+    // 遇到结束节点, 则停止记录
     if (node.id === end.id) {
+      // 如果结束节点深度小于最大访问深度, 则需要将结束节点加入结果中
+      endState.depth < maxAccessLevel && between.push(endRangeItem);
       break;
     }
-    if (!isInsideNode) {
+    // 如果不在起始节点和结束节点之间, 或者超过最大访问深度, 则跳过
+    if (!isInsideNode || node.depth > maxAccessLevel) {
       continue;
     }
-    if (!node.data.delta) {
+    // 分别处理块节点和文本节点
+    if (node.isBlockNode()) {
+      maxAccessLevel = node.depth;
       between.push(Entry.create(node.id, BLOCK));
     } else {
       between.push(Entry.create(node.id, TEXT, 0, node.length));
     }
   }
-  return [startRangeItem, ...between, endRangeItem];
+  return between;
 };
