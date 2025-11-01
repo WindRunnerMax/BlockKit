@@ -1,4 +1,5 @@
 import type { BlockEditor } from "../../editor";
+import { getLCAWithChildren } from "../../state/utils/tree";
 import type {
   BlockEntry,
   BlockPoint,
@@ -20,88 +21,82 @@ export class Entry {
   }
 
   /**
-   * 判断块 Point
-   * @param point
+   * 判断块 Entry
+   * @param entry
    */
-  public static isBlockEntry(point: RangeEntry): point is BlockEntry {
-    return point.type === T.BLOCK;
+  public static isBlockEntry(entry: RangeEntry): entry is BlockEntry {
+    return entry.type === T.BLOCK;
   }
 
   /**
-   * 判断文本 Point
-   * @param point
+   * 判断文本 Entry
+   * @param entry
    */
-  public static isTextEntry(point: RangeEntry): point is TextEntry {
-    return point.type === T.TEXT;
+  public static isTextEntry(entry: RangeEntry): entry is TextEntry {
+    return entry.type === T.TEXT;
   }
 
   /**
-   * 判断 Point 是否相等
-   * @param point1
-   * @param point2
+   * 判断 Entry 是否相等
+   * @param entry1
+   * @param entry2
    */
-  public static isEqual(point1: RangeEntry | null, point2: RangeEntry | null): boolean {
-    if (point1 === point2) return true;
-    if (!point1 || !point2) return false;
-    const n1 = point1 as TextEntry;
-    const n2 = point2 as TextEntry;
+  public static isEqual(entry1: RangeEntry | null, entry2: RangeEntry | null): boolean {
+    if (entry1 === entry2) return true;
+    if (!entry1 || !entry2) return false;
+    const n1 = entry1 as TextEntry;
+    const n2 = entry2 as TextEntry;
     return n1.id === n2.id && n1.type === n2.type && n1.start === n2.start && n1.len === n2.len;
   }
 
   /**
-   * 判断 Point1 是否在 Point2 之前
-   * - 即 < (p1 p2), 反之则 >= (p2 p1)
-   * @param point1
-   * @param point2
+   * 判断 Entry1 是否在 Entry2 之前
+   * - 即 < (e1 e2), 反之则 >= (e2 e1)
+   * @param entry1
+   * @param entry2
    */
   public static isBefore(
     editor: BlockEditor,
-    point1: RangeEntry | null,
-    point2: RangeEntry | null
+    entry1: RangeEntry | null,
+    entry2: RangeEntry | null
   ): boolean {
-    if (!point1 || !point2) return false;
-    if (point1.id === point2.id) {
-      if (point1.type !== point2.type) return false;
-      if (Entry.isBlockEntry(point1)) return true;
-      if (Entry.isTextEntry(point1)) return point1.start < (<TextEntry>point2).start;
+    if (!entry1 || !entry2) return false;
+    if (entry1.id === entry2.id) {
+      if (entry1.type !== entry2.type) return false;
+      if (Entry.isBlockEntry(entry1)) return true;
+      if (Entry.isTextEntry(entry1)) return entry1.start < (<TextEntry>entry2).start;
       return true;
     }
-    const root = editor.state.getBlock(editor.state.rootId);
-    const nodes = root && root.getTreeNodes();
-    if (!root || !nodes || !nodes.length) return false;
-    for (const node of nodes) {
-      if (node.id === point1.id) return true;
-      if (node.id === point2.id) return false;
-    }
-    return false;
+    const s1 = editor.state.getBlock(entry1.id);
+    const s2 = editor.state.getBlock(entry2.id);
+    if (!s1 || !s2) return false;
+    const tuple = getLCAWithChildren(s1, s2);
+    return tuple ? tuple.child1.index < tuple.child2.index : false;
   }
 
   /**
-   * 判断 Point1 是否在 Point2 之后
-   * - 即 > (p2 p1), 反之则 <= (p1 p2)
-   * @param point1
-   * @param point2
+   * 判断 Entry1 是否在 Entry2 之后
+   * - 即 > (e2 e1), 反之则 <= (e1 e2)
+   * @param entry1
+   * @param entry2
    */
   public static isAfter(
     editor: BlockEditor,
-    point1: RangeEntry | null,
-    point2: RangeEntry | null
+    entry1: RangeEntry | null,
+    entry2: RangeEntry | null
   ): boolean {
-    if (!point1 || !point2) return false;
-    if (point1.id === point2.id) {
-      if (point1.type !== point2.type) return false;
-      if (Entry.isBlockEntry(point1)) return true;
-      if (Entry.isTextEntry(point1)) return point1.start > (<TextEntry>point2).start;
+    if (!entry1 || !entry2) return false;
+    if (entry1.id === entry2.id) {
+      if (entry1.type !== entry2.type) return false;
+      if (Entry.isBlockEntry(entry1)) return true;
+      if (Entry.isTextEntry(entry1)) return entry1.start > (<TextEntry>entry2).start;
       return true;
     }
-    const root = editor.state.getBlock(editor.state.rootId);
-    const nodes = root && root.getTreeNodes();
-    if (!root || !nodes || !nodes.length) return false;
-    for (const node of nodes) {
-      if (node.id === point1.id) return false;
-      if (node.id === point2.id) return true;
-    }
-    return false;
+    const s1 = editor.state.getBlock(entry1.id);
+    const s2 = editor.state.getBlock(entry2.id);
+    if (!s1 || !s2) return false;
+    const tuple = getLCAWithChildren(s1, s2);
+    return tuple ? tuple.child1.index > tuple.child2.index : false;
   }
 
   /**
@@ -123,17 +118,17 @@ export class Entry {
 
   /**
    * 从 Point 创建 Range Entry
-   * @param point
+   * @param entry
    * @param start [?=undef]
    * @param len [?=undef]
    */
-  public static fromPoint(point: BlockPoint): BlockEntry;
-  public static fromPoint(point: TextPoint, start: number, len?: number): TextEntry;
-  public static fromPoint(point: RangePoint, start?: number, len?: number): RangeEntry {
-    if (point.type === T.BLOCK) {
-      return { id: point.id, type: point.type } as BlockEntry;
+  public static fromPoint(entry: BlockPoint): BlockEntry;
+  public static fromPoint(entry: TextPoint, start: number, len?: number): TextEntry;
+  public static fromPoint(entry: RangePoint, start?: number, len?: number): RangeEntry {
+    if (entry.type === T.BLOCK) {
+      return { id: entry.id, type: entry.type } as BlockEntry;
     } else {
-      return { id: point.id, type: point.type, start, len: len || 0 } as TextEntry;
+      return { id: entry.id, type: entry.type, start, len: len || 0 } as TextEntry;
     }
   }
 }

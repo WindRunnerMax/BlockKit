@@ -1,4 +1,5 @@
 import type { BlockEditor } from "../../editor";
+import { getLCAWithChildren } from "../../state/utils/tree";
 import type { BlockPoint, BlockType, RangePoint, TextPoint } from "../types";
 import { BLOCK_TYPE } from "../utils/constant";
 
@@ -58,14 +59,11 @@ export class Point {
       if (Point.isTextPoint(point1)) return point1.offset < (<TextPoint>point2).offset;
       return true;
     }
-    const root = editor.state.getBlock(editor.state.rootId);
-    const nodes = root && root.getTreeNodes();
-    if (!root || !nodes || !nodes.length) return false;
-    for (const node of nodes) {
-      if (node.id === point1.id) return true;
-      if (node.id === point2.id) return false;
-    }
-    return false;
+    const s1 = editor.state.getBlock(point1.id);
+    const s2 = editor.state.getBlock(point1.id);
+    if (!s1 || !s2) return false;
+    const tuple = getLCAWithChildren(s1, s2);
+    return tuple ? tuple.child1.index < tuple.child2.index : false;
   }
 
   /**
@@ -86,14 +84,11 @@ export class Point {
       if (Point.isTextPoint(point1)) return point1.offset > (<TextPoint>point2).offset;
       return true;
     }
-    const root = editor.state.getBlock(editor.state.rootId);
-    const nodes = root && root.getTreeNodes();
-    if (!root || !nodes || !nodes.length) return false;
-    for (const node of nodes) {
-      if (node.id === point1.id) return false;
-      if (node.id === point2.id) return true;
-    }
-    return false;
+    const s1 = editor.state.getBlock(point1.id);
+    const s2 = editor.state.getBlock(point1.id);
+    if (!s1 || !s2) return false;
+    const tuple = getLCAWithChildren(s1, s2);
+    return tuple ? tuple.child1.index > tuple.child2.index : false;
   }
 
   /**

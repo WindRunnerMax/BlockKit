@@ -14,7 +14,7 @@ import { getLowestCommonAncestor } from "../../state/utils/tree";
 import { Entry } from "../modules/entry";
 import { Point } from "../modules/point";
 import { Range } from "../modules/range";
-import type { BlockPoint, RangeEntry, RangePoint } from "../types";
+import type { RangeEntry, RangePoint } from "../types";
 import { BLOCK_TYPE } from "./constant";
 
 /**
@@ -108,7 +108,7 @@ export const normalizeModelRange = (
   // 如果 id 相同, 则为相同的块节点
   if (start.id === end.id) {
     return start.type === BLOCK || end.type === BLOCK
-      ? [Entry.fromPoint(start as BlockPoint)]
+      ? [Entry.create(start.id, BLOCK)]
       : [Entry.fromPoint(start, start.offset, end.offset - start.offset)];
   }
   const startDepth = startState.depth;
@@ -156,8 +156,7 @@ export const normalizeModelRange = (
     if (!node.data.delta) {
       between.push(Entry.create(node.id, BLOCK));
     } else {
-      const len = node.length;
-      between.push(Entry.create(node.id, TEXT, 0, len));
+      between.push(Entry.create(node.id, TEXT, 0, node.length));
     }
   }
   return [startRangeItem, ...between, endRangeItem];
