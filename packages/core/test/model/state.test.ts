@@ -29,6 +29,6 @@ describe("model state", () => {
     expect(newLeaf1).toBe(leaf2);
     expect(newLeaf0).not.toBe(leaf0);
     expect(newLeaf0?.getText()).toBe("text");
-    expect(leafDOMs[0][0]).toBe(newLeaf0!.getNode());
+    expect(leafDOMs[0][0]).toBe(newLeaf0!.getDOMNode());
   });
 });

@@ -74,6 +74,13 @@ export class BlockState {
   }
 
   /**
+   * 获取 State 对应的 DOM 节点
+   */
+  public getDOMNode() {
+    return this.state.editor.model.getBlockNode(this);
+  }
+
+  /**
    * 块重新挂载
    */
   public restore() {
@@ -90,7 +97,7 @@ export class BlockState {
   }
 
   /**
-   * 获取树结构子节点的数据 [DFS]
+   * 获取树结构子节点的数据 [DFS BlockState]
    * - 当前树节点所有子节点, 含自身节点
    */
   public getTreeNodes(): BlockState[] {

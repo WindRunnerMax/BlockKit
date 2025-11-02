@@ -9,7 +9,7 @@ import type {
   TextEntry,
   TextPoint,
 } from "../types";
-import { BLOCK_TYPE as T } from "../utils/constant";
+import { POINT_TYPE as T } from "../utils/constant";
 
 export class Entry {
   /** 内建节点 */

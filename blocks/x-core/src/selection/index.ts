@@ -20,6 +20,8 @@ export class Selection {
   protected previous: Range | null;
   /** 当前选区 */
   protected current: Range | null;
+  /** 块选区节点 */
+  public element: HTMLElement | null;
 
   /**
    * 构造函数
@@ -30,6 +32,7 @@ export class Selection {
     this.execution = 0;
     this.previous = null;
     this.current = null;
+    this.element = null;
   }
 
   /**

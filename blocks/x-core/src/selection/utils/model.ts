@@ -16,7 +16,7 @@ import { Entry } from "../modules/entry";
 import { Point } from "../modules/point";
 import { Range } from "../modules/range";
 import type { RangeEntry, RangePoint } from "../types";
-import { BLOCK_TYPE } from "./constant";
+import { POINT_TYPE } from "./constant";
 
 /**
  * 将 DOMPoint 转换为 ModelPoint
@@ -30,25 +30,20 @@ export const toModelPoint = (
   context: NormalizePointContext
 ): RangePoint | null => {
   const { node, offset } = domPoint;
-  const isTextNode = isClosestTo(node, `[${BLOCK_KEY}]`);
-  const xBlock = closestTo(node, `[${X_BLOCK_ID_KEY}]`);
-  if (!xBlock || !node) return null;
-  const { TEXT, BLOCK } = BLOCK_TYPE;
-  const id = xBlock.getAttribute(X_BLOCK_ID_KEY)!;
-  const blockState = isTextNode && editor.state.getBlock(id);
+  const isTextBlock = isClosestTo(node, `[${BLOCK_KEY}]`);
+  const xBlockNode = closestTo(node, `[${X_BLOCK_ID_KEY}]`);
+  if (!xBlockNode || !node) return null;
+  const { TEXT, BLOCK } = POINT_TYPE;
+  const id = xBlockNode.getAttribute(X_BLOCK_ID_KEY)!;
+  const blockState = isTextBlock && editor.state.getBlock(id);
   const text = blockState && editor.model.getTextEditor(blockState);
   // 如果是文本类型的块节点
-  if (isTextNode && text) {
+  if (isTextBlock && text) {
     const startDOMPoint = normalizeDOMPoint(domPoint, context);
-    const startRangePoint = toTextModelPoint(text, startDOMPoint, {
-      ...context,
-      nodeContainer: node,
-      nodeOffset: offset,
-    });
+    const pointContext = { ...context, nodeContainer: node, nodeOffset: offset };
+    const startRangePoint = toTextModelPoint(text, startDOMPoint, pointContext);
     const raw = RawPoint.fromPoint(text, startRangePoint);
-    if (raw) {
-      return Point.create(id, TEXT, raw.offset);
-    }
+    if (raw) return Point.create(id, TEXT, raw.offset);
   }
   // 否则作为块节点处理
   return Point.create(id, BLOCK);
@@ -104,7 +99,7 @@ export const normalizeModelRange = (
   const startState = editor.state.getBlock(start.id);
   const endState = editor.state.getBlock(end.id);
   if (!startState || !endState) return [];
-  const { TEXT, BLOCK } = BLOCK_TYPE;
+  const { TEXT, BLOCK } = POINT_TYPE;
   // ============== 同节点情况 ==============
   // 如果 id 相同, 则为相同的块节点
   if (start.id === end.id) {

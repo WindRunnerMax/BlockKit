@@ -44,7 +44,7 @@ export class InlineCodePlugin extends EditorPlugin {
       }
       const prev = leaves[i - 1];
       const next = leaves[i + 1];
-      const node = leaf.getNode();
+      const node = leaf.getDOMNode();
       if (!prev || !prev.op.attributes || !prev.op.attributes[INLINE_CODE_KEY]) {
         node && node.classList.add(INLINE_CODE_START_CLASS);
       } else {

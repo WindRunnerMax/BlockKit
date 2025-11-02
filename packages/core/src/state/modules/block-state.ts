@@ -71,6 +71,13 @@ export class BlockState {
   }
 
   /**
+   * 获取 State 对应的 DOM 节点
+   */
+  public getDOMNode() {
+    return this.editor.model.getBlockNode(this);
+  }
+
+  /**
    * 转换为 Delta
    * @param deep [?=undef] 深拷贝
    */
@@ -82,12 +89,5 @@ export class BlockState {
     return new Delta({
       ops: deep ? cloneOps(ops) : ops,
     });
-  }
-
-  /**
-   * 获取 State 对应的 DOM 节点
-   */
-  public getNode() {
-    return this.editor.model.getBlockNode(this);
   }
 }

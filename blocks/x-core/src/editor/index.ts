@@ -3,6 +3,7 @@ import { LOG_LEVEL, Logger } from "@block-kit/core";
 import { Event } from "../event";
 import { Model } from "../model";
 import { Plugin } from "../plugin";
+import { Selection } from "../selection";
 import { EditorState } from "../state";
 import { EDITOR_STATE } from "../state/types";
 import type { EditorOptions } from "./types";
@@ -21,6 +22,8 @@ export class BlockEditor {
   public plugin: Plugin;
   /** 模型映射 */
   public model: Model;
+  /** 选区模块 */
+  public selection: Selection;
 
   /**
    * 构造函数
@@ -34,6 +37,7 @@ export class BlockEditor {
     this.logger = new Logger(logLevel);
     this.plugin = new Plugin(this);
     this.model = new Model();
+    this.selection = new Selection(this);
   }
 
   /**

@@ -1,7 +1,7 @@
 import type { BlockEditor } from "../../editor";
 import { getLCAWithChildren } from "../../state/utils/tree";
 import type { BlockPoint, BlockType, RangePoint, TextPoint } from "../types";
-import { BLOCK_TYPE } from "../utils/constant";
+import { POINT_TYPE } from "../utils/constant";
 
 export class Point {
   /** 内建节点 */
@@ -17,7 +17,7 @@ export class Point {
    * @param point
    */
   public static isBlockPoint(point: RangePoint): point is BlockPoint {
-    return point.type === BLOCK_TYPE.BLOCK;
+    return point.type === POINT_TYPE.BLOCK;
   }
 
   /**
@@ -25,7 +25,7 @@ export class Point {
    * @param point
    */
   public static isTextPoint(point: RangePoint): point is TextPoint {
-    return point.type === BLOCK_TYPE.TEXT;
+    return point.type === POINT_TYPE.TEXT;
   }
 
   /**
@@ -97,10 +97,10 @@ export class Point {
    * @param type
    * @param offset
    */
-  public static create(id: string, type: typeof BLOCK_TYPE.BLOCK): BlockPoint;
-  public static create(id: string, type: typeof BLOCK_TYPE.TEXT, offset: number): TextPoint;
+  public static create(id: string, type: typeof POINT_TYPE.BLOCK): BlockPoint;
+  public static create(id: string, type: typeof POINT_TYPE.TEXT, offset: number): TextPoint;
   public static create(id: string, type: BlockType, offset?: number): RangePoint {
-    if (type === BLOCK_TYPE.BLOCK) {
+    if (type === POINT_TYPE.BLOCK) {
       return { id, type } as BlockPoint;
     } else {
       return { id, type, offset: Math.max(offset || 0, 0) } as TextPoint;

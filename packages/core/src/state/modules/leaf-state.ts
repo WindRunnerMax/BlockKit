@@ -126,6 +126,13 @@ export class LeafState {
   }
 
   /**
+   * 获取 State 对应的 DOM 节点
+   */
+  public getDOMNode() {
+    return this.parent.parent.editor.model.getLeafNode(this);
+  }
+
+  /**
    * 将 LeafState 转换为 Range
    */
   public toRange() {
@@ -141,12 +148,5 @@ export class LeafState {
     const range = this.toRange();
     const rawRange = RawRange.fromRange(this.parent.parent.editor, range);
     return rawRange;
-  }
-
-  /**
-   * 获取 State 对应的 DOM 节点
-   */
-  public getNode() {
-    return this.parent.parent.editor.model.getLeafNode(this);
   }
 }

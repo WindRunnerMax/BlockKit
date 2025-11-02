@@ -1,5 +1,5 @@
 import type { RangeEntry, TextEntry } from "../types";
-import { BLOCK_TYPE } from "../utils/constant";
+import { POINT_TYPE } from "../utils/constant";
 
 export class Range {
   /** 内建节点 */
@@ -14,7 +14,7 @@ export class Range {
     this.nodes = nodes;
     this.isBackward = !!isBackward;
     this.isCollapsed = !nodes.length;
-    const { TEXT } = BLOCK_TYPE;
+    const { TEXT } = POINT_TYPE;
     if (nodes.length === 1 && nodes[0].type === TEXT && nodes[0].len === 0) {
       this.isCollapsed = true;
     }
