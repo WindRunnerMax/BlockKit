@@ -1,11 +1,11 @@
+import type { P } from "@block-kit/utils/dist/es/types";
+
 // "🧑" + "\u200d" + "🎨" = "🧑‍🎨"
 // https://github.com/slab/quill/issues/1230
 // https://mathiasbynens.be/notes/javascript-unicode
 // https://github.com/ianstormtaylor/slate/issues/2635
 // https://eev.ee/blog/2015/09/12/dark-corners-of-unicode
 // https://www.zhihu.com/question/563376088/answer/2736182091
-
-import type { P } from "@block-kit/utils/dist/es/types";
 
 /**
  * 获取首个 Unicode 字符长度

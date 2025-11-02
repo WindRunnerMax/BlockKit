@@ -1,8 +1,9 @@
+import type { Delta } from "@block-kit/delta";
 import { getId } from "@block-kit/utils";
 import type { BlockDataField } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../../editor";
-import type { ApplyChange } from "../types";
+import type { ApplyChange } from "../../state/types";
 
 /**
  * 创建新 Block 的变更
@@ -52,4 +53,13 @@ export const createDeleteBlockChange = (
   const block = editor.state.getBlock(parentId);
   const child = block && block.data.children && block.data.children[index];
   return { id: parentId, ops: [{ p: ["children", index], ld: child }] };
+};
+
+/**
+ * 生成文本变更
+ * @param id Block id
+ * @param delta Delta 变更内容
+ */
+export const createTextChange = (id: string, delta: Delta): ApplyChange => {
+  return { id, ops: [{ p: ["delta"], t: "delta", o: delta }] };
 };

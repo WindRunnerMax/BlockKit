@@ -1,7 +1,7 @@
 import type { Blocks } from "@block-kit/x-json";
 
 import { BlockEditor, createNewBlockChange } from "../../src";
-import { createDeleteBlockChange, createInsertBlockChange } from "../../src/state/utils/change";
+import { createDeleteBlockChange, createInsertBlockChange } from "../../src/perform/utils/change";
 
 const getBlocks = (): Blocks => ({
   root: {

@@ -1,6 +1,8 @@
 import type { O } from "@block-kit/utils/dist/es/types";
 import type { BlockChange } from "@block-kit/x-json";
 
+import type { Range } from "../../selection/modules/range";
+
 export const EDITOR_STATE = {
   /** IME 组合状态 */
   COMPOSING: "COMPOSING",
@@ -44,6 +46,8 @@ export type ApplyOptions = {
   undoable?: boolean;
   /** 额外携带的信息 */
   extra?: unknown;
+  /** 设置应用后的选区 */
+  selection?: Range;
 };
 
 export type ApplyResult = {

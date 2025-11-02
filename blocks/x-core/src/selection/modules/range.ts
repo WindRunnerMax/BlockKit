@@ -5,19 +5,40 @@ export class Range {
   /** 内建节点 */
   public readonly nodes: RangeEntry[];
   /** 选区方向反选 */
-  public isBackward: boolean;
+  public readonly isBackward: boolean;
   /** 选区折叠状态 */
-  public isCollapsed: boolean;
+  public readonly isCollapsed: boolean;
+  /** 选区 Entries 长度 */
+  public readonly length: number;
 
   /** 构造函数 */
   public constructor(nodes: RangeEntry[], isBackward?: boolean) {
     this.nodes = nodes;
+    this.length = nodes.length;
     this.isBackward = !!isBackward;
     this.isCollapsed = !nodes.length;
-    const { TEXT } = POINT_TYPE;
-    if (nodes.length === 1 && nodes[0].type === TEXT && nodes[0].len === 0) {
+    if (nodes.length === 1 && nodes[0].type === POINT_TYPE.TEXT && nodes[0].len === 0) {
       this.isCollapsed = true;
     }
+  }
+
+  /**
+   * 获取 Entry
+   */
+  public get(index: number): RangeEntry | null {
+    if (index < 0) {
+      return this.nodes[this.nodes.length + index] || null;
+    }
+    return this.nodes[index] || null;
+  }
+
+  /**
+   * 切片 RangeEntry[]
+   * @param start
+   * @param end
+   */
+  public slice(start?: number, end?: number): RangeEntry[] {
+    return this.nodes.slice(start, end);
   }
 
   /**

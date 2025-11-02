@@ -1,6 +1,8 @@
+import { Schema } from "@block-kit/core";
 import { LOG_LEVEL, Logger } from "@block-kit/core";
 
 import { Event } from "../event";
+import { Lookup } from "../lookup";
 import { Model } from "../model";
 import { Plugin } from "../plugin";
 import { Selection } from "../selection";
@@ -12,6 +14,9 @@ import { getInitialBlocks } from "./utils/constant";
 export class BlockEditor {
   /** 编辑器 DOM 容器 */
   protected container: HTMLDivElement | null;
+  /** 配置模块 */
+  public schema: Schema;
+
   /** 状态模块 */
   public state: EditorState;
   /** 日志模块 */
@@ -24,20 +29,24 @@ export class BlockEditor {
   public model: Model;
   /** 选区模块 */
   public selection: Selection;
+  /** 检索模块 */
+  public lookup: Lookup;
 
   /**
    * 构造函数
    * @param options
    */
   public constructor(options: EditorOptions = {}) {
-    const { initial = getInitialBlocks(), logLevel = LOG_LEVEL.ERROR } = options;
+    const { initial = getInitialBlocks(), logLevel = LOG_LEVEL.ERROR, schema = {} } = options;
     this.container = null;
+    this.schema = new Schema(schema);
     this.state = new EditorState(this, initial);
     this.event = new Event(this);
     this.logger = new Logger(logLevel);
     this.plugin = new Plugin(this);
     this.model = new Model();
     this.selection = new Selection(this);
+    this.lookup = new Lookup(this);
   }
 
   /**
