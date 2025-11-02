@@ -10,6 +10,7 @@ import { RawPoint } from "@block-kit/core";
 
 import type { BlockEditor } from "../../editor";
 import { X_BLOCK_ID_KEY } from "../../model/types";
+import type { BlockState } from "../../state/modules/block-state";
 import { getLCAWithChildren } from "../../state/utils/tree";
 import { Entry } from "../modules/entry";
 import { Point } from "../modules/point";
@@ -46,11 +47,11 @@ export const toModelPoint = (
     });
     const raw = RawPoint.fromPoint(text, startRangePoint);
     if (raw) {
-      return { id, type: TEXT, offset: raw.offset };
+      return Point.create(id, TEXT, raw.offset);
     }
   }
   // 否则作为块节点处理
-  return { id, type: BLOCK };
+  return Point.create(id, BLOCK);
 };
 
 /**
@@ -112,30 +113,36 @@ export const normalizeModelRange = (
       : [Entry.fromPoint(start, start.offset, end.offset - start.offset)];
   }
   // ============== 不同节点情况 ==============
-  // 无论端点深度是否相同, 都需要提升到同一父节点上处理, DFS 序
-  const startRangeItem: RangeEntry = Point.isBlockPoint(start)
-    ? Entry.fromPoint(start)
-    : Entry.fromPoint(start, start.offset, Math.max(startState.length - start.offset, 0));
-  const endRangeItem: RangeEntry = Point.isBlockPoint(end)
-    ? Entry.fromPoint(end)
-    : Entry.fromPoint(end, 0, end.offset);
+  // 如果端点存在 Block 类型, 则处理为同级块节点集合
   const result = getLCAWithChildren(startState, endState);
   if (!result) return [];
-  const { lca, child1 } = result;
+  const { lca, child1, child2 } = result;
+  if (start.type === BLOCK || end.type === BLOCK) {
+    return lca.children.slice(child1.index, child2.index + 1).map(it => Entry.create(it.id, BLOCK));
+  }
+  // 文本节点下, 无论端点深度是否相同, 都处理为 DFS 序
+  const startEntry = Entry.fromPoint(start, start.offset, startState.length - start.offset);
+  const endEntry = Entry.fromPoint(end, 0, end.offset);
   const nodes = lca.getTreeNodes();
   const between: RangeEntry[] = [];
   let isInsideNode = false;
   let maxAccessLevel = Infinity;
-  // 如果起始节点是块节点, 则首先记录块节点
-  if (child1.isBlockNode()) {
-    maxAccessLevel = child1.depth;
-    between.push(Entry.create(child1.id, BLOCK));
-  }
-  for (const node of nodes) {
+  NODES_ITERATOR: for (const node of nodes) {
     // 遇到起始节点, 则开始记录
     if (node.id === start.id) {
       isInsideNode = true;
-      node.depth < maxAccessLevel && between.push(startRangeItem);
+      // 向父节点迭代查找块级类型的节点
+      let current: BlockState | null = node.parent;
+      let diff = node.depth - child1.depth;
+      while (diff-- > 0 && current) {
+        if (current.isBlockNode()) {
+          maxAccessLevel = current.depth;
+          between.push(Entry.create(child1.id, BLOCK));
+          continue NODES_ITERATOR;
+        }
+        current = current.parent;
+      }
+      between.push(startEntry);
       continue;
     }
     // 如果小于等于最大访问深度, 则认为已经越过先前的块节点, 恢复最大访问深度
@@ -145,7 +152,7 @@ export const normalizeModelRange = (
     // 遇到结束节点, 则停止记录
     if (node.id === end.id) {
       // 如果结束节点深度小于最大访问深度, 则需要将结束节点加入结果中
-      endState.depth < maxAccessLevel && between.push(endRangeItem);
+      endState.depth < maxAccessLevel && between.push(endEntry);
       break;
     }
     // 如果不在起始节点和结束节点之间, 或者超过最大访问深度, 则跳过

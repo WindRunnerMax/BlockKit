@@ -1,15 +1,8 @@
-interface Window {
-  MSStream: boolean;
-}
+/// <reference types="../../../packages/plugin/src/global.d.ts" />
+/// <reference types="../../../packages/utils/src/global.d.ts" />
 
 declare namespace NodeJS {
   interface ProcessEnv {
     NODE_ENV: "development" | "production" | "test";
-  }
-}
-
-declare module JSX {
-  interface IntrinsicElements {
-    "em-emoji": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
   }
 }

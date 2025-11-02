@@ -14,13 +14,22 @@ Quote2
   Text5
   Text6
 Text7
+Quote3
+  Quote4
+    Text8
+    Text9
+Text10
 */
 
 const getBlocks = (): Blocks => ({
   Root: {
     id: "Root",
     version: 1,
-    data: { type: "ROOT", children: ["Text1", "Text2", "Quote1", "Quote2", "Text7"], parent: "" },
+    data: {
+      type: "ROOT",
+      children: ["Text1", "Text2", "Quote1", "Quote2", "Text7", "Quote3", "Text10"],
+      parent: "",
+    },
   },
   Text1: {
     id: "Text1",
@@ -77,6 +86,31 @@ const getBlocks = (): Blocks => ({
     version: 1,
     data: { type: "text", children: [], delta: [{ insert: "xx" }], parent: "Root" },
   },
+  Quote3: {
+    id: "Quote3",
+    version: 1,
+    data: { type: "quote" as P.Any, children: ["Quote4"], parent: "Root" },
+  },
+  Quote4: {
+    id: "Quote4",
+    version: 1,
+    data: { type: "quote" as P.Any, children: ["Text8", "Text9"], parent: "Quote3" },
+  },
+  Text8: {
+    id: "Text8",
+    version: 1,
+    data: { type: "text", children: [], delta: [], parent: "Quote3" },
+  },
+  Text9: {
+    id: "Text9",
+    version: 1,
+    data: { type: "text", children: [], delta: [{ insert: "xx" }], parent: "Quote3" },
+  },
+  Text10: {
+    id: "Text10",
+    version: 1,
+    data: { type: "text", children: [], delta: [{ insert: "xx" }], parent: "Root" },
+  },
 });
 
 describe("selection model", () => {
@@ -104,7 +138,7 @@ describe("selection model", () => {
     ]);
   });
 
-  it("cross pre block model", () => {
+  it("cross start block model", () => {
     const editor = new BlockEditor({ initial: getBlocks() });
     const ranges = normalizeModelRange(
       editor,
@@ -117,7 +151,20 @@ describe("selection model", () => {
     ]);
   });
 
-  it.only("cross post block model", () => {
+  it("cross inside start block model", () => {
+    const editor = new BlockEditor({ initial: getBlocks() });
+    const ranges = normalizeModelRange(
+      editor,
+      { id: "Text8", type: "T", offset: 0 },
+      { id: "Text10", type: "T", offset: 0 }
+    );
+    expect(ranges).toEqual([
+      { id: "Quote3", type: "B" },
+      { id: "Text10", type: "T", start: 0, len: 0 },
+    ]);
+  });
+
+  it("cross end block model", () => {
     const editor = new BlockEditor({ initial: getBlocks() });
     const ranges = normalizeModelRange(
       editor,
@@ -133,7 +180,7 @@ describe("selection model", () => {
     ]);
   });
 
-  it("cross pre-post block model", () => {
+  it("cross start-end block model", () => {
     const editor = new BlockEditor({ initial: getBlocks() });
     const ranges = normalizeModelRange(
       editor,
@@ -143,6 +190,21 @@ describe("selection model", () => {
     expect(ranges).toEqual([
       { id: "Quote1", type: "B" },
       { id: "Quote2", type: "B" },
+    ]);
+  });
+
+  it("common block level nodes", () => {
+    const editor = new BlockEditor({ initial: getBlocks() });
+    const ranges = normalizeModelRange(
+      editor,
+      { id: "Text5", type: "B" },
+      { id: "Text10", type: "B" }
+    );
+    expect(ranges).toEqual([
+      { id: "Quote2", type: "B" },
+      { id: "Text7", type: "B" },
+      { id: "Quote3", type: "B" },
+      { id: "Text10", type: "B" },
     ]);
   });
 });

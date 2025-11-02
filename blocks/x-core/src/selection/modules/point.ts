@@ -103,7 +103,7 @@ export class Point {
     if (type === BLOCK_TYPE.BLOCK) {
       return { id, type } as BlockPoint;
     } else {
-      return { id, type, offset } as TextPoint;
+      return { id, type, offset: Math.max(offset || 0, 0) } as TextPoint;
     }
   }
 }

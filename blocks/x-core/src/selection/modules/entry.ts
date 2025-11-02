@@ -123,12 +123,13 @@ export class Entry {
    * @param len [?=undef]
    */
   public static fromPoint(entry: BlockPoint): BlockEntry;
-  public static fromPoint(entry: TextPoint, start: number, len?: number): TextEntry;
+  public static fromPoint(entry: TextPoint, start: number, len: number): TextEntry;
   public static fromPoint(entry: RangePoint, start?: number, len?: number): RangeEntry {
     if (entry.type === T.BLOCK) {
       return { id: entry.id, type: entry.type } as BlockEntry;
     } else {
-      return { id: entry.id, type: entry.type, start, len: len || 0 } as TextEntry;
+      const { id, type } = entry;
+      return { id, type, start, len: Math.max(len || 0, 0) } as TextEntry;
     }
   }
 }

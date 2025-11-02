@@ -9,6 +9,7 @@ import { Bind } from "@block-kit/utils";
 import type { BlockEditor } from "../editor";
 import type { Range } from "./modules/range";
 import { toModelRange } from "./utils/model";
+import { isSelectionElement } from "./utils/native";
 
 export class Selection {
   /** 上次时间片快照 */
@@ -65,6 +66,9 @@ export class Selection {
     }
     // 选区必然是从 startContainer 到 endContainer
     const { startContainer, endContainer, collapsed } = staticSel;
+    if (isSelectionElement(startContainer) || isSelectionElement(endContainer)) {
+      return void 0;
+    }
     if (isNeedIgnoreRangeDOM(startContainer, root)) {
       return void 0;
     }
