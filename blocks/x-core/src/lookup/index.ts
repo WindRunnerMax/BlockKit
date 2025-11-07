@@ -62,7 +62,7 @@ export class Lookup {
       this.marks = {};
       return void 0;
     }
-    const entry = current.get(0)!;
+    const entry = current.at(0)!;
     if (!Entry.isTextEntry(entry)) {
       return void 0;
     }

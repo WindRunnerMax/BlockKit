@@ -1,3 +1,4 @@
+export { useComposing } from "./hooks/use-composing";
 export { BlockKitContext, useEditorStatic } from "./hooks/use-editor";
 export { ReadonlyContext, useReadonly } from "./hooks/use-readonly";
 export { BlockModel } from "./model/block";

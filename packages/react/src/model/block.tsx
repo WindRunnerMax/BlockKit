@@ -11,6 +11,7 @@ import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { FC } from "react";
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
+import { useComposing } from "../hooks/use-composing";
 import { withWrapLineNodes } from "../plugin/modules/wrap";
 import { JSX_TO_STATE } from "../utils/weak-map";
 import { LineModel } from "./line";
@@ -27,6 +28,7 @@ const BlockView: FC<{
 }> = props => {
   const { editor, state } = props;
   const flushing = useRef(false);
+  const { isComposing } = useComposing(editor);
   const [lines, setLines] = useState(() => state.getLines());
 
   /**
@@ -123,7 +125,7 @@ const BlockView: FC<{
 
   return (
     <div {...{ [BLOCK_KEY]: true, [BLOCK_ID_KEY]: state.key, ...props.attributes }} ref={setModel}>
-      {props.placeholder && lines.length === 1 && isEmptyLine(lines[0], true) && (
+      {props.placeholder && !isComposing && lines.length === 1 && isEmptyLine(lines[0], true) && (
         <div
           {...{ [PLACEHOLDER_KEY]: true }}
           style={{

@@ -25,7 +25,7 @@ export class Range {
   /**
    * 获取 Entry
    */
-  public get(index: number): RangeEntry | null {
+  public at(index: number): RangeEntry | null {
     if (index < 0) {
       return this.nodes[this.nodes.length + index] || null;
     }

@@ -37,7 +37,7 @@ export class Perform {
       res && result.changes.push(...res.changes);
       res && Object.assign(result.options, res.options);
     }
-    const firstBlock = this.editor.state.getBlock(sel.get(0)!.id);
+    const firstBlock = this.editor.state.getBlock(sel.at(0)!.id);
     if (!firstBlock) return result;
     const prevBlock = firstBlock.prev();
     let prevBlockId = prevBlock ? prevBlock.id : "";

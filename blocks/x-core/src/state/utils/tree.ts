@@ -59,6 +59,7 @@ export const clearTreeCache = (blockState: BlockState) => {
 
 /**
  * 获取两个节点的公共祖先节点 LCA 及直属节点
+ * - 注意 n1 和 n2 可能为同子树, 该情况下返回元组值相同, 直接比较节点深度即可
  * @param n1
  * @param n2
  */
@@ -75,11 +76,14 @@ export const getLCAWithChildren = (n1: BlockState, n2: BlockState) => {
     current2 = current2.parent;
     depth2--;
   }
+  type LCATuple = { lca: BlockState; child1: BlockState; child2: BlockState };
+  if (current1 === current2) {
+    return { lca: current1, child1: current1, child2: current1 } as LCATuple;
+  }
   while (current1 && current2 && current1 !== current2) {
     const parent1 = current1.parent;
     const parent2 = current2.parent;
     if (parent1 && parent1 === parent2) {
-      type LCATuple = { lca: BlockState; child1: BlockState; child2: BlockState };
       return { lca: parent1, child1: current1, child2: current2 } as LCATuple;
     }
     current1 = parent1;

@@ -69,9 +69,10 @@ export class Entry {
     }
     const s1 = editor.state.getBlock(entry1.id);
     const s2 = editor.state.getBlock(entry2.id);
-    if (!s1 || !s2) return false;
-    const tuple = getLCAWithChildren(s1, s2);
-    return tuple ? tuple.child1.index < tuple.child2.index : false;
+    const tuple = s1 && s2 && getLCAWithChildren(s1, s2);
+    if (!s1 || !s2 || !tuple) return false;
+    const { child1: c1, child2: c2 } = tuple;
+    return c1 === c2 ? s1.depth < s2.depth : c1.index < c2.index;
   }
 
   /**
@@ -94,9 +95,10 @@ export class Entry {
     }
     const s1 = editor.state.getBlock(entry1.id);
     const s2 = editor.state.getBlock(entry2.id);
-    if (!s1 || !s2) return false;
-    const tuple = getLCAWithChildren(s1, s2);
-    return tuple ? tuple.child1.index > tuple.child2.index : false;
+    const tuple = s1 && s2 && getLCAWithChildren(s1, s2);
+    if (!s1 || !s2 || !tuple) return false;
+    const { child1: c1, child2: c2 } = tuple;
+    return c1 === c2 ? s1.depth > s2.depth : c1.index > c2.index;
   }
 
   /**
