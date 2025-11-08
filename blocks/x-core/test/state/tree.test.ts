@@ -42,9 +42,9 @@ describe("state tree", () => {
   it("tree flat nodes apply insert change", () => {
     const editor = new BlockEditor({ initial: getBlocks() });
     const atom = editor.perform.atom;
-    const newBlockChange = atom.createBlock("child1", { type: "text", children: [], delta: [] });
+    const newBlockChange = atom.create({ type: "text", children: [], delta: [] });
     newBlockChange.id = "grandchild0";
-    const insertBlockChange = atom.insertBlock("child1", 0, newBlockChange.id);
+    const insertBlockChange = atom.insert("child1", 0, newBlockChange);
     editor.state.apply([newBlockChange, insertBlockChange]);
     const root = editor.state.getBlock("root")!;
     const child1 = editor.state.getBlock("child1")!;
@@ -68,9 +68,9 @@ describe("state tree", () => {
   it("tree depth apply insert change", () => {
     const editor = new BlockEditor({ initial: getBlocks() });
     const atom = editor.perform.atom;
-    const newBlockChange = atom.createBlock("child1", { type: "text", children: [], delta: [] });
+    const newBlockChange = atom.create({ type: "text", children: [], delta: [] });
     newBlockChange.id = "grandchild0";
-    const insertBlockChange = atom.insertBlock("child1", 0, newBlockChange.id);
+    const insertBlockChange = atom.insert("child1", 0, newBlockChange);
     editor.state.apply([newBlockChange, insertBlockChange]);
     expect(editor.state.getBlock("root")!.depth).toBe(0);
     expect(editor.state.getBlock("child1")!.depth).toBe(1);
@@ -90,9 +90,9 @@ describe("state tree", () => {
   it("tree depth apply insert change", () => {
     const editor = new BlockEditor({ initial: getBlocks() });
     const atom = editor.perform.atom;
-    const newBlockChange = atom.createBlock("child1", { type: "text", children: [], delta: [] });
+    const newBlockChange = atom.create({ type: "text", children: [], delta: [] });
     newBlockChange.id = "grandchild0";
-    const insertBlockChange = atom.insertBlock("child1", 0, newBlockChange.id);
+    const insertBlockChange = atom.insert("child1", 0, newBlockChange);
     editor.state.apply([newBlockChange, insertBlockChange]);
     expect(editor.state.getBlock("root")!.index).toBe(-1);
     expect(editor.state.getBlock("child1")!.index).toBe(0);

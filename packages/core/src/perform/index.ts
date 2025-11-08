@@ -37,6 +37,7 @@ export class Perform {
       const isLeafTail = isLeafOffsetTail(leaf, point);
       attributes = this.editor.lookup.getLeafMarks(leaf, isLeafTail);
     }
+    // 选区非折叠状态下, 需要删除选区 len 长度的内容
     const delta = new Delta().retain(raw.start).delete(raw.len).insert(text, attributes);
     this.editor.state.apply(delta, { range: raw });
     return void 0;

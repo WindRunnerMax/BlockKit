@@ -45,9 +45,9 @@ export class Perform {
     if (!prevBlock) {
       const data: BlockDataField = { type: "text", children: [], delta: [], parent: "" };
       const parentId = firstBlock.data.parent;
-      const newBlockChange = this.atom.createBlock(parentId, data);
+      const newBlockChange = this.atom.create(data);
       prevBlockId = newBlockChange.id;
-      const insertBlockChange = this.atom.insertBlock(parentId, 0, newBlockChange.id);
+      const insertBlockChange = this.atom.insert(parentId, 0, newBlockChange);
       changes.push(newBlockChange, insertBlockChange);
     }
     if (!prevBlockId) return result;
@@ -72,8 +72,10 @@ export class Perform {
     if (sel.isCollapsed || !sel.length) return null;
     const options: ApplyOptions = {};
     const changes: BatchApplyChange = [];
-    for (let i = 0, n = sel.nodes.length; i < n; ++i) {
-      const entry = sel.nodes[i];
+    // 记录已经删除的父节点，子节点就不必删除
+    const deleted = new Set<string>();
+    for (let i = 0, n = sel.length; i < n; ++i) {
+      const entry = sel.at(i);
       const state = entry && this.editor.state.getBlock(entry.id);
       if (!entry || !state) {
         continue;
@@ -84,8 +86,11 @@ export class Perform {
         continue;
       }
       const parentId = state.data.parent;
-      const change = this.atom.deleteBlock(parentId, state.index);
-      parentId && changes.push(change);
+      if (parentId && !deleted.has(parentId)) {
+        const change = this.atom.remove(parentId, state.index);
+        deleted.add(state.id);
+        changes.push(change);
+      }
     }
     return { changes, options };
   }

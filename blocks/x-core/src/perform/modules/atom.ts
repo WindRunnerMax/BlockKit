@@ -1,6 +1,6 @@
 import type { Delta } from "@block-kit/delta";
-import { getId } from "@block-kit/utils";
-import type { BlockDataField } from "@block-kit/x-json";
+import { getId, isString } from "@block-kit/utils";
+import type { BlockDataField, JSONOp } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../../editor";
 import type { ApplyChange } from "../../state/types";
@@ -13,15 +13,15 @@ export class Atom {
    * - 通常需要配合 insertBlock 调用
    * @param data 初始化数据
    */
-  public createBlock = (parentId: string, data: Omit<BlockDataField, "parent">): ApplyChange => {
+  public create = (data: Omit<BlockDataField, "parent">): ApplyChange => {
     const blocks = this.editor.state.blocks;
     let id = getId(20);
     let max = 100;
     while (blocks[id] && max-- > 0) {
       id = getId(20);
     }
-    const newBlock = Object.assign({ parent: parentId }, data);
-    return { id: id, ops: [{ p: [], oi: newBlock }] };
+    (data as BlockDataField).parent = "";
+    return { id: id, ops: [{ p: [], oi: data }] };
   };
 
   /**
@@ -29,17 +29,32 @@ export class Atom {
    * - 并行创建节点时, 需要保证新创建的节点 parentId 一致性
    * @param parentId 父节点 id
    * @param index 位置索引
-   * @param childId 子节点 id
+   * @param childIdOrNewBlock 子节点 id / createBlock 的 ApplyChange
    */
-  public insertBlock = (parentId: string, index: number, childId: string): ApplyChange[] => {
+  public insert = (
+    parentId: string,
+    index: number,
+    childIdOrNewBlock: string | ApplyChange
+  ): ApplyChange[] => {
     const changes: ApplyChange[] = [];
-    const child = this.editor.state.getBlock(childId);
-    if (child && child.data.parent !== parentId) {
-      const updateParentChange: ApplyChange = {
-        id: childId,
-        ops: [{ p: ["parent"], od: child.data.parent, oi: parentId }],
-      };
-      changes.push(updateParentChange);
+    let childId = "";
+    if (isString(childIdOrNewBlock)) {
+      childId = childIdOrNewBlock;
+      const child = this.editor.state.getBlock(childId);
+      if (child && child.data.parent !== parentId) {
+        const updateChildParentChange: ApplyChange = {
+          id: childId,
+          ops: [{ p: ["parent"], od: child.data.parent, oi: parentId }],
+        };
+        changes.push(updateChildParentChange);
+      }
+    } else {
+      childId = childIdOrNewBlock.id;
+      let op: JSONOp | null = null;
+      if ((op = childIdOrNewBlock.ops[0]) && !op.p.length && op.oi) {
+        // 这里会原地修改 newBlockChange 的内容, 注意副作用
+        op.oi = { ...op.oi, parent: parentId };
+      }
     }
     const updateChildrenChange: ApplyChange = {
       id: parentId,
@@ -50,11 +65,11 @@ export class Atom {
   };
 
   /**
-   * 将 children 从指定 Block 位置删除的变更
+   * 将子节点从指定 Block 位置删除的变更
    * @param parentId  父节点 id
    * @param index 位置索引
    */
-  public deleteBlock = (parentId: string, index: number): ApplyChange => {
+  public remove = (parentId: string, index: number): ApplyChange => {
     const block = this.editor.state.getBlock(parentId);
     const childId = block && block.data.children && block.data.children[index];
     return { id: parentId, ops: [{ p: ["children", index], ld: childId }] };
