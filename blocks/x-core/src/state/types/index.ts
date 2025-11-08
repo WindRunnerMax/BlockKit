@@ -37,6 +37,9 @@ export type ApplyChange = {
   ops: BlockChange;
 };
 
+/** 批量 Block 变更 */
+export type BatchApplyChange = Array<ApplyChange | ApplyChange[]>;
+
 export type ApplyOptions = {
   /** 操作源 */
   source?: O.Values<typeof APPLY_SOURCE>;

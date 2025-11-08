@@ -18,6 +18,9 @@ export type Block = {
 /** Block 数据集合 */
 export type Blocks = Record<string, Block>;
 
+/** Block 数据集合 [Alias Blocks] */
+export type BlockMap = Blocks;
+
 /** Block 变更 */
 export type BlockChange = JSONOp[];
 

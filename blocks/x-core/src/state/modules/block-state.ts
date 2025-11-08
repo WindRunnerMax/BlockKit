@@ -14,7 +14,7 @@ export class BlockState {
   /** Block 版本 */
   public version: number;
   /** 标记是否删除 */
-  public deleted: boolean;
+  public removed: boolean;
   /** Block 父节点索引 */
   public index: number;
   /** 块结构深度 */
@@ -40,7 +40,7 @@ export class BlockState {
     this.id = block.id;
     this.parent = null;
     this.isDirty = true;
-    this.deleted = false;
+    this.removed = false;
     this.version = block.version;
     this.data = { ...block.data };
   }
@@ -84,7 +84,7 @@ export class BlockState {
    * 块重新挂载
    */
   public restore() {
-    this.deleted = false;
+    this.removed = false;
     this._updateMeta();
   }
 
@@ -92,7 +92,7 @@ export class BlockState {
    * 块软删除
    */
   public remove() {
-    this.deleted = true;
+    this.removed = true;
     this.isDirty = true;
   }
 

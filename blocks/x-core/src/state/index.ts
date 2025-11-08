@@ -1,5 +1,5 @@
 import { getId, ROOT_BLOCK } from "@block-kit/utils";
-import type { Blocks } from "@block-kit/x-json";
+import type { BlockMap } from "@block-kit/x-json";
 import type { Block } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../editor";
@@ -7,7 +7,7 @@ import type { ContentChangeEvent } from "../event/bus";
 import { EDITOR_EVENT } from "../event/bus";
 import { BlockState } from "./modules/block-state";
 import { Mutate } from "./mutate";
-import type { ApplyChange, ApplyOptions } from "./types";
+import type { ApplyOptions, BatchApplyChange } from "./types";
 import { APPLY_SOURCE, EDITOR_STATE } from "./types";
 import { normalizeBlocksChange } from "./utils/normalize";
 
@@ -19,14 +19,14 @@ export class EditorState {
   /** Root ID */
   public readonly rootId: string;
   /** Block 集合缓存 */
-  protected _cache: Blocks | null;
+  protected _cache: BlockMap | null;
 
   /**
    * 构造函数
    * @param editor
    * @param initial
    */
-  constructor(public editor: BlockEditor, initial: Blocks) {
+  constructor(public editor: BlockEditor, initial: BlockMap) {
     this._cache = {};
     this.status = {};
     this.blocks = {};
@@ -113,13 +113,13 @@ export class EditorState {
    * - 以内建状态为主, Block 集合数据按需转换
    * @param deep [?=undef] 深拷贝
    */
-  public toBlockSet(deep?: boolean): Blocks {
+  public toBlockSet(deep?: boolean): BlockMap {
     if (!deep && this._cache) {
       return this._cache;
     }
-    const result: Blocks = {};
+    const result: BlockMap = {};
     for (const block of Object.values(this.blocks)) {
-      if (block.deleted) continue;
+      if (block.removed) continue;
       result[block.id] = block.toBlock(deep);
     }
     this._cache = result;
@@ -131,7 +131,7 @@ export class EditorState {
    * @param changes
    * @param options
    */
-  public apply(changes: ApplyChange[], options: ApplyOptions = {}) {
+  public apply(changes: BatchApplyChange, options: ApplyOptions = {}) {
     const { source = APPLY_SOURCE.USER } = options;
     const previous = this.toBlockSet();
     this._cache = null;

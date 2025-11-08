@@ -8,14 +8,19 @@ import type { ApplyChange } from "../types";
  * @param changes
  * @returns
  */
-export const normalizeBlocksChange = (changes: ApplyChange[]): BlocksChange => {
+export const normalizeBlocksChange = (
+  changes: Array<ApplyChange | ApplyChange[]>
+): BlocksChange => {
   // 将相同 Block Id 的变更合并
   const mergedChange: BlocksChange = {};
   for (const change of changes) {
-    const blockId = change.id;
-    const ops = change.ops;
-    mergedChange[blockId] = mergedChange[blockId] || [];
-    mergedChange[blockId].push(...ops);
+    const entries = Array.isArray(change) ? change : [change];
+    for (const item of entries) {
+      const blockId = item.id;
+      const ops = item.ops;
+      mergedChange[blockId] = mergedChange[blockId] || [];
+      mergedChange[blockId].push(...ops);
+    }
   }
   // 对每个 Block 的变更进行规范化处理
   const normalized: BlocksChange = {};

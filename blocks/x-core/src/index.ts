@@ -1,11 +1,6 @@
 export { BlockEditor } from "./editor/index";
 export type { EditorOptions } from "./editor/types";
 export { X_BLOCK_ID_KEY, X_BLOCK_KEY, X_BLOCK_TYPE_KEY } from "./model/types";
-export {
-  createDeleteBlockChange,
-  createInsertBlockChange,
-  createNewBlockChange,
-} from "./perform/utils/change";
 export { Entry } from "./selection/modules/entry";
 export { Point } from "./selection/modules/point";
 export { Range } from "./selection/modules/range";

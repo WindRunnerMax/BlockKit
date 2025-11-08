@@ -4,6 +4,7 @@ export type {
   Block,
   BlockChange,
   BlockDataField,
+  BlockMap,
   BlockModuleField,
   Blocks,
   BlocksChange,

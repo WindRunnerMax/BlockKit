@@ -4,6 +4,7 @@ import { LOG_LEVEL, Logger } from "@block-kit/core";
 import { Event } from "../event";
 import { Lookup } from "../lookup";
 import { Model } from "../model";
+import { Perform } from "../perform";
 import { Plugin } from "../plugin";
 import { Selection } from "../selection";
 import { EditorState } from "../state";
@@ -31,6 +32,8 @@ export class BlockEditor {
   public selection: Selection;
   /** 检索模块 */
   public lookup: Lookup;
+  /** 变更模块 */
+  public perform: Perform;
 
   /**
    * 构造函数
@@ -47,6 +50,7 @@ export class BlockEditor {
     this.model = new Model();
     this.selection = new Selection(this);
     this.lookup = new Lookup(this);
+    this.perform = new Perform(this);
   }
 
   /**

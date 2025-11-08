@@ -1,7 +1,6 @@
 import type { Blocks } from "@block-kit/x-json";
 
-import { BlockEditor, createNewBlockChange } from "../../src";
-import { createDeleteBlockChange, createInsertBlockChange } from "../../src/perform/utils/change";
+import { BlockEditor } from "../../src/editor";
 
 const getBlocks = (): Blocks => ({
   root: {
@@ -29,8 +28,9 @@ const getBlocks = (): Blocks => ({
 describe("state mutate", () => {
   it("create block and insert to child2", () => {
     const editor = new BlockEditor({ initial: getBlocks() });
-    const newBlockChange = createNewBlockChange(editor, { type: "text", children: [], delta: [] });
-    const insertBlockChange = createInsertBlockChange("child2", 0, newBlockChange);
+    const atom = editor.perform.atom;
+    const newBlockChange = atom.createBlock("child2", { type: "text", children: [], delta: [] });
+    const insertBlockChange = atom.insertBlock("child2", 0, newBlockChange.id);
     editor.state.apply([newBlockChange, insertBlockChange]);
     const newBlocks = editor.state.toBlockSet();
     expect(newBlocks[newBlockChange.id]).toBeDefined();
@@ -42,7 +42,8 @@ describe("state mutate", () => {
 
   it("delete child1", () => {
     const editor = new BlockEditor({ initial: getBlocks() });
-    const deleteChange = createDeleteBlockChange(editor, "root", 0);
+    const atom = editor.perform.atom;
+    const deleteChange = atom.deleteBlock("root", 0);
     editor.state.apply([deleteChange]);
     const newBlocks = editor.state.toBlockSet();
     expect(newBlocks.root.data.children).toEqual(["child2"]);

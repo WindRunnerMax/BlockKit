@@ -6,21 +6,21 @@ import type { BlockEditor } from "../editor";
 import { getOpMetaMarks } from "../lookup/utils/marks";
 import { Entry } from "../selection/modules/entry";
 import type { Range } from "../selection/modules/range";
-import type { ApplyChange, ApplyOptions } from "../state/types";
+import type { ApplyOptions, BatchApplyChange } from "../state/types";
+import { Atom } from "./modules/atom";
 import type { PerformResult } from "./types";
-import {
-  createDeleteBlockChange,
-  createInsertBlockChange,
-  createNewBlockChange,
-  createTextChange,
-} from "./utils/change";
 
 export class Perform {
+  /** 原子化变更 BlockMap */
+  public atom: Atom;
+
   /**
    * 构造函数
    * @param editor
    */
-  constructor(protected editor: BlockEditor) {}
+  constructor(protected editor: BlockEditor) {
+    this.atom = new Atom(editor);
+  }
 
   /**
    * 插入文本
@@ -29,7 +29,7 @@ export class Perform {
    */
   public insertText(sel: Range, text: string): PerformResult | null {
     if (!sel.length) return null;
-    const changes: ApplyChange[] = [];
+    const changes: BatchApplyChange = [];
     const options: ApplyOptions = {};
     const result = { changes, options };
     if (!sel.isCollapsed) {
@@ -44,9 +44,10 @@ export class Perform {
     // 没有前节点的情况下需要创建空白的文本节点
     if (!prevBlock) {
       const data: BlockDataField = { type: "text", children: [], delta: [], parent: "" };
-      const newBlockChange = createNewBlockChange(this.editor, data);
+      const parentId = firstBlock.data.parent;
+      const newBlockChange = this.atom.createBlock(parentId, data);
       prevBlockId = newBlockChange.id;
-      const insertBlockChange = createInsertBlockChange(firstBlock.data.parent, 0, newBlockChange);
+      const insertBlockChange = this.atom.insertBlock(parentId, 0, newBlockChange.id);
       changes.push(newBlockChange, insertBlockChange);
     }
     if (!prevBlockId) return result;
@@ -58,7 +59,7 @@ export class Perform {
     }
     const len = prevBlock ? prevBlock.length : 0;
     const delta = new Delta().retain(len).insert(text, attributes);
-    const textChange = createTextChange(prevBlockId, delta);
+    const textChange = this.atom.updateText(prevBlockId, delta);
     changes.push(textChange);
     return result;
   }
@@ -70,7 +71,7 @@ export class Perform {
   public deleteFragment(sel: Range): PerformResult | null {
     if (sel.isCollapsed || !sel.length) return null;
     const options: ApplyOptions = {};
-    const changes: ApplyChange[] = [];
+    const changes: BatchApplyChange = [];
     for (let i = 0, n = sel.nodes.length; i < n; ++i) {
       const entry = sel.nodes[i];
       const state = entry && this.editor.state.getBlock(entry.id);
@@ -79,11 +80,11 @@ export class Perform {
       }
       if ((i === 0 || i === n - 1) && Entry.isTextEntry(entry)) {
         const delta = new Delta().retain(entry.start).delete(entry.len);
-        changes.push(createTextChange(entry.id, delta));
+        changes.push(this.atom.updateText(entry.id, delta));
         continue;
       }
       const parentId = state.data.parent;
-      const change = createDeleteBlockChange(this.editor, parentId, state.index);
+      const change = this.atom.deleteBlock(parentId, state.index);
       parentId && changes.push(change);
     }
     return { changes, options };
