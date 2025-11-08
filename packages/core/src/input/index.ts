@@ -13,6 +13,7 @@ export class Input {
    */
   constructor(protected editor: Editor) {
     this.editor.event.on(EDITOR_EVENT.BEFORE_INPUT, this.onBeforeInput);
+    this.editor.event.on(EDITOR_EVENT.COMPOSITION_START, this.onCompositionStart);
     this.editor.event.on(EDITOR_EVENT.COMPOSITION_END, this.onCompositionEnd);
   }
 
@@ -21,6 +22,7 @@ export class Input {
    */
   public destroy() {
     this.editor.event.off(EDITOR_EVENT.BEFORE_INPUT, this.onBeforeInput);
+    this.editor.event.off(EDITOR_EVENT.COMPOSITION_START, this.onCompositionStart);
     this.editor.event.off(EDITOR_EVENT.COMPOSITION_END, this.onCompositionEnd);
   }
 
@@ -84,6 +86,23 @@ export class Input {
   }
 
   /**
+   * 组合输入开始
+   * @param event
+   */
+  @Bind
+  protected onCompositionStart() {
+    // FIX: 避免 IME 破坏跨节点渲染造成问题
+    // 需要强制刷新 state.key, 且需要配合 removeChild 避免抛出异常
+    // https://github.com/facebookarchive/draft-js/issues/1320
+    const sel = this.editor.selection.get();
+    if (!sel || sel.isCollapsed) return void 0;
+    for (let i = sel.start.line; i <= sel.end.line; ++i) {
+      const line = this.editor.state.block.getLine(i);
+      line && line.forceRefresh();
+    }
+  }
+
+  /**
    * 组合输入结束
    * @param event
    */
@@ -92,6 +111,6 @@ export class Input {
     event.preventDefault();
     const data = event.data;
     const sel = this.editor.selection.get();
-    data && sel && this.editor.perform.insertText(sel, data);
+    sel && this.editor.perform.insertText(sel, data || "");
   }
 }

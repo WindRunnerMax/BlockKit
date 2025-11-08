@@ -65,3 +65,16 @@ export const updateDirtyLeaf = (editor: Editor, leaf: LeafState) => {
   }
   return true;
 };
+
+/**
+ * 重写 removeChild 方法
+ * - 避免 IME 破坏跨节点渲染造成问题
+ * - https://github.com/facebookarchive/draft-js/issues/1320
+ */
+export const rewriteRemoveChild = (node: Node) => {
+  const removeChild = Node.prototype.removeChild;
+  node.removeChild = function <T extends Node>(child: T) {
+    if (child.parentNode !== this) return child;
+    return removeChild.call(this, child) as T;
+  };
+};

@@ -13,6 +13,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "re
 
 import { useComposing } from "../hooks/use-composing";
 import { withWrapLineNodes } from "../plugin/modules/wrap";
+import { rewriteRemoveChild } from "../utils/dirty-dom";
 import { JSX_TO_STATE } from "../utils/weak-map";
 import { LineModel } from "./line";
 
@@ -34,11 +35,12 @@ const BlockView: FC<{
   /**
    * 设置行 DOM 节点
    */
-  const setModel = (ref: HTMLDivElement | null) => {
+  const setModel = useMemoFn((ref: HTMLDivElement | null) => {
     if (ref) {
       editor.model.setBlockModel(ref, state);
+      rewriteRemoveChild(ref);
     }
-  };
+  });
 
   /**
    * 数据同步变更, 异步批量绘制变更
