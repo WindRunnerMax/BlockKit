@@ -140,8 +140,9 @@ export class Selection {
    * @param force [?=false] 忽略 MouseDown 状态检查
    */
   public updateDOMSelection(force = false) {
-    const range = this.current;
-    if (!range || this.editor.state.get(EDITOR_STATE.COMPOSING)) {
+    // 在跨节点选中文本, 且唤醒 IME 输入后, 需要删除内容否则会导致 Crash
+    // 这里有个奇怪表现, 若是不更新浏览器选区, 会导致原选区后的节点都无法渲染
+    if (!force && this.editor.state.get(EDITOR_STATE.COMPOSING)) {
       return false;
     }
     // 按下鼠标的情况下不更新选区, 而 force 的情况则例外
@@ -150,9 +151,10 @@ export class Selection {
     if (!force && this.editor.state.get(EDITOR_STATE.MOUSE_DOWN)) {
       return false;
     }
+    const range = this.current;
     const root = this.editor.getContainer();
-    const selection = getRootSelection(root);
-    if (!selection) {
+    const selection = range && getRootSelection(root);
+    if (!selection || !range) {
       return false;
     }
     const sel = toDOMRange(this.editor, range);

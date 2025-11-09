@@ -91,15 +91,10 @@ export class Input {
    */
   @Bind
   protected onCompositionStart() {
-    // FIX: 避免 IME 破坏跨节点渲染造成问题
-    // 需要强制刷新 state.key, 且需要配合 removeChild 避免抛出异常
-    // https://github.com/facebookarchive/draft-js/issues/1320
+    // 避免 IME 破坏跨节点渲染造成问题
     const sel = this.editor.selection.get();
     if (!sel || sel.isCollapsed) return void 0;
-    for (let i = sel.start.line; i <= sel.end.line; ++i) {
-      const line = this.editor.state.block.getLine(i);
-      line && line.forceRefresh();
-    }
+    this.editor.perform.deleteFragment(sel);
   }
 
   /**

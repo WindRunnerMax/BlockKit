@@ -73,8 +73,13 @@ export const updateDirtyLeaf = (editor: Editor, leaf: LeafState) => {
  */
 export const rewriteRemoveChild = (node: Node) => {
   const removeChild = Node.prototype.removeChild;
-  node.removeChild = function <T extends Node>(child: T) {
-    if (child.parentNode !== this) return child;
+  node.removeChild = function removeNode<T extends Node>(child: T) {
+    if (child.parentNode !== this) {
+      if (process.env.NODE_ENV === "development") {
+        console.log("Remove Unmount Child", child, "From", this);
+      }
+      return child;
+    }
     return removeChild.call(this, child) as T;
   };
 };

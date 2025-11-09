@@ -73,12 +73,8 @@ const BlockView: FC<{
    */
   useLayoutEffect(() => {
     const selection = editor.selection.get();
-    if (
-      !editor.state.get(EDITOR_STATE.COMPOSING) &&
-      editor.state.get(EDITOR_STATE.FOCUS) &&
-      selection
-    ) {
-      // 更新浏览器选区
+    // 同步计算完成后更新浏览器选区, 等待 Paint
+    if (editor.state.isFocused() && selection) {
       editor.logger.debug("UpdateDOMSelection");
       editor.selection.updateDOMSelection(true);
     }
