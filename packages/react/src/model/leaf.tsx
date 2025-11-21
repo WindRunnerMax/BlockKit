@@ -1,11 +1,12 @@
 import type { Editor, LeafState } from "@block-kit/core";
 import { LEAF_KEY, PLUGIN_FUNC } from "@block-kit/core";
-import { useForceUpdate } from "@block-kit/utils/dist/es/hooks";
+import { useForceUpdate, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { FC } from "react";
 import React, { useMemo } from "react";
 
 import type { ReactLeafContext } from "../plugin/types";
 import { Text } from "../preset/text";
+import { rewriteRemoveChild } from "../utils/dirty-dom";
 import { LEAF_TO_REMOUNT, LEAF_TO_TEXT as LT } from "../utils/weak-map";
 
 /**
@@ -23,12 +24,13 @@ const LeafView: FC<{
   /**
    * 设置叶子 DOM 节点
    */
-  const setModel = (ref: HTMLSpanElement | null) => {
+  const setModel = useMemoFn((ref: HTMLSpanElement | null) => {
     if (ref) {
+      rewriteRemoveChild(ref);
       editor.model.setLeafModel(ref, leafState);
     }
     LEAF_TO_REMOUNT.set(leafState, forceUpdate);
-  };
+  });
 
   /**
    * 处理叶子节点的渲染

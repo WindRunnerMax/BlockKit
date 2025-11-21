@@ -56,3 +56,8 @@
   right: 12px;
   top: 6px;
 }
+
+.editable-vars .block-kit-editable-text:not([data-vars-placeholder]) {
+  display: inline;
+  word-break: break-all;
+}

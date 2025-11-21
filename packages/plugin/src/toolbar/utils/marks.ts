@@ -1,5 +1,5 @@
-import type { Op } from "@block-kit/delta";
-import type { AttributeMap } from "@block-kit/delta";
+import type { AttributeMap, Op } from "@block-kit/delta";
+import { isEOLOp } from "@block-kit/delta";
 
 export const filterMarkMap = (ops: Op[]): Record<string, string> => {
   const firstOp = ops[0];
@@ -10,6 +10,8 @@ export const filterMarkMap = (ops: Op[]): Record<string, string> => {
   // 全部存在且相同的属性才认为是此时存在的 mark
   for (let i = 1; i < ops.length; i++) {
     const op = ops[i];
+    // EOL Op 需要忽略
+    if (isEOLOp(op)) continue;
     const attrs = op.attributes;
     const keys = attrs && Object.keys(attrs);
     if (!keys || !keys.length) return {};
