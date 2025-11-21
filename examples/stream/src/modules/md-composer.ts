@@ -51,7 +51,7 @@ export class MdComposer {
     for (let i = 0; i < tree.length; i++) {
       const prev = tree[i - 1];
       const child = tree[i];
-      // 首层子节点存在第二级时，归档上一个节点
+      // 首层子节点存在第二级时, 归档上一个节点
       // 此外诸如表格等节点可以正则等额外的匹配策略来避免过早归档
       // 但这样需要避免前次循环不归档而后续归档, 导致归档数据本身不连续
       if (prev && child) {

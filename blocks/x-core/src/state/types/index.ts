@@ -45,12 +45,12 @@ export type ApplyOptions = {
   source?: O.Values<typeof APPLY_SOURCE>;
   /** 自动变换光标 */
   autoCaret?: boolean;
+  /** 应用变更后的选区 */
+  selection?: Range;
   /** 自动记录到 History */
   undoable?: boolean;
   /** 额外携带的信息 */
   extra?: unknown;
-  /** 设置应用后的选区 */
-  selection?: Range;
 };
 
 export type ApplyResult = {

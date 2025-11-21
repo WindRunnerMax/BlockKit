@@ -63,7 +63,7 @@ export const toDOMRange = (editor: BlockEditor, range: Range): DOMRange | null =
   if (!start || !end) {
     return null;
   }
-  if (Entry.isBlockEntry(start) && Entry.isBlockEntry(end)) {
+  if (Entry.isBlock(start) && Entry.isBlock(end)) {
     const node = editor.selection.element || editor.getContainer();
     const domRange = window.document.createRange();
     domRange.setStart(node, 0);
@@ -71,19 +71,19 @@ export const toDOMRange = (editor: BlockEditor, range: Range): DOMRange | null =
     return domRange;
   }
   const { BLOCK, TEXT } = POINT_TYPE;
-  const startPoint: RangePoint = Entry.isBlockEntry(start)
+  const startPoint: RangePoint = Entry.isBlock(start)
     ? Point.create(start.id, BLOCK)
     : Point.create(start.id, TEXT, start.start);
   let endPoint: RangePoint | null = isCollapsed ? startPoint : null;
   // 选区为同 Entry 的非折叠状态
   if (!isCollapsed && start.id === end.id) {
-    endPoint = Entry.isBlockEntry(start)
+    endPoint = Entry.isBlock(start)
       ? Point.create(start.id, BLOCK)
       : Point.create(start.id, TEXT, start.start + start.len);
   }
   // 选区为多个 Entry 的情况
   if (start.id !== end.id) {
-    endPoint = Entry.isBlockEntry(end)
+    endPoint = Entry.isBlock(end)
       ? Point.create(end.id, BLOCK)
       : Point.create(end.id, TEXT, end.start + end.len);
   }

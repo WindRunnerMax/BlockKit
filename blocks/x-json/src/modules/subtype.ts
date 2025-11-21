@@ -21,7 +21,7 @@ export const deltaType: Subtype = {
   compose: (ops1: Op[], ops2: Op[]) => {
     const delta1 = new Delta(ops1);
     const delta2 = new Delta(ops2);
-    // compose("A", "B") => BA
+    // compose("A", "B") => BA => delta2 compose delta1
     return delta2.compose(delta1).ops;
   },
   transform: (ops1: Op[], ops2: Op[], side) => {

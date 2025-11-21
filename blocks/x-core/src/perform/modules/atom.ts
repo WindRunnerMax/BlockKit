@@ -10,7 +10,7 @@ export class Atom {
 
   /**
    * 创建新 Block 的变更
-   * - 通常需要配合 insertBlock 调用
+   * - 通常需要配合 insert 调用
    * @param data 初始化数据
    */
   public create = (data: Omit<BlockDataField, "parent">): ApplyChange => {
@@ -20,7 +20,7 @@ export class Atom {
     while (blocks[id] && max-- > 0) {
       id = getId(20);
     }
-    (data as BlockDataField).parent = "";
+    (<BlockDataField>data).parent = "";
     return { id: id, ops: [{ p: [], oi: data }] };
   };
 
@@ -29,7 +29,7 @@ export class Atom {
    * - 并行创建节点时, 需要保证新创建的节点 parentId 一致性
    * @param parentId 父节点 id
    * @param index 位置索引
-   * @param childIdOrNewBlock 子节点 id / createBlock 的 ApplyChange
+   * @param childIdOrNewBlock 子节点 id / create 的 ApplyChange
    */
   public insert = (
     parentId: string,
@@ -37,7 +37,7 @@ export class Atom {
     childIdOrNewBlock: string | ApplyChange
   ): ApplyChange[] => {
     const changes: ApplyChange[] = [];
-    let childId = "";
+    let childId: string;
     if (isString(childIdOrNewBlock)) {
       childId = childIdOrNewBlock;
       const child = this.editor.state.getBlock(childId);
@@ -56,11 +56,11 @@ export class Atom {
         op.oi = { ...op.oi, parent: parentId };
       }
     }
-    const updateChildrenChange: ApplyChange = {
+    const insertChildChange: ApplyChange = {
       id: parentId,
       ops: [{ p: ["children", index], li: childId }],
     };
-    changes.push(updateChildrenChange);
+    changes.push(insertChildChange);
     return changes;
   };
 

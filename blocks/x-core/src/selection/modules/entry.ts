@@ -21,18 +21,18 @@ export class Entry {
   }
 
   /**
-   * 判断块 Entry
+   * 判断块类型 Entry
    * @param entry
    */
-  public static isBlockEntry(entry: RangeEntry): entry is BlockEntry {
+  public static isBlock(entry: RangeEntry): entry is BlockEntry {
     return entry.type === T.BLOCK;
   }
 
   /**
-   * 判断文本 Entry
+   * 判断文本类型 Entry
    * @param entry
    */
-  public static isTextEntry(entry: RangeEntry): entry is TextEntry {
+  public static isText(entry: RangeEntry): entry is TextEntry {
     return entry.type === T.TEXT;
   }
 
@@ -63,8 +63,8 @@ export class Entry {
     if (!entry1 || !entry2) return false;
     if (entry1.id === entry2.id) {
       if (entry1.type !== entry2.type) return false;
-      if (Entry.isBlockEntry(entry1)) return true;
-      if (Entry.isTextEntry(entry1)) return entry1.start < (<TextEntry>entry2).start;
+      if (Entry.isBlock(entry1)) return true;
+      if (Entry.isText(entry1)) return entry1.start < (<TextEntry>entry2).start;
       return true;
     }
     const s1 = editor.state.getBlock(entry1.id);
@@ -89,8 +89,8 @@ export class Entry {
     if (!entry1 || !entry2) return false;
     if (entry1.id === entry2.id) {
       if (entry1.type !== entry2.type) return false;
-      if (Entry.isBlockEntry(entry1)) return true;
-      if (Entry.isTextEntry(entry1)) return entry1.start > (<TextEntry>entry2).start;
+      if (Entry.isBlock(entry1)) return true;
+      if (Entry.isText(entry1)) return entry1.start > (<TextEntry>entry2).start;
       return true;
     }
     const s1 = editor.state.getBlock(entry1.id);

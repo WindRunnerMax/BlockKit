@@ -46,7 +46,7 @@ export class BlockState {
   }
 
   /**
-   * 获取上一个相邻节点
+   * 获取同级的上一个相邻节点
    */
   public prev(): BlockState | null {
     const parent = this.parent;
@@ -56,7 +56,7 @@ export class BlockState {
   }
 
   /**
-   * 获取下一个相邻节点
+   * 获取同级的下一个相邻节点
    */
   public next(): BlockState | null {
     const parent = this.parent;

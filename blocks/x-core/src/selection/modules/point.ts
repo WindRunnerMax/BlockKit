@@ -13,18 +13,18 @@ export class Point {
   }
 
   /**
-   * 判断块 Point
+   * 判断块类型 Point
    * @param point
    */
-  public static isBlockPoint(point: RangePoint): point is BlockPoint {
+  public static isBlock(point: RangePoint): point is BlockPoint {
     return point.type === POINT_TYPE.BLOCK;
   }
 
   /**
-   * 判断文本 Point
+   * 判断文本类型 Point
    * @param point
    */
-  public static isTextPoint(point: RangePoint): point is TextPoint {
+  public static isText(point: RangePoint): point is TextPoint {
     return point.type === POINT_TYPE.TEXT;
   }
 
@@ -55,8 +55,8 @@ export class Point {
     if (!point1 || !point2) return false;
     if (point1.id === point2.id) {
       if (point1.type !== point2.type) return false;
-      if (Point.isBlockPoint(point1)) return true;
-      if (Point.isTextPoint(point1)) return point1.offset < (<TextPoint>point2).offset;
+      if (Point.isBlock(point1)) return true;
+      if (Point.isText(point1)) return point1.offset < (<TextPoint>point2).offset;
       return true;
     }
     const s1 = editor.state.getBlock(point1.id);
@@ -80,8 +80,8 @@ export class Point {
     if (!point1 || !point2) return false;
     if (point1.id === point2.id) {
       if (point1.type !== point2.type) return false;
-      if (Point.isBlockPoint(point1)) return true;
-      if (Point.isTextPoint(point1)) return point1.offset > (<TextPoint>point2).offset;
+      if (Point.isBlock(point1)) return true;
+      if (Point.isText(point1)) return point1.offset > (<TextPoint>point2).offset;
       return true;
     }
     const s1 = editor.state.getBlock(point1.id);

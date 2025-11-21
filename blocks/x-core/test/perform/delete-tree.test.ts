@@ -1,5 +1,5 @@
-describe("perform delete", () => {
-  it("delete text tree sub nodes", () => {
+describe("perform delete-tree", () => {
+  it("text tree sub nodes", () => {
     // 从 B 前删除到 C, 子节点中未删除的节点需要组合到 B 中
     // 因此从 B 开始到同层级 H 结束间的所有节点作为 B 的子节点
     // 即 (B, H) 且不包括两端节点, 注意是 B 直属子节点起始, 不需要递归处理

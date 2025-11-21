@@ -63,7 +63,7 @@ export class Lookup {
       return void 0;
     }
     const entry = current.at(0)!;
-    if (!Entry.isTextEntry(entry)) {
+    if (!Entry.isText(entry)) {
       return void 0;
     }
     const meta = this.getLeafAtPoint(entry.id, entry.start);
