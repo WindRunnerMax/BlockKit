@@ -21,6 +21,7 @@ export { Isolate } from "./preset/isolate";
 export { Text } from "./preset/text";
 export { Void } from "./preset/void";
 export { ZeroSpace } from "./preset/zero";
+export { rewriteRemoveChild } from "./utils/dirty-dom";
 export { preventNativeEvent, preventReactEvent } from "./utils/event";
 export { MountNode } from "./utils/mount-dom";
 export { JSX_TO_STATE, LEAF_TO_REMOUNT, LEAF_TO_TEXT, LEAF_TO_ZERO_TEXT } from "./utils/weak-map";

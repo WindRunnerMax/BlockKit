@@ -39,7 +39,9 @@
     "react-dom": ">=16"
   },
   "dependencies": {
+    "@block-kit/x-core": "workspace: *",
     "@block-kit/core": "workspace: *",
+    "@block-kit/react": "workspace: *",
     "@block-kit/delta": "workspace: *",
     "@block-kit/utils": "workspace: *"
   },

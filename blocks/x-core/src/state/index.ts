@@ -35,6 +35,7 @@ export class EditorState {
     // 建立 Blocks 集合
     for (const block of Object.values(initial)) {
       if (block.data.type === ROOT_BLOCK) {
+        usedIds.add(block.id);
         this.rootId = block.id;
       }
       this.blocks[block.id] = new BlockState(block, this);
@@ -42,11 +43,7 @@ export class EditorState {
     }
     // 建立树集合后更新元信息, 并构建树结构
     for (const state of Object.values(this.blocks)) {
-      if (!usedIds.has(state.id)) {
-        state.remove();
-        continue;
-      }
-      state._updateMeta();
+      usedIds.has(state.id) ? state._updateMeta() : state.remove();
     }
   }
 

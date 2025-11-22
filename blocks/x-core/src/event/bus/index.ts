@@ -43,8 +43,7 @@ export type EventMap = {
   [EDITOR_EVENT.CONTENT_WILL_CHANGE]: ContentWillChangeEvent;
 } & NativeEventMap;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type PaintEvent = {};
+export type PaintEvent = { id: string };
 export type EventMapType = typeof EDITOR_EVENT;
 export type EventMapKeys = Object.Values<EventMapType>;
 export type EditorEvent = Reflex.Tuple<EventMap>;

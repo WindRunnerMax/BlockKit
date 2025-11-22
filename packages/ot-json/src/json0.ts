@@ -172,7 +172,7 @@ export class JSONType {
         // Should check that elem[key] == c.od
         delete elem[key];
       } else {
-        throw new Error("invalid / missing instruction in op");
+        throw new Error("invalid / missing instruction in op: " + JSON.stringify(c));
       }
     }
     return container.data;

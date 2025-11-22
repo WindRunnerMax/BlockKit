@@ -233,9 +233,15 @@ importers:
       '@block-kit/delta':
         specifier: 'workspace: *'
         version: link:../../packages/delta
+      '@block-kit/react':
+        specifier: 'workspace: *'
+        version: link:../../packages/react
       '@block-kit/utils':
         specifier: 'workspace: *'
         version: link:../../packages/utils
+      '@block-kit/x-core':
+        specifier: 'workspace: *'
+        version: link:../x-core
     devDependencies:
       '@babel/core':
         specifier: 7.20.12
