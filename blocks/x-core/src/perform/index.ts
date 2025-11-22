@@ -74,9 +74,9 @@ export class Perform {
     if (!firstBlock || !lastBlock) return null;
     // 记录已经删除的父节点, 此时子节点就不必删除
     const deleted = new Set<string>();
-    // 记录父节点删除单子节点应该保留的情况, 仅出现在文本节点情况下
-    // const remain: string[] = [];
-    // 遍历选区节点, 逐一执行删除
+    // 记录父节点删除单子节点应该保留的情况
+    const remain: string[] = [];
+    // ========== 遍历选区节点, 逐一执行删除 ==========
     for (let i = 0, n = sel.length; i < n; ++i) {
       const entry = sel.at(i);
       const state = entry && this.editor.state.getBlock(entry.id);
@@ -105,7 +105,6 @@ export class Perform {
         if (firstBlock.id !== lastBlock.id && Entry.isBlock(firstEntry)) {
           const delDelta = new Delta().delete(entry.len);
           changes.push(this.atom.updateText(entry.id, delDelta));
-          continue;
         }
         continue;
       }
@@ -116,8 +115,13 @@ export class Perform {
         deleted.add(state.id);
         changes.push(change);
       }
+      // 删除的块节点需要将子节点收集, 未删除的需要重新插入到父节点中
+      const children = state.data.children;
+      for (const child of children) {
+        remain.push(child);
+      }
     }
-    // 预设删除后的选区, 需要根据不同的情况处理
+    // ========== 预设删除后的选区, 需要根据不同的情况处理 ==========
     if (Entry.isText(firstEntry)) {
       // 首个节点为文本节点, 直接设置选区到该位置
       const offset = firstEntry.start;
@@ -146,6 +150,28 @@ export class Perform {
         options.selection = new Range([entry], false);
       }
     }
+    // ========== 处理保留的子节点插入 ==========
+    const firstPoint = options.selection && options.selection.getFirstPoint();
+    if (firstPoint && remain.length) {
+      const block = this.editor.state.getBlock(firstPoint.id);
+      const exists = new Set<string>(block ? block.data.children : []);
+      let index = 0;
+      for (const childId of remain) {
+        if (exists.has(childId) || deleted.has(childId)) continue;
+        const moveChanges = this.atom.move(childId, firstPoint.id, index++);
+        changes.push(moveChanges);
+      }
+    }
     return { changes, options };
+  }
+
+  /**
+   * 执行变更结果
+   * @param result
+   */
+  public applyChanges(result: PerformResult | null) {
+    const changes = result ? result.changes : [];
+    const options = result ? result.options : {};
+    return this.editor.state.apply(changes, options);
   }
 }

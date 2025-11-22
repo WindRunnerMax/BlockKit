@@ -1,5 +1,7 @@
 import type { RangeEntry, TextEntry } from "../types";
 import { POINT_TYPE } from "../utils/constant";
+import { Entry } from "./entry";
+import { Point } from "./point";
 
 export class Range {
   /** 内建节点 */
@@ -46,6 +48,17 @@ export class Range {
    */
   public clone() {
     return new Range(this.nodes.slice());
+  }
+
+  /**
+   * 获取选区首个节点
+   */
+  public getFirstPoint() {
+    if (!this.nodes.length) return null;
+    const first = this.nodes[0];
+    return Entry.isText(first)
+      ? Point.create(first.id, first.type, first.start)
+      : Point.create(first.id, first.type);
   }
 
   /**

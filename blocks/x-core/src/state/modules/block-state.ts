@@ -81,7 +81,7 @@ export class BlockState {
   }
 
   /**
-   * 块重新挂载
+   * 标记块重新挂载
    */
   public restore() {
     this.removed = false;
@@ -89,7 +89,7 @@ export class BlockState {
   }
 
   /**
-   * 块软删除
+   * 标记块软删除
    */
   public remove() {
     this.removed = true;
@@ -195,7 +195,7 @@ export class BlockState {
     let isChildrenChanged = false;
     const inserts: Set<string> = new Set();
     const deletes: Set<string> = new Set();
-    for (const op of ops) {
+    for (const op of changes) {
       // 若是 children 的新增变更, 则需要同步相关的 Block 状态
       if (op.p[0] === "children" && isString(op.li)) {
         isChildrenChanged = true;

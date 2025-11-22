@@ -31,15 +31,21 @@ export class EditorState {
     this.status = {};
     this.blocks = {};
     this.rootId = "";
+    const usedIds = new Set<string>();
     // 建立 Blocks 集合
     for (const block of Object.values(initial)) {
       if (block.data.type === ROOT_BLOCK) {
         this.rootId = block.id;
       }
       this.blocks[block.id] = new BlockState(block, this);
+      block.data.children.forEach(id => usedIds.add(id));
     }
     // 建立树集合后更新元信息, 并构建树结构
     for (const state of Object.values(this.blocks)) {
+      if (!usedIds.has(state.id)) {
+        state.remove();
+        continue;
+      }
       state._updateMeta();
     }
   }

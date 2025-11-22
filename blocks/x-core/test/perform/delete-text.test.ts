@@ -53,11 +53,11 @@ describe("perform delete-text fragment", () => {
       Point.create("child1", "T", 1),
       Point.create("child2", "T", 2)
     );
-    const { changes, options } = editor.perform.deleteFragment(new Range(range))!;
-    editor.state.apply(changes, options);
+    const res = editor.perform.deleteFragment(new Range(range))!;
+    editor.perform.applyChanges(res);
     const blockSet = editor.state.toBlockSet();
     expect(blockSet.child1.data.delta).toEqual([{ insert: "16" }]);
-    expect(options!.selection!.at(0)).toEqual(Entry.create("child1", "T", 1, 0));
+    expect(res.options!.selection!.at(0)).toEqual(Entry.create("child1", "T", 1, 0));
   });
 
   it("first block node", () => {

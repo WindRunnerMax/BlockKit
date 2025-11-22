@@ -13,7 +13,7 @@ export class Atom {
    * - 通常需要配合 insert 调用
    * @param data 初始化数据
    */
-  public create = (data: Omit<BlockDataField, "parent">): ApplyChange => {
+  public create(data: Omit<BlockDataField, "parent">): ApplyChange {
     const blocks = this.editor.state.blocks;
     let id = getId(20);
     let max = 100;
@@ -22,7 +22,7 @@ export class Atom {
     }
     (<BlockDataField>data).parent = "";
     return { id: id, ops: [{ p: [], oi: data }] };
-  };
+  }
 
   /**
    * 将 Block 插入到指定 Block 子节点位置的变更
@@ -31,11 +31,11 @@ export class Atom {
    * @param index 位置索引
    * @param childIdOrNewBlock 子节点 id / create 的 ApplyChange
    */
-  public insert = (
+  public insert(
     parentId: string,
     index: number,
     childIdOrNewBlock: string | ApplyChange
-  ): ApplyChange[] => {
+  ): ApplyChange[] {
     const changes: ApplyChange[] = [];
     let childId: string;
     if (isString(childIdOrNewBlock)) {
@@ -62,25 +62,42 @@ export class Atom {
     };
     changes.push(insertChildChange);
     return changes;
-  };
+  }
 
   /**
    * 将子节点从指定 Block 位置删除的变更
    * @param parentId  父节点 id
    * @param index 位置索引
    */
-  public remove = (parentId: string, index: number): ApplyChange => {
+  public remove(parentId: string, index: number): ApplyChange {
     const block = this.editor.state.getBlock(parentId);
     const childId = block && block.data.children && block.data.children[index];
     return { id: parentId, ops: [{ p: ["children", index], ld: childId }] };
-  };
+  }
 
   /**
    * 生成文本变更
    * @param id 变更块 id
    * @param delta Delta 变更内容
    */
-  public updateText = (id: string, delta: Delta): ApplyChange => {
+  public updateText(id: string, delta: Delta): ApplyChange {
     return { id, ops: [{ p: ["delta"], t: "delta", o: delta }] };
-  };
+  }
+
+  /**
+   * 某节点子节点位置移动的变更
+   * @param nodeId 将要移动节点 id
+   * @param toParentId  新的父节点 id
+   * @param index 新的位置索引
+   */
+  public move(nodeId: string, toParentId: string, index: number): ApplyChange[] {
+    const block = this.editor.state.getBlock(nodeId);
+    if (!block) return [];
+    const changes: ApplyChange[] = [
+      { id: block.data.parent, ops: [{ p: ["children", block.index], ld: nodeId }] },
+      { id: toParentId, ops: [{ p: ["children", index], li: nodeId }] },
+      { id: nodeId, ops: [{ p: ["parent"], od: block.data.parent, oi: toParentId }] },
+    ];
+    return changes;
+  }
 }
