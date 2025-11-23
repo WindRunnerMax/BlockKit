@@ -1,4 +1,7 @@
+import type { GRANULARITY } from "@block-kit/core";
 import {
+  ALERT,
+  DIRECTION,
   getRootSelection,
   getStaticSelection,
   isBackwardDOMRange,
@@ -6,6 +9,7 @@ import {
   isNeedIgnoreRangeDOM,
 } from "@block-kit/core";
 import { Bind } from "@block-kit/utils";
+import type { O } from "@block-kit/utils/dist/es/types";
 
 import type { BlockEditor } from "../editor";
 import { EDITOR_EVENT } from "../event/bus";
@@ -125,6 +129,32 @@ export class Selection {
       selection.setBaseAndExtent(startContainer, startOffset, endContainer, endOffset);
     }
     return true;
+  }
+
+  /**
+   * 同步移动浏览器选区并设置模型选区
+   * - 可用于移动选区, 同样可用于计算新选区范围
+   * @param granularity
+   * @param direction [?=FORWARD]
+   * @param alert [?=MOVE]
+   */
+  public move(
+    granularity: O.Values<typeof GRANULARITY>,
+    direction: O.Values<typeof DIRECTION> = DIRECTION.FORWARD,
+    alert: O.Values<typeof ALERT> = ALERT.MOVE
+  ): Range | null {
+    const root = this.editor.getContainer();
+    const domSelection = getRootSelection(root);
+    const selection = this.current;
+    if (!domSelection || !selection) return null;
+    domSelection.modify(alert, direction, granularity);
+    const staticSel = getStaticSelection(domSelection);
+    if (!staticSel || this.limit()) return null;
+    const { startContainer } = staticSel;
+    if (!root.contains(startContainer)) return null;
+    const newRange = toModelRange(this.editor, staticSel, false);
+    newRange && this.set(newRange);
+    return newRange;
   }
 
   /**

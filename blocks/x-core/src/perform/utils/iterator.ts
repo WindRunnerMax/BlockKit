@@ -19,9 +19,7 @@ export const iterator = (
     if (!state) continue;
     if (state.isBlockNode()) {
       const treeNodes = state.getTreeNodes();
-      for (const node of treeNodes) {
-        cb(entry, node);
-      }
+      for (const node of treeNodes) cb(entry, node);
     } else {
       cb(entry, state);
     }

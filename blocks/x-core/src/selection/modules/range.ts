@@ -1,5 +1,6 @@
-import type { RangeEntry, TextEntry } from "../types";
-import { POINT_TYPE } from "../utils/constant";
+import type { BlockEditor } from "../../editor";
+import type { RangeEntry, RangePoint, TextEntry } from "../types";
+import { normalizeModelRange } from "../utils/model";
 import { Entry } from "./entry";
 import { Point } from "./point";
 
@@ -8,18 +9,27 @@ export class Range {
   public readonly nodes: RangeEntry[];
   /** 选区方向反选 */
   public readonly isBackward: boolean;
-  /** 选区折叠状态 */
+  /**
+   * 选区折叠状态
+   * - 没有 Entry 时为折叠
+   * - 只有单个 Block Entry 时为折叠
+   * - 只有单个 Text Entry 且选区长度为 0 时为折叠
+   */
   public readonly isCollapsed: boolean;
   /** 选区 Entries 长度 */
   public readonly length: number;
 
   /** 构造函数 */
-  public constructor(nodes: RangeEntry[], isBackward?: boolean) {
-    this.nodes = nodes;
-    this.length = nodes.length;
+  public constructor(entries: RangeEntry[], isBackward?: boolean) {
+    this.nodes = entries;
+    this.length = entries.length;
     this.isBackward = !!isBackward;
-    this.isCollapsed = !nodes.length;
-    if (nodes.length === 1 && nodes[0].type === POINT_TYPE.TEXT && nodes[0].len === 0) {
+    this.isCollapsed = !entries.length;
+    const firstEntry = entries.length === 1 && entries[0];
+    if (firstEntry && Entry.isBlock(firstEntry)) {
+      this.isCollapsed = true;
+    }
+    if (firstEntry && Entry.isText(firstEntry) && firstEntry.len === 0) {
       this.isCollapsed = true;
     }
   }
@@ -44,6 +54,35 @@ export class Range {
   }
 
   /**
+   * 获取选区首个节点
+   */
+  public getFirstPoint(): RangePoint | null {
+    const first = this.nodes.length && this.at(0);
+    if (!first) return null;
+    return Entry.isText(first)
+      ? Point.create(first.id, first.type, first.start)
+      : Point.create(first.id, first.type);
+  }
+
+  /**
+   * 获取选区末尾节点
+   */
+  public getLastPoint(): RangePoint | null {
+    const last = this.nodes.length && this.at(-1);
+    if (!last) return null;
+    return Entry.isText(last)
+      ? Point.create(last.id, last.type, last.start + last.len)
+      : Point.create(last.id, last.type);
+  }
+
+  /**
+   * 判断 Range 是否为空
+   */
+  public isEmpty(): boolean {
+    return this.nodes.length === 0;
+  }
+
+  /**
    * 克隆节点
    */
   public clone() {
@@ -51,14 +90,26 @@ export class Range {
   }
 
   /**
-   * 获取选区首个节点
+   * 合并 Range 取最大范围
+   * @param range1
+   * @param range2
+   * @returns
    */
-  public getFirstPoint() {
-    if (!this.nodes.length) return null;
-    const first = this.nodes[0];
-    return Entry.isText(first)
-      ? Point.create(first.id, first.type, first.start)
-      : Point.create(first.id, first.type);
+  public static aggregate(
+    editor: BlockEditor,
+    range1: Range | null,
+    range2: Range | null
+  ): Range | null {
+    if (!range1 || !range2) return null;
+    const start1 = range1.getFirstPoint();
+    const start2 = range2.getFirstPoint();
+    const end1 = range1.getLastPoint();
+    const end2 = range2.getLastPoint();
+    if (!start1 || !start2 || !end1 || !end2) return null;
+    const start = Point.isBefore(editor, start1, start2) ? start1 : start2;
+    const end = Point.isAfter(editor, end1, end2) ? end1 : end2;
+    const entries = normalizeModelRange(editor, start, end);
+    return new Range(entries);
   }
 
   /**

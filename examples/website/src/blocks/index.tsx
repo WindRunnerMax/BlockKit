@@ -1,4 +1,4 @@
-import { Editor, LOG_LEVEL } from "@block-kit/core";
+import { Editor as TextEditor, LOG_LEVEL } from "@block-kit/core";
 import type { Delta } from "@block-kit/delta";
 import {
   BackgroundPlugin,
@@ -22,11 +22,12 @@ import { INIT } from "./config/blocks";
 
 const App: FC = () => {
   const block = useMemo(() => {
-    return new BlockEditor({ initial: INIT, logLevel: LOG_LEVEL.DEBUG });
+    const instance = new BlockEditor({ initial: INIT, logLevel: LOG_LEVEL.DEBUG });
+    return instance;
   }, []);
 
   const onCreateTextEditor = (delta: Delta) => {
-    const instance = new Editor({ schema: SCHEMA, delta });
+    const instance = new TextEditor({ schema: SCHEMA, delta });
     instance.plugin.register([
       new BoldPlugin(),
       new ItalicPlugin(),

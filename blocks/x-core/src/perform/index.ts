@@ -1,3 +1,4 @@
+import { getLastUnicodeLen } from "@block-kit/core";
 import type { AttributeMap } from "@block-kit/delta";
 import { Delta } from "@block-kit/delta";
 import type { BlockDataField } from "@block-kit/x-json";
@@ -7,11 +8,12 @@ import { getOpMetaMarks } from "../lookup/utils/marks";
 import { Entry } from "../selection/modules/entry";
 import { Point } from "../selection/modules/point";
 import { Range } from "../selection/modules/range";
-import type { RangeEntry } from "../selection/types";
+import type { RangeEntry, TextPoint } from "../selection/types";
 import { POINT_TYPE } from "../selection/utils/constant";
 import type { ApplyOptions, BatchApplyChange } from "../state/types";
 import { Atom } from "./modules/atom";
 import type { PerformResult } from "./types";
+import { reserveDeletedNodes } from "./utils/nodes";
 
 export class Perform {
   /** 原子化变更 BlockMap */
@@ -116,6 +118,7 @@ export class Perform {
         changes.push(change);
       }
       // 删除的块节点需要将子节点收集, 未删除的需要重新插入到父节点中
+      // 由于块节点本身不会存在直属 children, 因此这里实际上只有文本块
       const children = state.data.children;
       for (const child of children) {
         remain.push(child);
@@ -151,17 +154,56 @@ export class Perform {
       }
     }
     // ========== 处理保留的子节点插入 ==========
-    const firstPoint = options.selection && options.selection.getFirstPoint();
-    if (firstPoint && remain.length) {
-      const block = this.editor.state.getBlock(firstPoint.id);
-      const exists = new Set<string>(block ? block.data.children : []);
-      let index = 0;
-      for (const childId of remain) {
-        if (exists.has(childId) || deleted.has(childId)) continue;
-        const moveChanges = this.atom.move(childId, firstPoint.id, index++);
-        changes.push(moveChanges);
-      }
+    const reserve = reserveDeletedNodes(this.editor, remain, deleted, options);
+    changes.push(...reserve);
+    return { changes, options };
+  }
+
+  /**
+   * 向后删除字符
+   * - 这里的后指的是 CARET 位置左侧的内容
+   * @param sel
+   */
+  public deleteBackward(sel: Range): PerformResult | null {
+    if (!sel || sel.isEmpty()) return null;
+    if (!sel.isCollapsed || Entry.isBlock(sel.at(0)!)) {
+      return this.deleteFragment(sel);
     }
+    const options: ApplyOptions = {};
+    const changes: BatchApplyChange = [];
+    const start = sel.getFirstPoint() as TextPoint;
+    const block = this.editor.state.getBlock(start.id);
+    if (!block) return null;
+    // 如果处于当前行的行首, 需要根据状态处理情况
+    if (start.offset === 0) {
+      const prevBlock = block.prev();
+      // 如果没有前节点, 则不能执行删除操作
+      if (!prevBlock) return null;
+      // 如果前节点是块节点, 则移动选区到前节点上
+      if (prevBlock.isBlockNode()) {
+        const entry = Entry.create(prevBlock.id, POINT_TYPE.BLOCK);
+        options.selection = new Range([entry], false);
+        return { changes, options };
+      }
+      // 此处开始将当前节点的内容合并到前节点中, 并且删除当前节点
+      const deleted = new Set<string>([block.id]);
+      const remain = [...block.data.children, ...prevBlock.data.children];
+      const sliceDelta = new Delta(block.data.delta!).slice(0, block.length);
+      const mergeDelta = new Delta().retain(prevBlock.length).merge(sliceDelta);
+      const entry = Entry.create(prevBlock.id, POINT_TYPE.TEXT, prevBlock.length, 0);
+      options.selection = new Range([entry], false);
+      const reserve = reserveDeletedNodes(this.editor, remain, deleted, options);
+      changes.push(this.atom.updateText(prevBlock.id, mergeDelta), ...reserve);
+      return { changes, options };
+    }
+    const meta = this.editor.lookup.getLeafAtPoint(block.id, start.offset);
+    let len = 1;
+    if (meta && meta.op.insert) {
+      len = getLastUnicodeLen(meta.op.insert);
+    }
+    const startOffset = start.offset - len;
+    const delta = new Delta().retain(startOffset).delete(len);
+    changes.push(this.atom.updateText(block.id, delta));
     return { changes, options };
   }
 

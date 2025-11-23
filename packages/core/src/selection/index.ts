@@ -288,16 +288,18 @@ export class Selection {
    * - 可用于移动选区, 同样可用于计算新选区范围
    * @param granularity
    * @param direction [?=FORWARD]
+   * @param alert [?=MOVE]
    */
   public move(
     granularity: O.Values<typeof GRANULARITY>,
-    direction: O.Values<typeof DIRECTION> = DIRECTION.FORWARD
+    direction: O.Values<typeof DIRECTION> = DIRECTION.FORWARD,
+    alert: O.Values<typeof ALERT> = ALERT.MOVE
   ): Range | null {
     const root = this.editor.getContainer();
     const domSelection = getRootSelection(root);
     const selection = this.current;
     if (!domSelection || !selection) return null;
-    domSelection.modify(ALERT.MOVE, direction, granularity);
+    domSelection.modify(alert, direction, granularity);
     const staticSel = getStaticSelection(domSelection);
     if (!staticSel || this.limit()) return null;
     const { startContainer } = staticSel;

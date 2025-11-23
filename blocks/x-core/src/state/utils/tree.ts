@@ -91,3 +91,72 @@ export const getLCAWithChildren = (n1: BlockState, n2: BlockState) => {
   }
   return null;
 };
+
+/**
+ * 获取紧邻的上一个节点
+ * - 与 prev 方法不同的是, 该方法会跨越父节点查找上一个节点
+ * @param state 块状态
+ * @param strict [?=false] 严格查找文本节点
+ */
+export const getPrevSiblingNode = (state: BlockState, strict = false): BlockState | null => {
+  const prev = state.prev();
+  if (prev) {
+    if (!strict) return prev;
+    // 严格查找文本节点
+    const nodes = prev.getTreeNodes();
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      const node = nodes[i];
+      if (!node.isBlockNode()) return node;
+    }
+  }
+  let current = state;
+  // 没有上一个节点且不严格查找则直接返回其父节点
+  if (!strict && current.parent) {
+    return current.parent;
+  }
+  // 否则没有前节点的情况, 从其父节点上查找文本节点
+  while (current && current.parent) {
+    const parent = current.parent;
+    // 文本节点则可以停止查找, 可以直接返回
+    if (!parent.isBlockNode()) {
+      return parent;
+    }
+    current = current.parent;
+  }
+  return null;
+};
+
+/**
+ * 获取紧邻的下一个节点
+ * - 与 next 方法不同的是, 该方法会跨越父节点查找下一个节点
+ * @param state 块状态
+ * @param strict [?=false] 严格查找文本节点
+ */
+export const getNextSiblingNode = (state: BlockState, strict = false): BlockState | null => {
+  // 非严格模式下检查子节点和同级节点
+  if (!strict) {
+    // 优先检查直属的子节点
+    const firstChild = state.children[0];
+    if (firstChild) return firstChild;
+    // 其次检查同级的下一个节点
+    const nextNode = state.next();
+    if (nextNode) return nextNode;
+  }
+  // 严格模式下需要控制查找文本节点
+  const parent = state.parent;
+  if (!parent) return null;
+  const nodes = parent.getTreeNodes();
+  let isStarted = false;
+  for (const node of nodes) {
+    // 遇到 state 之后才正常进行查找
+    if (node === state) {
+      isStarted = true;
+      continue;
+    }
+    // 到这里为严格模式, 在开始查找之后直接返回文本节点
+    if (isStarted && !node.isBlockNode()) {
+      return node;
+    }
+  }
+  return null;
+};
