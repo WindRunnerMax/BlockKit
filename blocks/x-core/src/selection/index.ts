@@ -36,6 +36,14 @@ export class Selection {
     this.previous = null;
     this.current = null;
     this.element = null;
+    this.editor.event.on(EDITOR_EVENT.SELECTION_CHANGE_NATIVE, this.onNativeSelectionChange);
+  }
+
+  /**
+   * 销毁模块
+   */
+  public destroy() {
+    this.editor.event.off(EDITOR_EVENT.SELECTION_CHANGE_NATIVE, this.onNativeSelectionChange);
   }
 
   /**

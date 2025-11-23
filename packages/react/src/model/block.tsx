@@ -25,7 +25,6 @@ const BlockView: FC<{
   editor: Editor;
   state: BlockState;
   placeholder?: React.ReactNode;
-  attributes?: Record<string, boolean | string>;
 }> = props => {
   const { editor, state } = props;
   const flushing = useRef(false);
@@ -33,7 +32,7 @@ const BlockView: FC<{
   const [lines, setLines] = useState(() => state.getLines());
 
   /**
-   * 设置行 DOM 节点
+   * 设置 Block DOM 节点
    */
   const setModel = useMemoFn((ref: HTMLDivElement | null) => {
     if (ref) {
@@ -122,7 +121,7 @@ const BlockView: FC<{
   }, [editor, elements]);
 
   return (
-    <div {...{ [BLOCK_KEY]: true, [BLOCK_ID_KEY]: state.key, ...props.attributes }} ref={setModel}>
+    <div {...{ [BLOCK_KEY]: true, [BLOCK_ID_KEY]: state.key }} ref={setModel}>
       {props.placeholder && !isComposing && lines.length === 1 && isEmptyLine(lines[0], true) && (
         <div
           {...{ [PLACEHOLDER_KEY]: true }}

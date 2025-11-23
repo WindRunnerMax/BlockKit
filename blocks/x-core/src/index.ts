@@ -2,7 +2,7 @@ export { BlockEditor } from "./editor/index";
 export type { EditorOptions } from "./editor/types";
 export { EDITOR_EVENT } from "./event/bus";
 export type { InternalEvent, Listener } from "./event/bus/types";
-export { X_BLOCK_ID_KEY, X_BLOCK_KEY, X_BLOCK_TYPE_KEY } from "./model/types";
+export { X_BLOCK_ID_KEY, X_BLOCK_KEY, X_BLOCK_TYPE_KEY, X_TEXT_BLOCK_KEY } from "./model/types";
 export { Entry } from "./selection/modules/entry";
 export { Point } from "./selection/modules/point";
 export { Range } from "./selection/modules/range";

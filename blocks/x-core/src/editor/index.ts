@@ -93,6 +93,7 @@ export class BlockEditor {
    */
   public destroy(this: BlockEditor) {
     this.event.unbind();
+    this.selection.destroy();
     this.state.set(EDITOR_STATE.MOUNTED, false);
   }
 }

@@ -1,6 +1,5 @@
 import type { DOMPoint, NormalizePointContext } from "@block-kit/core";
 import {
-  BLOCK_KEY,
   closestTo,
   isClosestTo,
   normalizeDOMPoint,
@@ -9,7 +8,7 @@ import {
 import { RawPoint } from "@block-kit/core";
 
 import type { BlockEditor } from "../../editor";
-import { X_BLOCK_ID_KEY } from "../../model/types";
+import { X_BLOCK_ID_KEY, X_TEXT_BLOCK_KEY } from "../../model/types";
 import type { BlockState } from "../../state/modules/block-state";
 import { getLCAWithChildren } from "../../state/utils/tree";
 import { Entry } from "../modules/entry";
@@ -30,7 +29,7 @@ export const toModelPoint = (
   context: NormalizePointContext
 ): RangePoint | null => {
   const { node, offset } = domPoint;
-  const isTextBlock = isClosestTo(node, `[${BLOCK_KEY}]`);
+  const isTextBlock = isClosestTo(node, `[${X_TEXT_BLOCK_KEY}]`);
   const xBlockNode = closestTo(node, `[${X_BLOCK_ID_KEY}]`);
   if (!xBlockNode || !node) return null;
   const { TEXT, BLOCK } = POINT_TYPE;

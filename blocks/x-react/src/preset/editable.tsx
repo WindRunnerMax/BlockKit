@@ -1,3 +1,5 @@
+import "../styles/editable.scss";
+
 import { EDITOR_KEY } from "@block-kit/core";
 import { cs } from "@block-kit/utils";
 import React, { useLayoutEffect, useRef } from "react";
@@ -28,6 +30,7 @@ export const EditableX: React.FC<{
   const { editor } = useEditorStatic();
   const { readonly } = useReadonly();
   const ref = useRef<HTMLDivElement>(null);
+  const root = editor.state.getBlock(editor.state.rootId);
 
   useLayoutEffect(() => {
     const el = ref.current;
@@ -38,9 +41,8 @@ export const EditableX: React.FC<{
     };
   }, [editor, preventDestroy]);
 
-  const root = editor.state.getBlock(editor.state.rootId);
   if (!root) {
-    editor.logger.error("Root block not found");
+    editor.logger.error("Missing Root Block");
     return null;
   }
 

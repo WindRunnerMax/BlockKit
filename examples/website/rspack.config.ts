@@ -13,6 +13,10 @@ const plugin = path.resolve(__dirname, "../../packages/plugin/src");
 const vue = path.resolve(__dirname, "../../packages/vue/src");
 const variable = path.resolve(__dirname, "../../examples/variable/src");
 const streaming = path.resolve(__dirname, "../../examples/stream/src");
+const xCore = path.resolve(__dirname, "../../blocks/x-core/src");
+const xJson = path.resolve(__dirname, "../../blocks/x-json/src");
+const xReact = path.resolve(__dirname, "../../blocks/x-react/src");
+const xPlugin = path.resolve(__dirname, "../../blocks/x-plugin/src");
 
 /**
  * @type {import("@rspack/cli").Configuration}
@@ -25,6 +29,7 @@ const config: Configuration = {
     vue: "./src/vue/index.ts",
     variable: "./src/variable/index.tsx",
     streaming: "./src/stream/index.tsx",
+    blocks: "./src/blocks/index.tsx",
   },
   externals: {
     "react": "React",
@@ -53,6 +58,11 @@ const config: Configuration = {
       template: "./public/index.html",
       chunks: ["streaming"],
     }),
+    new HtmlPlugin({
+      filename: "blocks.html",
+      template: "./public/index.html",
+      chunks: ["blocks"],
+    }),
   ],
   resolve: {
     alias: {
@@ -65,6 +75,10 @@ const config: Configuration = {
       "@block-kit/vue": vue,
       "@block-kit/variable": variable,
       "@block-kit/stream": streaming,
+      "@block-kit/x-core": xCore,
+      "@block-kit/x-json": xJson,
+      "@block-kit/x-react": xReact,
+      "@block-kit/x-plugin": xPlugin,
     },
   },
   builtins: {

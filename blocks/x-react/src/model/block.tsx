@@ -19,7 +19,8 @@ import { TextModel } from "./text";
 const BlockView: FC<{
   editor: BlockEditor;
   state: BlockState;
-  placeholder?: React.ReactNode;
+  className?: string;
+  placeholder?: string;
 }> = props => {
   const { editor, state } = props;
   const flushing = useRef(false);
@@ -112,9 +113,19 @@ const BlockView: FC<{
    */
   const children = useMemo(() => {
     const els: JSX.Element[] = [];
-    state.data.delta && els.push(<TextModel key={state.id} state={state}></TextModel>);
+    if (state.data.delta) {
+      els.push(<TextModel block={editor} key={state.id} state={state}></TextModel>);
+    }
     for (const child of state.children) {
-      els.push(<BlockView key={child.id} editor={editor} state={child}></BlockView>);
+      const view = (
+        <BlockView
+          className="block-kit-x-children"
+          key={child.id}
+          editor={editor}
+          state={child}
+        ></BlockView>
+      );
+      els.push(view);
     }
     return els;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -128,6 +139,7 @@ const BlockView: FC<{
         [X_BLOCK_ID_KEY]: state.id,
         [PLACEHOLDER_KEY]: placeholder,
       }}
+      className={props.className}
       ref={setModel}
     >
       {children}
@@ -139,6 +151,7 @@ export const BlockModel = React.memo(BlockView, (prev, next) => {
   return (
     prev.state.id === next.state.id &&
     prev.state.depth === next.state.depth &&
-    prev.placeholder === next.placeholder
+    prev.placeholder === next.placeholder &&
+    prev.className === next.className
   );
 });

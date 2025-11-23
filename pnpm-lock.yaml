@@ -371,6 +371,18 @@ importers:
       '@block-kit/vue':
         specifier: 'workspace: *'
         version: link:../../packages/vue
+      '@block-kit/x-core':
+        specifier: 'workspace: *'
+        version: link:../../blocks/x-core
+      '@block-kit/x-json':
+        specifier: 'workspace: *'
+        version: link:../../blocks/x-json
+      '@block-kit/x-plugin':
+        specifier: 'workspace: *'
+        version: link:../../blocks/x-plugin
+      '@block-kit/x-react':
+        specifier: 'workspace: *'
+        version: link:../../blocks/x-react
       react:
         specifier: 17.0.2
         version: 17.0.2

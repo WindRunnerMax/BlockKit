@@ -1,5 +1,6 @@
 import type { Editor } from "@block-kit/core";
 import { EDITOR_STATE } from "@block-kit/core";
+import type { Delta } from "@block-kit/delta";
 import type { BlockEditor } from "@block-kit/x-core";
 import type { ReactNode } from "react";
 import { useMemo, useRef } from "react";
@@ -13,7 +14,7 @@ export type BlockKitProps = {
   editor: BlockEditor;
   readonly?: boolean;
   children?: ReactNode;
-  onCreateTextEditor: () => Editor;
+  onCreateTextEditor: (delta: Delta) => Editor;
 };
 
 export const BlockKitX: React.FC<BlockKitProps> = props => {
