@@ -6,17 +6,18 @@ import { useState } from "react";
 
 import { SEL_KEY } from "../utils/constant";
 
-const SelectorOptions: FC<{
+export const SelectorOptions: FC<{
   left: number;
   top: number;
   width: number;
   value: string;
   options: string[];
   onChange: (v: string) => void;
+  className?: string;
 }> = props => {
   return (
     <div
-      className="editable-selector-options"
+      className={cs("editable-selector-options", props.className)}
       style={{ left: props.left, top: props.top, width: props.width }}
       onMouseDown={preventNativeEvent}
     >

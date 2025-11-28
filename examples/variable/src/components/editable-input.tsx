@@ -1,7 +1,6 @@
-import { EDITOR_EVENT, LEAF_KEY, LEAF_STRING, ZERO_SPACE_KEY } from "@block-kit/core";
-import { Isolate, useReadonly } from "@block-kit/react";
+import { EDITOR_EVENT } from "@block-kit/core";
+import { Isolate, useEditorStatic, useReadonly } from "@block-kit/react";
 import {
-  isDOMElement,
   isDOMText,
   isKeyCode,
   isNil,
@@ -16,6 +15,7 @@ import type { FC } from "react";
 import React, { useEffect, useRef, useState } from "react";
 
 import { DATA_EDITABLE_KEY } from "../utils/constant";
+import { onLeftArrowKey, onRightArrowKey, onTabKey } from "../utils/event";
 
 export const EditableTextInput: FC<{
   value: string;
@@ -27,6 +27,7 @@ export const EditableTextInput: FC<{
   onBeforeInput?: (event: InputEvent) => void;
 }> = props => {
   const { onChange = NOOP, value, placeholder } = props;
+  const { editor } = useEditorStatic();
   const { readonly } = useReadonly();
   const [isComposing, setIsComposing] = useState(false);
   const [editNode, setEditNode] = useState<HTMLDivElement | null>(null);
@@ -67,58 +68,15 @@ export const EditableTextInput: FC<{
   });
 
   const onKeyDown = useMemoFn((e: KeyboardEvent) => {
-    if (isKeyCode(e, KEY_CODE.ENTER) || isKeyCode(e, KEY_CODE.TAB)) {
+    if (isKeyCode(e, KEY_CODE.ENTER)) {
       preventNativeEvent(e);
       return void 0;
     }
     const sel = window.getSelection();
-    LEFT_ARROW_KEY: if (
-      !readonly &&
-      isKeyCode(e, KEY_CODE.LEFT) &&
-      sel &&
-      sel.isCollapsed &&
-      sel.anchorOffset === 0 &&
-      sel.anchorNode &&
-      sel.anchorNode.parentElement &&
-      sel.anchorNode.parentElement.closest(`[${LEAF_KEY}]`)
-    ) {
-      const leafNode = sel.anchorNode.parentElement.closest(`[${LEAF_KEY}]`)!;
-      const prevNode = leafNode.previousSibling;
-      if (!isDOMElement(prevNode) || !prevNode.hasAttribute(LEAF_KEY)) {
-        break LEFT_ARROW_KEY;
-      }
-      const selector = `span[${LEAF_STRING}], span[${ZERO_SPACE_KEY}]`;
-      const focusNode = prevNode.querySelector(selector);
-      if (!focusNode || !isDOMText(focusNode.firstChild)) {
-        break LEFT_ARROW_KEY;
-      }
-      const text = focusNode.firstChild;
-      sel.setBaseAndExtent(text, text.length, text, text.length);
-      preventNativeEvent(e);
-    }
-    RIGHT_ARROW_KEY: if (
-      !readonly &&
-      isKeyCode(e, KEY_CODE.RIGHT) &&
-      sel &&
-      sel.isCollapsed &&
-      sel.anchorOffset === props.value.length &&
-      sel.anchorNode &&
-      sel.anchorNode.parentElement &&
-      sel.anchorNode.parentElement.closest(`[${LEAF_KEY}]`)
-    ) {
-      const leafNode = sel.anchorNode.parentElement.closest(`[${LEAF_KEY}]`)!;
-      const prevNode = leafNode.nextSibling;
-      if (!isDOMElement(prevNode) || !prevNode.hasAttribute(LEAF_KEY)) {
-        break RIGHT_ARROW_KEY;
-      }
-      const selector = `span[${LEAF_STRING}], span[${ZERO_SPACE_KEY}]`;
-      const focusNode = prevNode.querySelector(selector);
-      if (!focusNode || !isDOMText(focusNode.firstChild)) {
-        break RIGHT_ARROW_KEY;
-      }
-      const text = focusNode.firstChild;
-      sel.setBaseAndExtent(text, 0, text, 0);
-      preventNativeEvent(e);
+    if (sel && sel.isCollapsed) {
+      isKeyCode(e, KEY_CODE.TAB) && onTabKey(editor, sel, e);
+      !readonly && isKeyCode(e, KEY_CODE.LEFT) && onLeftArrowKey(sel, e);
+      !readonly && isKeyCode(e, KEY_CODE.RIGHT) && onRightArrowKey(props.value, sel, e);
     }
   });
 
