@@ -62,6 +62,7 @@ export const Editable: React.FC<{
       {...{ [EDITOR_KEY]: true }}
       contentEditable={!readonly}
       suppressContentEditableWarning
+      spellCheck={false}
       style={{
         outline: "none",
         position: "relative",

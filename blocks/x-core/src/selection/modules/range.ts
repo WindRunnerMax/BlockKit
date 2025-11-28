@@ -1,6 +1,6 @@
 import type { BlockEditor } from "../../editor";
 import type { RangeEntry, RangePoint, TextEntry } from "../types";
-import { normalizeModelRange } from "../utils/model";
+import { normalizeModelRange } from "../utils/normalize";
 import { Entry } from "./entry";
 import { Point } from "./point";
 

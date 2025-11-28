@@ -6,6 +6,7 @@ export { X_BLOCK_ID_KEY, X_BLOCK_KEY, X_BLOCK_TYPE_KEY, X_TEXT_BLOCK_KEY } from 
 export { Entry } from "./selection/modules/entry";
 export { Point } from "./selection/modules/point";
 export { Range } from "./selection/modules/range";
-export { normalizeModelRange, toModelPoint, toModelRange } from "./selection/utils/model";
+export { toModelPoint, toModelRange } from "./selection/utils/model";
+export { normalizeModelRange } from "./selection/utils/normalize";
 export { BlockState } from "./state/modules/block-state";
 export { EDITOR_STATE } from "./state/types";
