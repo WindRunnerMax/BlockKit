@@ -57,7 +57,8 @@ export class Input {
       }
       case "deleteContent":
       case "deleteContentBackward": {
-        // this.editor.perform.deleteBackward(sel);
+        const res = this.editor.perform.deleteBackward(sel);
+        this.editor.perform.applyChanges(res);
         break;
       }
       case "deleteWordForward": {

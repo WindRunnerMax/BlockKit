@@ -2,6 +2,7 @@ import { Schema } from "@block-kit/core";
 import { LOG_LEVEL, Logger } from "@block-kit/core";
 
 import { Event } from "../event";
+import { Input } from "../input";
 import { Lookup } from "../lookup";
 import { Model } from "../model";
 import { Perform } from "../perform";
@@ -34,6 +35,8 @@ export class BlockEditor {
   public lookup: Lookup;
   /** 变更模块 */
   public perform: Perform;
+  /** 输入模块 */
+  public input: Input;
 
   /**
    * 构造函数
@@ -51,6 +54,7 @@ export class BlockEditor {
     this.selection = new Selection(this);
     this.lookup = new Lookup(this);
     this.perform = new Perform(this);
+    this.input = new Input(this);
   }
 
   /**
@@ -92,6 +96,7 @@ export class BlockEditor {
    * 销毁编辑器
    */
   public destroy(this: BlockEditor) {
+    this.input.destroy();
     this.event.unbind();
     this.selection.destroy();
     this.state.set(EDITOR_STATE.MOUNTED, false);

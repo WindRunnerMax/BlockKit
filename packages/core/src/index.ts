@@ -88,6 +88,7 @@ export { ALERT, DIRECTION, GRANULARITY } from "./selection/types/index";
 export {
   getRootSelection,
   getStaticSelection,
+  getTextNode,
   isBackwardDOMRange,
   isEmbedZeroNode,
   isEnterZeroNode,

@@ -77,9 +77,7 @@ export class Selection {
       previous: this.previous,
       current: this.current,
     });
-    if (force) {
-      this.updateDOMSelection();
-    }
+    force && this.updateDOMSelection();
   }
 
   /**

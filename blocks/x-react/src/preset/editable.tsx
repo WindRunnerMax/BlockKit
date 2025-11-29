@@ -35,8 +35,13 @@ export const EditableX: React.FC<{
   useLayoutEffect(() => {
     const el = ref.current;
     el && editor.mount(el);
+    const textarea = document.createElement("textarea");
+    textarea.hidden = true;
+    document.body.appendChild(textarea);
+    editor.selection.element = textarea;
     return () => {
       editor.unmount();
+      textarea.remove();
       !preventDestroy && editor.destroy();
     };
   }, [editor, preventDestroy]);

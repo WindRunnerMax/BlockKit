@@ -1,4 +1,5 @@
 import type { AttributeMap } from "@block-kit/delta";
+import type { Op } from "@block-kit/delta";
 import { getOpLength } from "@block-kit/delta";
 import { Bind } from "@block-kit/utils";
 
@@ -29,11 +30,11 @@ export class Lookup {
   }
 
   /**
-   * 基于 Point 获取索引位置的 Leaf
+   * 基于 Offset 获取索引位置的 Leaf Meta
    * @param blockId
    * @param offset
    */
-  public getLeafAtPoint(blockId: string, offset: number): OpMeta | null {
+  public getLeafAtOffset(blockId: string, offset: number): OpMeta | null {
     const block = this.editor.state.getBlock(blockId);
     if (!block || !block.data.delta) return null;
     let index = offset;
@@ -52,6 +53,18 @@ export class Lookup {
   }
 
   /**
+   * 基于 Offset 获取索引位置的 Op 内容
+   * @param point
+   */
+  public getBackwardOpAtOffset(blockId: string, offset: number): Op | null {
+    const meta = this.getLeafAtOffset(blockId, offset);
+    const newOp = meta && meta.op;
+    if (!newOp || !newOp.insert) return null;
+    newOp.insert = newOp.insert!.slice(0, meta.offset);
+    return newOp;
+  }
+
+  /**
    * 选区变化事件
    * @param event
    */
@@ -66,7 +79,7 @@ export class Lookup {
     if (!Entry.isText(entry)) {
       return void 0;
     }
-    const meta = this.getLeafAtPoint(entry.id, entry.start);
+    const meta = this.getLeafAtOffset(entry.id, entry.start);
     if (!meta) return void 0;
     const attributes = getOpMetaMarks(this.editor, meta);
     this.marks = attributes || {};

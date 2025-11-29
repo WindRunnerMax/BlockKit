@@ -52,7 +52,7 @@ export class Perform {
     let attributes: AttributeMap | undefined = this.editor.lookup.marks;
     // 非折叠选区时, 需要以 start 起始判断该节点的尾部 marks
     if (!sel.isCollapsed) {
-      const meta = this.editor.lookup.getLeafAtPoint(start.id, start.offset);
+      const meta = this.editor.lookup.getLeafAtOffset(start.id, start.offset);
       attributes = getOpMetaMarks(this.editor, meta!);
     }
     const delta = new Delta().retain(start.offset).insert(text, attributes);
@@ -194,10 +194,10 @@ export class Perform {
       changes.push(this.atom.updateText(prevBlock.id, mergeDelta), ...reserve);
       return { changes, options };
     }
-    const meta = this.editor.lookup.getLeafAtPoint(block.id, start.offset);
+    const op = this.editor.lookup.getBackwardOpAtOffset(block.id, start.offset);
     let len = 1;
-    if (meta && meta.op.insert) {
-      len = getLastUnicodeLen(meta.op.insert);
+    if (op && op.insert) {
+      len = getLastUnicodeLen(op.insert);
     }
     const startOffset = start.offset - len;
     const delta = new Delta().retain(startOffset).delete(len);

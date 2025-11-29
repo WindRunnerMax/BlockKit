@@ -34,7 +34,7 @@ describe("lookup marks", () => {
         inline: { mark: true, inline: true },
       },
     });
-    const meta = editor.lookup.getLeafAtPoint("child1", 5);
+    const meta = editor.lookup.getLeafAtOffset("child1", 5);
     const attributes = getOpMetaMarks(editor, meta!);
     expect(attributes).toEqual({ bold: "true", inline: "true" });
   });

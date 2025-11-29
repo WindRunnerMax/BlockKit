@@ -5,7 +5,13 @@ import { useForceUpdate, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { Listener } from "@block-kit/x-core";
 import type { BlockEditor } from "@block-kit/x-core";
 import type { BlockState } from "@block-kit/x-core";
-import { EDITOR_EVENT, EDITOR_STATE, X_BLOCK_ID_KEY, X_BLOCK_KEY } from "@block-kit/x-core";
+import {
+  EDITOR_EVENT,
+  EDITOR_STATE,
+  X_BLOCK_ID_KEY,
+  X_BLOCK_KEY,
+  X_BLOCK_TYPE_KEY,
+} from "@block-kit/x-core";
 import type { FC } from "react";
 import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
@@ -95,10 +101,12 @@ const BlockView: FC<{
    */
   const placeholder = useMemo(() => {
     if (
-      state.id === ROOT_BLOCK &&
+      state.parent &&
+      state.parent.data.type === ROOT_BLOCK &&
       props.placeholder &&
       !isComposing &&
-      state.children.length === 1 &&
+      state.parent.children.length === 1 &&
+      !state.children.length &&
       state.data.delta &&
       !state.data.delta.length
     ) {
@@ -123,19 +131,21 @@ const BlockView: FC<{
           key={child.id}
           editor={editor}
           state={child}
+          placeholder={props.placeholder}
         ></BlockView>
       );
       els.push(view);
     }
     return els;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor, state, state.version]);
+  }, [editor, state, state.version, props.placeholder]);
 
   return (
     <div
       key={state.id}
       {...{
         [X_BLOCK_KEY]: true,
+        [X_BLOCK_TYPE_KEY]: state.data.type,
         [X_BLOCK_ID_KEY]: state.id,
         [PLACEHOLDER_KEY]: placeholder,
       }}

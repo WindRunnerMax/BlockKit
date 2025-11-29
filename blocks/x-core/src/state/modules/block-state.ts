@@ -1,10 +1,10 @@
 import { getOpLength } from "@block-kit/delta";
-import { isString } from "@block-kit/utils";
+import { isString, isUndef } from "@block-kit/utils";
 import type { Block, BlockDataField, JSONOp } from "@block-kit/x-json";
 import { cloneSnapshot, json } from "@block-kit/x-json";
 
 import type { EditorState } from "../index";
-import { clearTreeCache } from "../utils/tree";
+import { clearTreeCache, getNextSiblingNode, getPrevSiblingNode } from "../utils/tree";
 
 export class BlockState {
   /** Block ID */
@@ -69,6 +69,24 @@ export class BlockState {
   }
 
   /**
+   * 获取相邻的上一个节点
+   * - 与 prev 方法不同的是, 该方法会跨越父节点查找上一个节点
+   * @param strict [?=false] 严格查找文本节点
+   */
+  public prevSiblingNode(strict = false) {
+    return getPrevSiblingNode(this, strict);
+  }
+
+  /**
+   * 获取紧邻的下一个节点
+   * - 与 next 方法不同的是, 该方法会跨越父节点查找下一个节点
+   * @param strict [?=false] 严格查找文本节点
+   */
+  public nextSiblingNode(strict = false) {
+    return getNextSiblingNode(this, strict);
+  }
+
+  /**
    * 判断是否为块级类型的节点
    * @returns
    */
@@ -125,7 +143,8 @@ export class BlockState {
    */
   public getTreeNodeIndex(id: string): number | null {
     !this._nodes && this.getTreeNodes();
-    return this._nodesIndex[id] || null;
+    const index = this._nodesIndex[id];
+    return isUndef(index) ? null : index;
   }
 
   /**
@@ -158,6 +177,7 @@ export class BlockState {
       const parent = this.state.getBlock(this.data.parent);
       this.parent = parent || null;
       const len = this.data.children.length;
+      this.children = [];
       for (let i = 0; i < len; i++) {
         const id = this.data.children[i];
         const child = this.state.getOrCreateBlock(id);

@@ -1,3 +1,5 @@
+import { isNil } from "@block-kit/utils";
+
 import type { BlockState } from "../modules/block-state";
 
 /**
@@ -108,29 +110,26 @@ export const getPrevSiblingNode = (state: BlockState, strict = false): BlockStat
   // - F 节点的上一个节点为 E 节点, 为其相邻的同级节点
   // - E 节点的上一个节点为 D 节点, 为其父节点
   // - D 节点的上一个节点为 C 节点, 为其同级节点 B 的最深文本节点
-  const prev = state.prev();
-  if (prev) {
-    if (!strict) return prev;
-    // 严格查找文本节点
-    const nodes = prev.getTreeNodes();
-    for (let i = nodes.length - 1; i >= 0; i--) {
+  // 因此实际情况非常复杂, 因此需要考虑需要通过 state 内建的索引进行查找
+  // 直接从 root 开始查找虽然方便, 但是会出现较多的无效递归遍历, 即使存在缓存
+  // 因此在这里考虑通过父节点链进行查找, 不断尝试向上查找, 存在缓存不会出现太多遍历
+  let currentParent = state.parent;
+  let currentBlockId = state.id;
+  while (currentParent) {
+    const nodes = currentParent.getTreeNodes();
+    const index = currentParent.getTreeNodeIndex(currentBlockId);
+    if (isNil(index)) return null;
+    // 从当前节点的索引位置向前查找
+    for (let i = index - 1; i >= 0; i--) {
       const node = nodes[i];
+      // 非严格模式下直接返回前一个节点
+      if (!strict) return node;
+      // 严格模式下需要检查文本节点
       if (!node.isBlockType()) return node;
     }
-  }
-  let current = state;
-  // 没有上一个节点且不严格查找则直接返回其父节点
-  if (!strict && current.parent) {
-    return current.parent;
-  }
-  // 否则没有前节点的情况, 从其父节点上查找文本节点
-  while (current && current.parent) {
-    const parent = current.parent;
-    // 文本节点则可以停止查找, 可以直接返回
-    if (!parent.isBlockType()) {
-      return parent;
-    }
-    current = current.parent;
+    // 定位到首个节点, 提高下一次查找性能
+    currentBlockId = currentParent.id;
+    currentParent = currentParent.parent;
   }
   return null;
 };
@@ -151,30 +150,24 @@ export const getNextSiblingNode = (state: BlockState, strict = false): BlockStat
   // - F 节点的下一个节点为 G 节点, 为其父节点的同级节点
   // - E 节点的下一个节点为 F 节点, 为其同级节点
   // - D 节点的下一个节点为 E 节点, 为其直属的首个子节点
-  // 非严格模式下检查子节点和同级节点
-  if (!strict) {
-    // 优先检查直属的子节点
-    const firstChild = state.children[0];
-    if (firstChild) return firstChild;
-    // 其次检查同级的下一个节点
-    const nextNode = state.next();
-    if (nextNode) return nextNode;
-  }
-  // 严格模式下需要控制查找文本节点
-  const parent = state.parent;
-  if (!parent) return null;
-  const nodes = parent.getTreeNodes();
-  let isStarted = false;
-  for (const node of nodes) {
-    // 遇到 state 之后才正常进行查找
-    if (node === state) {
-      isStarted = true;
-      continue;
+  // 基本逻辑同 getPrevSiblingNode, 也是通过父节点链进行查找
+  let currentParent: BlockState | null = state;
+  let currentBlockId = state.id;
+  while (currentParent) {
+    const nodes = currentParent.getTreeNodes();
+    const index = currentParent.getTreeNodeIndex(currentBlockId);
+    if (isNil(index)) return null;
+    // 从当前节点的索引位置向前查找
+    for (let i = index + 1; i < nodes.length; i++) {
+      const node = nodes[i];
+      // 非严格模式下直接返回下一个节点
+      if (!strict) return node;
+      // 严格模式下需要检查文本节点
+      if (!node.isBlockType()) return node;
     }
-    // 到这里为严格模式, 在开始查找之后直接返回文本节点
-    if (isStarted && !node.isBlockType()) {
-      return node;
-    }
+    // 定位到首个节点, 提高下一次查找性能
+    currentBlockId = nodes[nodes.length - 1].id;
+    currentParent = currentParent.parent;
   }
   return null;
 };

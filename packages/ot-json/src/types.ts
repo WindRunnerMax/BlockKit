@@ -88,6 +88,7 @@ export type TextOp = {
 };
 
 export type Op = {
+  /** - [path] */
   p: Path;
   /** - adds x to the number at [path]. */
   na?: number;
@@ -109,6 +110,7 @@ export type Op = {
   // oi?: Snapshot;
   /** - applies the subtype op o of type t to the object at [path] */
   t?: string;
+  /** - applies the subtype op o of type t to the object at [path] */
   o?: P.Any;
   /** - inserts the string s at offset offset into the string at [path] (uses subtypes internally). */
   si?: string;

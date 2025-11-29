@@ -2,7 +2,7 @@ import { EDITOR_EVENT, EDITOR_STATE } from "@block-kit/core";
 import { cloneOp, Delta, EOL_OP } from "@block-kit/delta";
 import { BlockKit, LineModel, rewriteRemoveChild } from "@block-kit/react";
 import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
-import type { BlockEditor, BlockState } from "@block-kit/x-core";
+import type { BlockEditor, BlockState, Listener } from "@block-kit/x-core";
 import { X_TEXT_BLOCK_KEY } from "@block-kit/x-core";
 import type { FC } from "react";
 import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -46,11 +46,17 @@ const TextView: FC<{
   /**
    * 数据同步变更, 异步批量绘制变更
    */
-  const onContentChange = useMemoFn(() => {
-    // 举个例子: 同步等待刷新的队列 => ||||||||
-    // 进入更新行为后, 异步行为等待, 同步的队列由于 !flushing 全部被守卫
-    // 主线程执行完毕后, 异步队列开始执行, 此时拿到的是最新数据, 以此批量重新渲染
-    if (flushing.current) return void 0;
+  const onContentChange: Listener<"CONTENT_CHANGE"> = useMemoFn(e => {
+    const ops = e.changes[props.state.id];
+    if (!ops) return void 0;
+    let isAppliedDelta = false;
+    for (const op of ops) {
+      if (op.p[0] === "delta" && op.t === "delta" && op.o) {
+        isAppliedDelta = true;
+        editor.state.apply(new Delta(op.o), { autoCaret: false });
+      }
+    }
+    if (!isAppliedDelta || flushing.current) return void 0;
     flushing.current = true;
     Promise.resolve().then(() => {
       flushing.current = false;
@@ -63,11 +69,11 @@ const TextView: FC<{
    * 监听内容变更事件, 更新当前块视图
    */
   useLayoutEffect(() => {
-    editor.event.on(EDITOR_EVENT.CONTENT_CHANGE, onContentChange);
+    props.block.event.on(EDITOR_EVENT.CONTENT_CHANGE, onContentChange);
     return () => {
-      editor.event.off(EDITOR_EVENT.CONTENT_CHANGE, onContentChange);
+      props.block.event.off(EDITOR_EVENT.CONTENT_CHANGE, onContentChange);
     };
-  }, [editor.event, onContentChange]);
+  }, [props.block.event, onContentChange]);
 
   /**
    * 处理行节点

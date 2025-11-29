@@ -30,7 +30,7 @@ describe("perform delete-text fragment", () => {
     expect(options!.selection!.at(0)).toEqual(Entry.create("child1", "T", 1, 0));
   });
 
-  it("text cross line", () => {
+  it.only("text cross line", () => {
     const blocks: Blocks = {
       root: {
         id: "root",
@@ -57,6 +57,9 @@ describe("perform delete-text fragment", () => {
     const res = editor.perform.deleteFragment(new Range(range))!;
     editor.perform.applyChanges(res);
     const blockSet = editor.state.toBlockSet();
+    expect(blockSet.root.data.children).toEqual(["child1"]);
+    expect(editor.state.blocks.root.data.children).toEqual(["child1"]);
+    expect(editor.state.blocks.root.children.map(it => it.id)).toEqual(["child1"]);
     expect(Object.keys(blockSet)).toEqual(["root", "child1"]);
     expect(blockSet.child1.data.delta).toEqual([{ insert: "16" }]);
     expect(res.options!.selection!.at(0)).toEqual(Entry.create("child1", "T", 1, 0));

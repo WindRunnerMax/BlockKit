@@ -1,6 +1,6 @@
 /* stylelint-disable selector-no-qualifying-type */
 
-div[data-block]::before {
+div[data-block][data-placeholder]::before {
   color: #bbbfc4;
   content: attr(data-placeholder);
   height: 0;

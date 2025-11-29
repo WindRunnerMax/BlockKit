@@ -1,5 +1,5 @@
 import type { DOMPoint, DOMRange, NormalizePointContext } from "@block-kit/core";
-import { toDOMPoint as toTextDOMPoint } from "@block-kit/core";
+import { getTextNode, toDOMPoint as toTextDOMPoint } from "@block-kit/core";
 import { RawPoint } from "@block-kit/core";
 import { Point as TextPoint } from "@block-kit/core";
 import { isDOMElement } from "@block-kit/utils";
@@ -100,9 +100,11 @@ export const toDOMRange = (editor: BlockEditor, range: Range): DOMRange | null =
   const domRange = window.document.createRange();
   const { node: startNode, offset: startOffset } = startDOMPoint;
   const { node: endNode, offset: endOffset } = endDOMPoint;
-  if (startNode && endNode) {
-    domRange.setStart(startNode, Math.min(startOffset, startNode.childNodes.length));
-    domRange.setEnd(endNode, Math.min(endOffset, endNode.childNodes.length));
+  const startTextNode = getTextNode(startNode);
+  const endTextNode = getTextNode(endNode);
+  if (startTextNode && endTextNode) {
+    domRange.setStart(startTextNode, Math.min(startOffset, startTextNode.length));
+    domRange.setEnd(endTextNode, Math.min(endOffset, startTextNode.length));
     return domRange;
   }
   return null;

@@ -49,7 +49,7 @@ const App: FC = () => {
 
   return (
     <BlockKitX editor={block} onCreateTextEditor={onCreateTextEditor}>
-      <EditableX></EditableX>
+      <EditableX placeholder="Input Placeholder..."></EditableX>
     </BlockKitX>
   );
 };

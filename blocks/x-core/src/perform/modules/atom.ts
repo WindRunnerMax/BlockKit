@@ -81,7 +81,7 @@ export class Atom {
    * @param delta Delta 变更内容
    */
   public updateText(id: string, delta: Delta): ApplyChange {
-    return { id, ops: [{ p: ["delta"], t: "delta", o: delta }] };
+    return { id, ops: [{ p: ["delta"], t: "delta", o: delta.ops }] };
   }
 
   /**
