@@ -5,7 +5,10 @@ import type { ROOT_BLOCK } from "@block-kit/utils";
 export interface BasicBlock {
   /** Block 类型  */
   type: string;
-  /** Block 文本类型 */
+  /**
+   * Block 文本类型
+   * - 重点关注, 该类型的存在意味着该 Block 是文本类型节点
+   */
   delta?: Op[];
   /** Block 父节点 */
   parent: string;

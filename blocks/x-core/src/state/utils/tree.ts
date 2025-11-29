@@ -93,12 +93,21 @@ export const getLCAWithChildren = (n1: BlockState, n2: BlockState) => {
 };
 
 /**
- * 获取紧邻的上一个节点
+ * 获取相邻的上一个节点
  * - 与 prev 方法不同的是, 该方法会跨越父节点查找上一个节点
  * @param state 块状态
  * @param strict [?=false] 严格查找文本节点
  */
 export const getPrevSiblingNode = (state: BlockState, strict = false): BlockState | null => {
+  // 获取上一个相邻节点时, 需要分情况讨论, 以下面的树结构为例:
+  //         A
+  //      /  |  \
+  //     B   D   G
+  //    /   / \
+  //   C   E   F
+  // - F 节点的上一个节点为 E 节点, 为其相邻的同级节点
+  // - E 节点的上一个节点为 D 节点, 为其父节点
+  // - D 节点的上一个节点为 C 节点, 为其同级节点 B 的最深文本节点
   const prev = state.prev();
   if (prev) {
     if (!strict) return prev;
@@ -106,7 +115,7 @@ export const getPrevSiblingNode = (state: BlockState, strict = false): BlockStat
     const nodes = prev.getTreeNodes();
     for (let i = nodes.length - 1; i >= 0; i--) {
       const node = nodes[i];
-      if (!node.isBlockNode()) return node;
+      if (!node.isBlockType()) return node;
     }
   }
   let current = state;
@@ -118,7 +127,7 @@ export const getPrevSiblingNode = (state: BlockState, strict = false): BlockStat
   while (current && current.parent) {
     const parent = current.parent;
     // 文本节点则可以停止查找, 可以直接返回
-    if (!parent.isBlockNode()) {
+    if (!parent.isBlockType()) {
       return parent;
     }
     current = current.parent;
@@ -133,6 +142,15 @@ export const getPrevSiblingNode = (state: BlockState, strict = false): BlockStat
  * @param strict [?=false] 严格查找文本节点
  */
 export const getNextSiblingNode = (state: BlockState, strict = false): BlockState | null => {
+  // 获取下一个相邻节点时, 同样需要分情况讨论, 以下面的树结构为例:
+  //         A
+  //      /  |  \
+  //     B   D   G
+  //    /   / \
+  //   C   E   F
+  // - F 节点的下一个节点为 G 节点, 为其父节点的同级节点
+  // - E 节点的下一个节点为 F 节点, 为其同级节点
+  // - D 节点的下一个节点为 E 节点, 为其直属的首个子节点
   // 非严格模式下检查子节点和同级节点
   if (!strict) {
     // 优先检查直属的子节点
@@ -154,7 +172,7 @@ export const getNextSiblingNode = (state: BlockState, strict = false): BlockStat
       continue;
     }
     // 到这里为严格模式, 在开始查找之后直接返回文本节点
-    if (isStarted && !node.isBlockNode()) {
+    if (isStarted && !node.isBlockType()) {
       return node;
     }
   }

@@ -29,6 +29,8 @@ export class BlockState {
   public children: BlockState[];
   /** @internal 子树节点 */
   public _nodes: BlockState[] | null;
+  /** @internal 子树节点索引映射 */
+  public _nodesIndex: Record<string, number>;
 
   /** 构造函数 */
   public constructor(block: Block, protected state: EditorState) {
@@ -39,6 +41,7 @@ export class BlockState {
     this.children = [];
     this.id = block.id;
     this.parent = null;
+    this._nodesIndex = {};
     this.isDirty = true;
     this.removed = false;
     this.version = block.version;
@@ -66,10 +69,10 @@ export class BlockState {
   }
 
   /**
-   * 判断是否为块级节点
+   * 判断是否为块级类型的节点
    * @returns
    */
-  public isBlockNode() {
+  public isBlockType() {
     return !this.data.delta;
   }
 
@@ -103,13 +106,26 @@ export class BlockState {
   public getTreeNodes(): BlockState[] {
     if (this._nodes) return this._nodes;
     const nodes: BlockState[] = [this];
-    const children = this.data.children;
-    for (const id of children) {
-      const child = this.state.getOrCreateBlock(id);
-      nodes.push(...child.getTreeNodes());
+    let index = 0;
+    this._nodesIndex = { [this.id]: index++ };
+    for (const child of this.children) {
+      const subNodes = child.getTreeNodes();
+      for (const subNode of subNodes) {
+        nodes.push(subNode);
+        this._nodesIndex[subNode.id] = index++;
+      }
     }
     this._nodes = nodes;
     return nodes;
+  }
+
+  /**
+   * 获取树结构子节点索引值
+   * @param id Block ID
+   */
+  public getTreeNodeIndex(id: string): number | null {
+    !this._nodes && this.getTreeNodes();
+    return this._nodesIndex[id] || null;
   }
 
   /**
@@ -200,20 +216,34 @@ export class BlockState {
       if (op.p[0] === "children" && isString(op.li)) {
         isChildrenChanged = true;
         const liBlock = this.state.getOrCreateBlock(op.li);
-        const nodes = liBlock.getTreeNodes();
-        for (const child of nodes) {
-          child.restore();
-          inserts.add(child.id);
+        // 文本类型的节点仅需要处理本身
+        if (!liBlock.isBlockType()) {
+          liBlock.restore();
+          inserts.add(liBlock.id);
+          // 块级节点需要护理处理本身及其子树节点
+        } else {
+          const nodes = liBlock.getTreeNodes();
+          for (const child of nodes) {
+            child.restore();
+            inserts.add(child.id);
+          }
         }
       }
       // 若是 children 的删除变更, 则需要同步相关的 Block 状态
       if (op.p[0] === "children" && isString(op.ld)) {
         isChildrenChanged = true;
         const ldBlock = this.state.getOrCreateBlock(op.ld);
-        const nodes = ldBlock.getTreeNodes();
-        for (const child of nodes) {
-          child.remove();
-          deletes.add(child.id);
+        // 文本类型的节点仅需要处理本身
+        if (!ldBlock.isBlockType()) {
+          ldBlock.remove();
+          deletes.add(ldBlock.id);
+          // 块级节点需要护理处理本身及其子树节点
+        } else {
+          const nodes = ldBlock.getTreeNodes();
+          for (const child of nodes) {
+            child.remove();
+            deletes.add(child.id);
+          }
         }
       }
     }

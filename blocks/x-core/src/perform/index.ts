@@ -110,7 +110,7 @@ export class Perform {
         }
         continue;
       }
-      // 块级节点需要删除整个节点
+      // 块级节点需要删除整个节点, 父节点已经删除的不再处理
       const parentId = state.data.parent;
       if (parentId && !deleted.has(parentId)) {
         const change = this.atom.remove(parentId, state.index);
@@ -118,11 +118,9 @@ export class Perform {
         changes.push(change);
       }
       // 删除的块节点需要将子节点收集, 未删除的需要重新插入到父节点中
-      // 由于块节点本身不会存在直属 children, 因此这里实际上只有文本块
+      // 由于块节点仅存在直属类型的子节点, 会被直接删除, 因此这里仅文本块需要处理
       const children = state.data.children;
-      for (const child of children) {
-        remain.push(child);
-      }
+      !state.isBlockType() && remain.push(...children);
     }
     // ========== 预设删除后的选区, 需要根据不同的情况处理 ==========
     if (Entry.isText(firstEntry)) {
@@ -137,7 +135,7 @@ export class Perform {
     } else {
       // 此时首尾节点都是块类型, 需要根据情况判断是否需要创建新的块
       const prevBlock = firstBlock.prev();
-      if (prevBlock && !prevBlock.isBlockNode()) {
+      if (prevBlock && !prevBlock.isBlockType()) {
         // 存在前节点且前节点是文本块的情况下, 选区设置到前节点的末尾
         const offset = prevBlock.length;
         const entry = Entry.create(lastBlock.id, POINT_TYPE.TEXT, offset, 0);
@@ -180,7 +178,7 @@ export class Perform {
       // 如果没有前节点, 则不能执行删除操作
       if (!prevBlock) return null;
       // 如果前节点是块节点, 则移动选区到前节点上
-      if (prevBlock.isBlockNode()) {
+      if (prevBlock.isBlockType()) {
         const entry = Entry.create(prevBlock.id, POINT_TYPE.BLOCK);
         options.selection = new Range([entry], false);
         return { changes, options };

@@ -85,7 +85,13 @@ describe("perform delete-tree", () => {
     const blockSet = editor.state.toBlockSet();
     expect(Object.keys(blockSet)).toEqual(["root", "A", "B", "D", "E", "F", "G", "H", "I"]);
     expect(blockSet.A.data.children).toEqual(["B", "H"]);
+    expect(blockSet.B.data.parent).toEqual("A");
+    expect(blockSet.H.data.parent).toEqual("A");
     expect(blockSet.B.data.children).toEqual(["D", "F", "G"]);
+    expect(blockSet.D.data.parent).toEqual("B");
+    expect(blockSet.F.data.parent).toEqual("B");
+    expect(blockSet.G.data.parent).toEqual("B");
     expect(blockSet.D.data.children).toEqual(["E"]);
+    expect(blockSet.E.data.parent).toEqual("D");
   });
 });

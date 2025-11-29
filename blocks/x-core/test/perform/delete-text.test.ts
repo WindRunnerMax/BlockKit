@@ -25,6 +25,7 @@ describe("perform delete-text fragment", () => {
     const { changes, options } = editor.perform.deleteFragment(new Range(range))!;
     editor.state.apply(changes, options);
     const blockSet = editor.state.toBlockSet();
+    expect(blockSet.child1.data.parent).toEqual("root");
     expect(blockSet.child1.data.delta).toEqual([{ insert: "13" }]);
     expect(options!.selection!.at(0)).toEqual(Entry.create("child1", "T", 1, 0));
   });
@@ -56,6 +57,7 @@ describe("perform delete-text fragment", () => {
     const res = editor.perform.deleteFragment(new Range(range))!;
     editor.perform.applyChanges(res);
     const blockSet = editor.state.toBlockSet();
+    expect(Object.keys(blockSet)).toEqual(["root", "child1"]);
     expect(blockSet.child1.data.delta).toEqual([{ insert: "16" }]);
     expect(res.options!.selection!.at(0)).toEqual(Entry.create("child1", "T", 1, 0));
   });
@@ -93,6 +95,7 @@ describe("perform delete-text fragment", () => {
     const { changes, options } = editor.perform.deleteFragment(new Range(range))!;
     editor.state.apply(changes, options);
     const blockSet = editor.state.toBlockSet();
+    expect(Object.keys(blockSet)).toEqual(["root", "child2"]);
     expect(blockSet.child2.data.delta).toEqual([{ insert: "6" }]);
     expect(options!.selection!.at(0)).toEqual(Entry.create("child2", "T", 0, 0));
   });
@@ -130,6 +133,7 @@ describe("perform delete-text fragment", () => {
     const { changes, options } = editor.perform.deleteFragment(new Range(range))!;
     editor.state.apply(changes, options);
     const blockSet = editor.state.toBlockSet();
+    expect(Object.keys(blockSet)).toEqual(["root", "child1"]);
     expect(blockSet.child1.data.delta).toEqual([{ insert: "1" }]);
     expect(options!.selection!.at(0)).toEqual(Entry.create("child1", "T", 1, 0));
   });
@@ -174,6 +178,7 @@ describe("perform delete-text fragment", () => {
     const newId = changes.flat().find(it => it.ops[0].p.length === 0)?.id;
     editor.state.apply(changes, options);
     const blockSet = editor.state.toBlockSet();
+    expect(Object.keys(blockSet)).toEqual(["root", newId]);
     expect(blockSet[newId!].data.delta).toEqual([]);
     expect(options!.selection!.at(0)).toEqual(Entry.create(newId!, "T", 0, 0));
   });

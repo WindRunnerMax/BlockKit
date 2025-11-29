@@ -112,6 +112,13 @@ export class EditorState {
   }
 
   /**
+   * 获取 Root BlockState
+   */
+  public getRootBlock(): BlockState {
+    return this.blocks[this.rootId]!;
+  }
+
+  /**
    * 转换为 Block 集合
    * - 以内建状态为主, Block 集合数据按需转换
    * @param deep [?=undef] 深拷贝
@@ -167,6 +174,6 @@ export class EditorState {
     };
     this.editor.logger.debug("Editor Content Change", payload);
     this.editor.event.trigger(EDITOR_EVENT.CONTENT_CHANGE, payload);
-    return { id, inserts, updates, deletes };
+    return payload;
   }
 }

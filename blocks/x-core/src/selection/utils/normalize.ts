@@ -50,7 +50,7 @@ export const normalizeModelRange = (
       let current: BlockState | null = node.parent;
       let diff = node.depth - child1.depth;
       while (diff-- > 0 && current) {
-        if (current.isBlockNode()) {
+        if (current.isBlockType()) {
           maxAccessLevel = current.depth;
           between.push(Entry.create(child1.id, BLOCK));
           continue NODES_ITERATOR;
@@ -75,7 +75,7 @@ export const normalizeModelRange = (
       continue;
     }
     // 分别处理块节点和文本节点
-    if (node.isBlockNode()) {
+    if (node.isBlockType()) {
       maxAccessLevel = node.depth;
       between.push(Entry.create(node.id, BLOCK));
     } else {

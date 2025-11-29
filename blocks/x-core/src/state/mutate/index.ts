@@ -55,7 +55,7 @@ export class Mutate {
     }
     // 如果节点同时被删除和插入, 则认为是更新操作, 需要恢复节点挂载状态
     // 否则可能会造成移动的情况下, 节点被认为是删除的情况(顺序问题)
-    // 虽然存在误判的可能, 但通常不会出现刚创建就删除的批量执行场景
+    // 虽然存在误判的可能, 但通常应该不会出现刚创建就删除的批量执行场景
     for (const id of Array.from(this.inserts)) {
       if (!this.deletes.has(id)) continue;
       this.inserts.delete(id);

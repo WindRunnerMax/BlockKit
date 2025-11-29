@@ -17,7 +17,7 @@ export const iterator = (
   for (const entry of range.nodes) {
     const state = editor.state.getBlock(entry.id);
     if (!state) continue;
-    if (state.isBlockNode()) {
+    if (state.isBlockType()) {
       const treeNodes = state.getTreeNodes();
       for (const node of treeNodes) cb(entry, node);
     } else {

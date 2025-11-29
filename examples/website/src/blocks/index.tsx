@@ -14,7 +14,7 @@ import {
 import { BlockEditor } from "@block-kit/x-core";
 import { BlockKitX, EditableX } from "@block-kit/x-react";
 import type { FC } from "react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 
 import { SCHEMA } from "../react/config/schema";
@@ -25,6 +25,11 @@ const App: FC = () => {
     const instance = new BlockEditor({ initial: INIT, logLevel: LOG_LEVEL.DEBUG });
     return instance;
   }, []);
+
+  useEffect(() => {
+    // @ts-expect-error 仅调试用
+    window.editor = block;
+  }, [block]);
 
   const onCreateTextEditor = (delta: Delta) => {
     const instance = new TextEditor({ schema: SCHEMA, delta });
