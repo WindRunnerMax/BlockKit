@@ -30,7 +30,7 @@ describe("perform delete-text fragment", () => {
     expect(options!.selection!.at(0)).toEqual(Entry.create("child1", "T", 1, 0));
   });
 
-  it.only("text cross line", () => {
+  it("text cross line", () => {
     const blocks: Blocks = {
       root: {
         id: "root",

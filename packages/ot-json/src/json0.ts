@@ -180,7 +180,7 @@ export class JSONType {
 
   /**
    * 操作变换
-   * - ops' = transform(ops, otherOps, side)
+   * - ops1' = transform(ops1, otherOps, side)
    * @param op
    * @param otherOp
    * @param side

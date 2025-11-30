@@ -2,6 +2,7 @@ import "../styles/editable.scss";
 
 import { EDITOR_KEY } from "@block-kit/core";
 import { cs } from "@block-kit/utils";
+import { X_SELECTION_KEY } from "@block-kit/x-core";
 import React, { useLayoutEffect, useRef } from "react";
 
 import { useEditorStatic } from "../hooks/use-editor";
@@ -37,6 +38,7 @@ export const EditableX: React.FC<{
     el && editor.mount(el);
     const textarea = document.createElement("textarea");
     textarea.hidden = true;
+    textarea.setAttribute(X_SELECTION_KEY, "true");
     document.body.appendChild(textarea);
     editor.selection.element = textarea;
     return () => {

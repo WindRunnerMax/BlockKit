@@ -1,5 +1,4 @@
-import type { AttributeMap } from "@block-kit/delta";
-import type { Op } from "@block-kit/delta";
+import type { AttributeMap, InsertOp } from "@block-kit/delta";
 import { cloneOp, getOpLength } from "@block-kit/delta";
 import { Bind } from "@block-kit/utils";
 
@@ -56,12 +55,33 @@ export class Lookup {
    * 基于 Offset 获取索引位置的 Op 内容
    * @param point
    */
-  public getBackwardOpAtOffset(blockId: string, offset: number): Op | null {
+  public getBackwardOpAtOffset(blockId: string, offset: number): InsertOp | null {
     const meta = this.getLeafAtOffset(blockId, offset);
     const newOp = meta && cloneOp(meta.op);
     if (!newOp || !newOp.insert) return null;
     newOp.insert = newOp.insert!.slice(0, meta.offset);
-    return newOp;
+    return newOp as InsertOp;
+  }
+
+  /**
+   * 向前查找基于 Point 获取索引位置的 Op 内容
+   * @param point
+   */
+  public getForwardOpAtOffset(blockId: string, offset: number): InsertOp | null {
+    const block = this.editor.state.getBlock(blockId);
+    if (!block || !block.data.delta) return null;
+    let index = offset;
+    const ops = block.data.delta;
+    for (const op of ops) {
+      const opLength = getOpLength(op);
+      if (opLength > index) {
+        const newOp = cloneOp(op) as InsertOp;
+        newOp.insert = newOp.insert.slice(index, newOp.insert.length);
+        return newOp;
+      }
+      index = index - opLength;
+    }
+    return null;
   }
 
   /**

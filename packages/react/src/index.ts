@@ -21,6 +21,7 @@ export { Isolate } from "./preset/isolate";
 export { Text } from "./preset/text";
 export { Void } from "./preset/void";
 export { ZeroSpace } from "./preset/zero";
+export { NO_CURSOR } from "./utils/constant";
 export { rewriteRemoveChild } from "./utils/dirty-dom";
 export { preventNativeEvent, preventReactEvent } from "./utils/event";
 export { MountNode } from "./utils/mount-dom";

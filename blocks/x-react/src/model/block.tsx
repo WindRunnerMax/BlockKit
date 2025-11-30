@@ -1,7 +1,7 @@
 import { PLACEHOLDER_KEY } from "@block-kit/core";
 import { rewriteRemoveChild } from "@block-kit/react";
 import { ROOT_BLOCK } from "@block-kit/utils";
-import { useForceUpdate, useMemoFn } from "@block-kit/utils/dist/es/hooks";
+import { useForceUpdate, useIsMounted, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { Listener } from "@block-kit/x-core";
 import type { BlockEditor } from "@block-kit/x-core";
 import type { BlockState } from "@block-kit/x-core";
@@ -16,6 +16,7 @@ import type { FC } from "react";
 import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useComposing } from "../hooks/use-composing";
+import { ZeroSpace } from "../preset/zero";
 import { TextModel } from "./text";
 
 /**
@@ -30,8 +31,11 @@ const BlockView: FC<{
 }> = props => {
   const { editor, state } = props;
   const flushing = useRef(false);
+  const { mounted } = useIsMounted();
   const { forceUpdate } = useForceUpdate();
   const { isComposing } = useComposing(editor);
+  const isRootBlock = state.data.type === ROOT_BLOCK;
+  const isBlockType = !isRootBlock && state.isBlockType();
 
   /**
    * 设置行 DOM 节点
@@ -53,7 +57,7 @@ const BlockView: FC<{
     if (flushing.current) return void 0;
     flushing.current = true;
     Promise.resolve().then(() => {
-      forceUpdate();
+      mounted.current && forceUpdate();
       flushing.current = false;
       editor.state.set(EDITOR_STATE.PAINTING, true);
     });
@@ -73,7 +77,7 @@ const BlockView: FC<{
    * 视图更新需要重新设置选区 无依赖数组
    */
   useLayoutEffect(() => {
-    if (state.data.type !== ROOT_BLOCK) return void 0;
+    if (!isRootBlock) return void 0;
     const selection = editor.selection.get();
     // 同步计算完成后更新浏览器选区, 等待 Paint
     if (editor.state.isFocused() && selection) {
@@ -88,7 +92,7 @@ const BlockView: FC<{
    * effect <- parent <- node <- child <-|
    */
   useEffect(() => {
-    if (state.data.type !== ROOT_BLOCK) return void 0;
+    if (!isRootBlock) return void 0;
     editor.logger.debug("OnPaint");
     editor.state.set(EDITOR_STATE.PAINTING, false);
     Promise.resolve().then(() => {
@@ -152,7 +156,9 @@ const BlockView: FC<{
       className={props.className}
       ref={setModel}
     >
+      {isBlockType && <ZeroSpace block hide />}
       {children}
+      {isBlockType && <ZeroSpace block hide />}
     </div>
   );
 };

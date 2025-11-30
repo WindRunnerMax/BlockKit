@@ -68,12 +68,14 @@ export class Input {
         break;
       }
       case "deleteContentForward": {
-        // this.editor.perform.deleteForward(sel);
+        const res = this.editor.perform.deleteForward(sel);
+        this.editor.perform.applyChanges(res);
         break;
       }
       case "insertLineBreak":
       case "insertParagraph": {
-        // this.editor.perform.insertBreak(sel);
+        const res = this.editor.perform.insertBreak(sel);
+        this.editor.perform.applyChanges(res);
         break;
       }
       // case "insertFromDrop":
@@ -113,6 +115,6 @@ export class Input {
     const data = event.data;
     const sel = this.editor.selection.get();
     const res = sel && this.editor.perform.insertText(sel, data || "");
-    res && this.editor.perform.applyChanges(res);
+    this.editor.perform.applyChanges(res);
   }
 }

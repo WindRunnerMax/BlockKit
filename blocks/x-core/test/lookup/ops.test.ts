@@ -59,4 +59,25 @@ describe("lookup ops", () => {
     const op = editor.lookup.getBackwardOpAtOffset("child1", 7);
     expect(op).toEqual({ insert: "tex", attributes: { bold: "true", inline: "true" } });
   });
+
+  it("get backward op at offset tail", () => {
+    const blocks = getBlocks();
+    const editor = new BlockEditor({ initial: blocks });
+    const op = editor.lookup.getBackwardOpAtOffset("child1", 4);
+    expect(op).toEqual({ insert: "text", attributes: { inline: "true" } });
+  });
+
+  it("get forward op at offset", () => {
+    const blocks = getBlocks();
+    const editor = new BlockEditor({ initial: blocks });
+    const op = editor.lookup.getForwardOpAtOffset("child1", 7);
+    expect(op).toEqual({ insert: "t2", attributes: { bold: "true", inline: "true" } });
+  });
+
+  it("get forward op at offset tail", () => {
+    const blocks = getBlocks();
+    const editor = new BlockEditor({ initial: blocks });
+    const op = editor.lookup.getForwardOpAtOffset("child1", 9);
+    expect(op).toEqual({ insert: "text3", attributes: { bold: "true" } });
+  });
 });
