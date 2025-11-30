@@ -73,7 +73,7 @@ const BlockView: FC<{
    * 视图更新需要重新设置选区 无依赖数组
    */
   useLayoutEffect(() => {
-    if (state.id !== ROOT_BLOCK) return void 0;
+    if (state.data.type !== ROOT_BLOCK) return void 0;
     const selection = editor.selection.get();
     // 同步计算完成后更新浏览器选区, 等待 Paint
     if (editor.state.isFocused() && selection) {
@@ -88,7 +88,7 @@ const BlockView: FC<{
    * effect <- parent <- node <- child <-|
    */
   useEffect(() => {
-    if (state.id !== ROOT_BLOCK) return void 0;
+    if (state.data.type !== ROOT_BLOCK) return void 0;
     editor.logger.debug("OnPaint");
     editor.state.set(EDITOR_STATE.PAINTING, false);
     Promise.resolve().then(() => {

@@ -1,6 +1,6 @@
 import type { AttributeMap } from "@block-kit/delta";
 import type { Op } from "@block-kit/delta";
-import { getOpLength } from "@block-kit/delta";
+import { cloneOp, getOpLength } from "@block-kit/delta";
 import { Bind } from "@block-kit/utils";
 
 import type { BlockEditor } from "../editor";
@@ -58,7 +58,7 @@ export class Lookup {
    */
   public getBackwardOpAtOffset(blockId: string, offset: number): Op | null {
     const meta = this.getLeafAtOffset(blockId, offset);
-    const newOp = meta && meta.op;
+    const newOp = meta && cloneOp(meta.op);
     if (!newOp || !newOp.insert) return null;
     newOp.insert = newOp.insert!.slice(0, meta.offset);
     return newOp;

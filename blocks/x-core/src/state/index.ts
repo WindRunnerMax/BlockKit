@@ -1,15 +1,17 @@
 import { getId, ROOT_BLOCK } from "@block-kit/utils";
+import type { P } from "@block-kit/utils/dist/es/types";
 import type { BlockMap } from "@block-kit/x-json";
 import type { Block } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../editor";
 import type { ContentChangeEvent } from "../event/bus";
 import { EDITOR_EVENT } from "../event/bus";
+import type { Range } from "../selection/modules/range";
 import { BlockState } from "./modules/block-state";
 import { Mutate } from "./mutate";
 import type { ApplyOptions, BatchApplyChange } from "./types";
 import { APPLY_SOURCE, EDITOR_STATE } from "./types";
-import { normalizeBlocksChange } from "./utils/normalize";
+import { normalizeBlocksChange, transformPosition } from "./utils/normalize";
 
 export class EditorState {
   /** 内建状态集合 */
@@ -27,7 +29,7 @@ export class EditorState {
    * @param initial
    */
   constructor(public editor: BlockEditor, initial: BlockMap) {
-    this._cache = {};
+    this._cache = null;
     this.status = {};
     this.blocks = {};
     this.rootId = "";
@@ -142,7 +144,7 @@ export class EditorState {
    * @param options
    */
   public apply(changes: BatchApplyChange, options: ApplyOptions = {}) {
-    const { source = APPLY_SOURCE.USER } = options;
+    const { source = APPLY_SOURCE.USER, autoCaret = true } = options;
     const previous = this.toBlockSet();
     this._cache = null;
     const normalized = normalizeBlocksChange(changes);
@@ -172,6 +174,14 @@ export class EditorState {
       deletes: deletes,
       extra: options.extra,
     };
+
+    let nextRange: Range | P.Nil = options.selection;
+    if (autoCaret && !nextRange) {
+      const range = this.editor.selection.get();
+      nextRange = range ? transformPosition(payload, range) : null;
+    }
+    nextRange && this.editor.selection.set(nextRange);
+
     this.editor.logger.debug("Editor Content Change", payload);
     this.editor.event.trigger(EDITOR_EVENT.CONTENT_CHANGE, payload);
     return payload;

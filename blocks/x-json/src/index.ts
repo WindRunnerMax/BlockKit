@@ -10,6 +10,7 @@ export type {
   BlocksChange,
 } from "./types/block";
 export type { BasicBlock, BlockModule } from "./types/interface";
+export { isTextDeltaOp } from "./utils/is";
 export { normalizeBatchOps } from "./utils/transform";
 export { createBlockTreeWalker, createBlockTreeWalkerBFS } from "./utils/walker";
 export type { Op as DeltaOp } from "@block-kit/delta";

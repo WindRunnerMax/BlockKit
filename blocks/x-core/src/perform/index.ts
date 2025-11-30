@@ -174,7 +174,7 @@ export class Perform {
     if (!block) return null;
     // 如果处于当前行的行首, 需要根据状态处理情况
     if (start.offset === 0) {
-      const prevBlock = block.prev();
+      const prevBlock = block.prevSiblingNode(true);
       // 如果没有前节点, 则不能执行删除操作
       if (!prevBlock) return null;
       // 如果前节点是块节点, 则移动选区到前节点上
@@ -190,6 +190,7 @@ export class Perform {
       const mergeDelta = new Delta().retain(prevBlock.length).merge(sliceDelta);
       const entry = Entry.create(prevBlock.id, POINT_TYPE.TEXT, prevBlock.length, 0);
       options.selection = new Range([entry], false);
+      changes.push(this.atom.remove(block.data.parent, block.index));
       const reserve = reserveDeletedNodes(this.editor, remain, deleted, options);
       changes.push(this.atom.updateText(prevBlock.id, mergeDelta), ...reserve);
       return { changes, options };

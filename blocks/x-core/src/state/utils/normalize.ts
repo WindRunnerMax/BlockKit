@@ -1,6 +1,11 @@
+import { Delta } from "@block-kit/delta";
 import type { BlocksChange } from "@block-kit/x-json";
-import { normalizeBatchOps } from "@block-kit/x-json";
+import { isTextDeltaOp, normalizeBatchOps } from "@block-kit/x-json";
 
+import type { ContentChangeEvent } from "../../event/bus";
+import { Entry } from "../../selection/modules/entry";
+import { Range } from "../../selection/modules/range";
+import { POINT_TYPE } from "../../selection/utils/constant";
 import type { ApplyChange } from "../types";
 
 /**
@@ -28,4 +33,49 @@ export const normalizeBlocksChange = (
     normalized[changeId] = normalizeBatchOps(ops);
   }
   return normalized;
+};
+
+/**
+ * 根据内容变更事件，转换选区位置
+ * @param state
+ * @param payload
+ * @param range
+ */
+export const transformPosition = (payload: ContentChangeEvent, range: Range) => {
+  const entries = range.clone().nodes;
+  const newEntries: typeof entries = [];
+  const { deletes, inserts } = payload;
+  for (const entry of entries) {
+    // 已经删除的节点需要跳过
+    if (deletes.has(entry.id)) continue;
+    const ops = payload.changes[entry.id];
+    // 处理纯文本选区 Entry
+    if (Entry.isText(entry) && ops) {
+      let isAppliedDelta = false;
+      let start = entry.start;
+      let end = entry.start + entry.len;
+      for (const op of ops) {
+        // 非文本变更的操作不处理
+        if (!isTextDeltaOp(op)) continue;
+        const delta = new Delta(op.o);
+        start = delta.transformPosition(start);
+        end = entry.len ? delta.transformPosition(end) : start;
+        isAppliedDelta = true;
+      }
+      if (isAppliedDelta) {
+        const text = Entry.create(entry.id, POINT_TYPE.TEXT, start, end - start);
+        newEntries.push(text);
+        continue;
+      }
+    }
+    // 处理块级选区 Entry
+    newEntries.push(entry);
+  }
+  // 全部删除的情况下, 选区尝试设置到第一个插入的节点位置
+  if (newEntries.length === 0 && inserts.size > 0) {
+    const firstInsertId = inserts.values().next().value;
+    const entry = Entry.create(firstInsertId!, POINT_TYPE.TEXT, 0, 0);
+    newEntries.push(entry);
+  }
+  return new Range(newEntries);
 };

@@ -4,6 +4,7 @@ import { BlockKit, LineModel, rewriteRemoveChild } from "@block-kit/react";
 import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { BlockEditor, BlockState, Listener } from "@block-kit/x-core";
 import { X_TEXT_BLOCK_KEY } from "@block-kit/x-core";
+import { isTextDeltaOp } from "@block-kit/x-json";
 import type { FC } from "react";
 import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
 
@@ -51,7 +52,7 @@ const TextView: FC<{
     if (!ops) return void 0;
     let isAppliedDelta = false;
     for (const op of ops) {
-      if (op.p[0] === "delta" && op.t === "delta" && op.o) {
+      if (isTextDeltaOp(op)) {
         isAppliedDelta = true;
         editor.state.apply(new Delta(op.o), { autoCaret: false });
       }

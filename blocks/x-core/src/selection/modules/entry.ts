@@ -1,5 +1,7 @@
+import { isNil } from "@block-kit/utils";
+
 import type { BlockEditor } from "../../editor";
-import { getLCAWithChildren } from "../../state/utils/tree";
+import { getLowestCommonAncestor } from "../../state/utils/tree";
 import type {
   BlockEntry,
   BlockPoint,
@@ -69,10 +71,12 @@ export class Entry {
     }
     const s1 = editor.state.getBlock(entry1.id);
     const s2 = editor.state.getBlock(entry2.id);
-    const tuple = s1 && s2 && getLCAWithChildren(s1, s2);
-    if (!s1 || !s2 || !tuple) return false;
-    const { child1: c1, child2: c2 } = tuple;
-    return c1 === c2 ? s1.depth < s2.depth : c1.index < c2.index;
+    const lca = s1 && s2 && getLowestCommonAncestor(s1, s2);
+    if (!lca) return false;
+    const i1 = lca.getTreeNodeIndex(s1.id);
+    const i2 = lca.getTreeNodeIndex(s2.id);
+    if (isNil(i1) || isNil(i2)) return false;
+    return i1 < i2;
   }
 
   /**
@@ -95,10 +99,12 @@ export class Entry {
     }
     const s1 = editor.state.getBlock(entry1.id);
     const s2 = editor.state.getBlock(entry2.id);
-    const tuple = s1 && s2 && getLCAWithChildren(s1, s2);
-    if (!s1 || !s2 || !tuple) return false;
-    const { child1: c1, child2: c2 } = tuple;
-    return c1 === c2 ? s1.depth > s2.depth : c1.index > c2.index;
+    const lca = s1 && s2 && getLowestCommonAncestor(s1, s2);
+    if (!lca) return false;
+    const i1 = lca.getTreeNodeIndex(s1.id);
+    const i2 = lca.getTreeNodeIndex(s2.id);
+    if (isNil(i1) || isNil(i2)) return false;
+    return i1 > i2;
   }
 
   /**
