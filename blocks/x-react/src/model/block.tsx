@@ -16,7 +16,6 @@ import type { FC } from "react";
 import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useComposing } from "../hooks/use-composing";
-import { ZeroSpace } from "../preset/zero";
 import { TextModel } from "./text";
 
 /**
@@ -35,7 +34,6 @@ const BlockView: FC<{
   const { forceUpdate } = useForceUpdate();
   const { isComposing } = useComposing(editor);
   const isRootBlock = state.data.type === ROOT_BLOCK;
-  const isBlockType = !isRootBlock && state.isBlockType();
 
   /**
    * 设置行 DOM 节点
@@ -156,9 +154,7 @@ const BlockView: FC<{
       className={props.className}
       ref={setModel}
     >
-      {isBlockType && <ZeroSpace block hide />}
       {children}
-      {isBlockType && <ZeroSpace block hide />}
     </div>
   );
 };

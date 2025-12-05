@@ -242,6 +242,9 @@ importers:
       '@block-kit/x-core':
         specifier: 'workspace: *'
         version: link:../x-core
+      '@block-kit/x-json':
+        specifier: 'workspace: *'
+        version: link:../x-json
     devDependencies:
       '@babel/core':
         specifier: 7.20.12

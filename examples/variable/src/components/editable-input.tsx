@@ -22,6 +22,7 @@ export const EditableTextInput: FC<{
   placeholder?: string;
   className?: string;
   style?: React.CSSProperties;
+  onKeydown?: React.KeyboardEventHandler<HTMLDivElement>;
   onRef?: (ref: HTMLDivElement | null) => void;
   onChange?: (value: string, event: InputEvent) => void;
   onBeforeInput?: (event: InputEvent) => void;
@@ -132,6 +133,7 @@ export const EditableTextInput: FC<{
         className="block-kit-editable-text"
         ref={onEditableRef}
         data-vars-placeholder={showPlaceholder ? placeholder : void 0}
+        onKeyDown={props.onKeydown}
         contentEditable
         suppressContentEditableWarning
       ></div>

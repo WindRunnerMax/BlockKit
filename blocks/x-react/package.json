@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@block-kit/x-core": "workspace: *",
+    "@block-kit/x-json": "workspace: *",
     "@block-kit/core": "workspace: *",
     "@block-kit/react": "workspace: *",
     "@block-kit/delta": "workspace: *",
