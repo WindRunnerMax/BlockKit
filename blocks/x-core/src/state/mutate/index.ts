@@ -31,8 +31,9 @@ export class Mutate {
    * @param changes
    */
   public apply(changes: BlocksChange) {
+    // 优先处理新建的 Block 节点操作变更
     for (const [blockId, ops] of Object.entries(changes)) {
-      let block = this.state.getBlock(blockId);
+      const block = this.state.getBlock(blockId);
       // 如果不存在节点, 则需要检查是否需要新增 Block [Insert]
       const insert = !block && ops.find(it => !it.p.length && it.oi);
       if (!block && insert) {
@@ -45,8 +46,11 @@ export class Mutate {
         const newBlockState = new BlockState(data, this.state);
         this.state.blocks[blockId] = newBlockState;
         newBlockState._updateMeta();
-        block = newBlockState;
       }
+    }
+    // 新建的节点处理后才可以应用变更
+    for (const [blockId, ops] of Object.entries(changes)) {
+      const block = this.state.getBlock(blockId);
       if (!block) continue;
       this.updates.add(blockId);
       const result = block._apply(ops);

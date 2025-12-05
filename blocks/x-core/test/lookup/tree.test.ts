@@ -28,6 +28,16 @@ const getBlocks = (): Blocks => ({
     version: 1,
     data: { type: "text", children: ["E", "F"], delta: [], parent: "A" },
   },
+  E: {
+    id: "E",
+    version: 1,
+    data: { type: "text", children: [], delta: [], parent: "A" },
+  },
+  F: {
+    id: "F",
+    version: 1,
+    data: { type: "text", children: [], delta: [], parent: "A" },
+  },
   G: {
     id: "G",
     version: 1,
@@ -43,7 +53,7 @@ const getBlocks = (): Blocks => ({
 
 describe("lookup ops", () => {
   it("get prev sibling node", () => {
-    const editor = new BlockEditor({ initial: getBlocks() });
+    const editor = new BlockEditor({ initial: getBlocks(), logLevel: 1 });
     const state = editor.state;
     expect(state.getBlock("A")?.prevSiblingNode()?.id).toBe(void 0);
     expect(state.getBlock("B")?.prevSiblingNode()?.id).toBe("A");

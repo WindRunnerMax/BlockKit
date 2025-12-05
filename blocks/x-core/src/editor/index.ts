@@ -45,10 +45,10 @@ export class BlockEditor {
   public constructor(options: EditorOptions = {}) {
     const { initial = getInitialBlocks(), logLevel = LOG_LEVEL.ERROR, schema = {} } = options;
     this.container = null;
+    this.logger = new Logger(logLevel);
     this.schema = new Schema(schema);
     this.state = new EditorState(this, initial);
     this.event = new Event(this);
-    this.logger = new Logger(logLevel);
     this.plugin = new Plugin(this);
     this.model = new Model();
     this.selection = new Selection(this);

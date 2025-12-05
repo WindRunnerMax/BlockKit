@@ -22,8 +22,7 @@ describe("perform delete-text fragment", () => {
       Point.create("child1", "T", 1),
       Point.create("child1", "T", 2)
     );
-    const { changes, options } = editor.perform.deleteFragment(new Range(range))!;
-    editor.state.apply(changes, options);
+    const { options } = editor.perform.deleteFragment(new Range(range))!;
     const blockSet = editor.state.toBlockSet();
     expect(blockSet.child1.data.parent).toEqual("root");
     expect(blockSet.child1.data.delta).toEqual([{ insert: "13" }]);
@@ -55,7 +54,6 @@ describe("perform delete-text fragment", () => {
       Point.create("child2", "T", 2)
     );
     const res = editor.perform.deleteFragment(new Range(range))!;
-    editor.perform.applyChanges(res);
     const blockSet = editor.state.toBlockSet();
     expect(blockSet.root.data.children).toEqual(["child1"]);
     expect(editor.state.blocks.root.data.children).toEqual(["child1"]);
@@ -95,8 +93,7 @@ describe("perform delete-text fragment", () => {
       Point.create("grandchild1", "T", 1),
       Point.create("child2", "T", 2)
     );
-    const { changes, options } = editor.perform.deleteFragment(new Range(range))!;
-    editor.state.apply(changes, options);
+    const { options } = editor.perform.deleteFragment(new Range(range))!;
     const blockSet = editor.state.toBlockSet();
     expect(Object.keys(blockSet)).toEqual(["root", "child2"]);
     expect(blockSet.child2.data.delta).toEqual([{ insert: "6" }]);
@@ -133,8 +130,7 @@ describe("perform delete-text fragment", () => {
       Point.create("child1", "T", 1),
       Point.create("grandchild2", "T", 2)
     );
-    const { changes, options } = editor.perform.deleteFragment(new Range(range))!;
-    editor.state.apply(changes, options);
+    const { options } = editor.perform.deleteFragment(new Range(range))!;
     const blockSet = editor.state.toBlockSet();
     expect(Object.keys(blockSet)).toEqual(["root", "child1"]);
     expect(blockSet.child1.data.delta).toEqual([{ insert: "1" }]);
@@ -178,8 +174,7 @@ describe("perform delete-text fragment", () => {
       Point.create("grandchild2", "T", 2)
     );
     const { changes, options } = editor.perform.deleteFragment(new Range(range))!;
-    const newId = changes.flat().find(it => it.ops[0].p.length === 0)?.id;
-    editor.state.apply(changes, options);
+    const newId = Object.entries(changes).find(([, it]) => it[0].p.length === 0)?.[0];
     const blockSet = editor.state.toBlockSet();
     expect(Object.keys(blockSet)).toEqual(["root", newId]);
     expect(blockSet[newId!].data.delta).toEqual([]);

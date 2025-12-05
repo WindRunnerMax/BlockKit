@@ -109,6 +109,7 @@ export class EditorState {
         data: { parent: "", type: "text", delta: [], children: [] },
       };
       this.blocks[id] = new BlockState(textBlock, this);
+      this.editor.logger.warning("BlockState Not Found:", id);
     }
     return this.blocks[id];
   }

@@ -80,8 +80,7 @@ describe("perform delete-tree", () => {
     // - I
     const editor = new BlockEditor({ initial: getBlocks() });
     const range = normalizeModelRange(editor, Point.create("B", "T", 0), Point.create("C", "T", 1));
-    const res = editor.perform.deleteFragment(new Range(range))!;
-    editor.perform.applyChanges(res);
+    editor.perform.deleteFragment(new Range(range))!;
     const blockSet = editor.state.toBlockSet();
     expect(Object.keys(blockSet)).toEqual(["root", "A", "B", "D", "E", "F", "G", "H", "I"]);
     expect(blockSet.A.data.children).toEqual(["B", "H"]);

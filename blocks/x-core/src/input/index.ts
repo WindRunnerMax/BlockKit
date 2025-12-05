@@ -45,37 +45,31 @@ export class Input {
       // case "deleteByDrag":
       case "deleteByComposition":
       case "deleteByCut": {
-        const res = this.editor.perform.deleteFragment(sel);
-        this.editor.perform.applyChanges(res);
+        this.editor.perform.deleteFragment(sel);
         break;
       }
       case "deleteWordBackward": {
         const newRange = this.editor.selection.move(WORD, BACKWARD, EXTEND);
-        const res = this.editor.perform.deleteBackward(newRange || sel);
-        this.editor.perform.applyChanges(res);
+        this.editor.perform.deleteBackward(newRange || sel);
         break;
       }
       case "deleteContent":
       case "deleteContentBackward": {
-        const res = this.editor.perform.deleteBackward(sel);
-        this.editor.perform.applyChanges(res);
+        this.editor.perform.deleteBackward(sel);
         break;
       }
       case "deleteWordForward": {
         const newRange = this.editor.selection.move(WORD, FORWARD, EXTEND);
-        const res = this.editor.perform.deleteBackward(newRange || sel);
-        this.editor.perform.applyChanges(res);
+        this.editor.perform.deleteBackward(newRange || sel);
         break;
       }
       case "deleteContentForward": {
-        const res = this.editor.perform.deleteForward(sel);
-        this.editor.perform.applyChanges(res);
+        this.editor.perform.deleteForward(sel);
         break;
       }
       case "insertLineBreak":
       case "insertParagraph": {
-        const res = this.editor.perform.insertBreak(sel);
-        this.editor.perform.applyChanges(res);
+        this.editor.perform.insertBreak(sel);
         break;
       }
       // case "insertFromDrop":
@@ -83,8 +77,7 @@ export class Input {
       case "insertFromYank":
       case "insertReplacementText":
       case "insertText": {
-        const res = this.editor.perform.insertText(sel, data || "");
-        this.editor.perform.applyChanges(res);
+        this.editor.perform.insertText(sel, data || "");
         break;
       }
       default:
@@ -101,8 +94,7 @@ export class Input {
     // 避免 IME 破坏跨节点渲染造成问题
     const sel = this.editor.selection.get();
     if (!sel || sel.isCollapsed) return void 0;
-    const res = this.editor.perform.deleteFragment(sel);
-    this.editor.perform.applyChanges(res);
+    this.editor.perform.deleteFragment(sel);
   }
 
   /**
@@ -114,7 +106,6 @@ export class Input {
     event.preventDefault();
     const data = event.data;
     const sel = this.editor.selection.get();
-    const res = sel && this.editor.perform.insertText(sel, data || "");
-    this.editor.perform.applyChanges(res);
+    sel && this.editor.perform.insertText(sel, data || "");
   }
 }

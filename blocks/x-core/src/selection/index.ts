@@ -20,26 +20,21 @@ import { isSelectionElement, toDOMRange } from "./utils/native";
 
 export class Selection {
   /** 上次时间片快照 */
-  protected lastRecord: number;
+  protected lastRecord: number = 0;
   /** 时间片内执行次数 */
-  protected execution: number;
+  protected execution: number = 0;
   /** 先前选区 */
-  protected previous: Range | null;
+  protected previous: Range | null = null;
   /** 当前选区 */
-  protected current: Range | null;
+  protected current: Range | null = null;
   /** 块选区节点 */
-  public element: HTMLElement | null;
+  public element: HTMLElement | null = null;
 
   /**
    * 构造函数
    * @param editor
    */
   public constructor(protected editor: BlockEditor) {
-    this.lastRecord = 0;
-    this.execution = 0;
-    this.previous = null;
-    this.current = null;
-    this.element = null;
     this.editor.event.on(EDITOR_EVENT.SELECTION_CHANGE_NATIVE, this.onNativeSelectionChange);
   }
 

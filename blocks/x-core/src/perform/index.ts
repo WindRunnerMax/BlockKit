@@ -4,6 +4,7 @@ import { Delta } from "@block-kit/delta";
 import type { BlockDataField } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../editor";
+import type { ContentChangeEvent } from "../event/bus";
 import { getOpMetaMarks } from "../lookup/utils/marks";
 import { Entry } from "../selection/modules/entry";
 import { Point } from "../selection/modules/point";
@@ -12,10 +13,9 @@ import type { RangeEntry, TextPoint } from "../selection/types";
 import { POINT_TYPE } from "../selection/utils/constant";
 import type { ApplyOptions, BatchApplyChange } from "../state/types";
 import { Atom } from "./modules/atom";
-import type { PerformResult } from "./types";
 
 export class Perform {
-  /** 原子化变更 BlockMap */
+  /** BlockMap 原子化变更 */
   public atom: Atom;
 
   /**
@@ -31,22 +31,21 @@ export class Perform {
    * @param sel
    * @param text
    */
-  public insertText(sel: Range, text: string): PerformResult | null {
+  public insertText(sel: Range, text: string): ContentChangeEvent | null {
     if (!sel.length) return null;
     const changes: BatchApplyChange = [];
     const options: ApplyOptions = {};
-    const result: PerformResult = { changes, options };
-    let delRes: PerformResult | null = null;
     let entry: RangeEntry | null = sel.at(0)!;
-    if (!sel.isCollapsed && (delRes = this.deleteFragment(sel))) {
-      result.changes.push(...delRes.changes);
-      Object.assign(result.options!, delRes.options);
-      if (delRes.options && delRes.options.selection) {
+    if (!sel.isCollapsed) {
+      const delRes = this.deleteFragment(sel);
+      if (delRes && delRes.options.selection) {
         entry = delRes.options.selection.at(0)!;
       }
     }
     // 理论上来说, 此时的 Entry 类型只应该是 TextEntry
-    if (!entry || !Entry.isText(entry)) return result;
+    if (!entry || !Entry.isText(entry)) {
+      return this.editor.state.apply(changes, options);
+    }
     const start = Point.create(entry.id, POINT_TYPE.TEXT, entry.start);
     let attributes: AttributeMap | undefined = this.editor.lookup.marks;
     // 非折叠选区时, 需要以 start 起始判断该节点的尾部 marks
@@ -57,14 +56,14 @@ export class Perform {
     const delta = new Delta().retain(start.offset).insert(text, attributes);
     const textChange = this.atom.updateText(start.id, delta);
     changes.push(textChange);
-    return result;
+    return this.editor.state.apply(changes, options);
   }
 
   /**
    * 删除选区片段
    * @param sel
    */
-  public deleteFragment(sel: Range): PerformResult | null {
+  public deleteFragment(sel: Range): ContentChangeEvent | null {
     if (sel.isCollapsed || !sel.length) return null;
     const options: ApplyOptions = {};
     const changes: BatchApplyChange = [];
@@ -162,7 +161,7 @@ export class Perform {
         changes.push(moveChanges);
       }
     }
-    return { changes, options };
+    return this.editor.state.apply(changes, options);
   }
 
   /**
@@ -170,7 +169,7 @@ export class Perform {
    * - 这里的后指的是 CARET 位置左侧的内容
    * @param sel
    */
-  public deleteBackward(sel: Range): PerformResult | null {
+  public deleteBackward(sel: Range): ContentChangeEvent | null {
     if (!sel || sel.isEmpty()) return null;
     if (!sel.isCollapsed || Entry.isBlock(sel.at(0)!)) {
       return this.deleteFragment(sel);
@@ -189,7 +188,7 @@ export class Perform {
       if (prevBlock.isBlockType()) {
         const entry = Entry.create(prevBlock.id, POINT_TYPE.BLOCK);
         options.selection = new Range([entry], false);
-        return { changes, options };
+        return this.editor.state.apply(changes, options);
       }
       // 将当前节点的内容合并到前节点中, 并且删除当前节点
       const entry1 = Entry.create(prevBlock.id, POINT_TYPE.TEXT, prevBlock.length, 0);
@@ -204,7 +203,7 @@ export class Perform {
     const startOffset = start.offset - len;
     const delta = new Delta().retain(startOffset).delete(len);
     changes.push(this.atom.updateText(block.id, delta));
-    return { changes, options };
+    return this.editor.state.apply(changes, options);
   }
 
   /**
@@ -212,7 +211,7 @@ export class Perform {
    * - 这里的前指的是 CARET 位置右侧的内容
    * @param sel
    */
-  public deleteForward(sel: Range): PerformResult | null {
+  public deleteForward(sel: Range): ContentChangeEvent | null {
     if (!sel || sel.isEmpty()) return null;
     if (!sel.isCollapsed || Entry.isBlock(sel.at(0)!)) {
       return this.deleteFragment(sel);
@@ -231,7 +230,7 @@ export class Perform {
       if (nextBlock.isBlockType()) {
         const entry = Entry.create(nextBlock.id, POINT_TYPE.BLOCK);
         options.selection = new Range([entry], false);
-        return { changes, options };
+        return this.editor.state.apply(changes, options);
       }
       // 将当前节点的内容合并到前节点中, 并且删除当前节点
       const entry1 = Entry.create(block.id, POINT_TYPE.TEXT, block.length, 0);
@@ -245,7 +244,7 @@ export class Perform {
     }
     const delta = new Delta().retain(start.offset).delete(len);
     changes.push(this.atom.updateText(block.id, delta));
-    return { changes, options };
+    return this.editor.state.apply(changes, options);
   }
 
   /**
@@ -253,54 +252,38 @@ export class Perform {
    * @param sel
    * @param attributes
    */
-  public insertBreak(sel: Range, data?: BlockDataField): PerformResult | null {
+  public insertBreak(sel: Range, data?: BlockDataField): ContentChangeEvent | null {
     if (!sel || sel.isEmpty()) return null;
     const changes: BatchApplyChange = [];
     const options: ApplyOptions = {};
-    if (!sel.isCollapsed || Entry.isBlock(sel.at(0)!)) {
+    if (!sel.isCollapsed) {
       const res = this.deleteFragment(sel);
-      res && changes.push(...res.changes);
-      res && Object.assign(options, res.options);
+      const first = sel.at(0)!;
+      const last = sel.at(-1)!;
+      if (Entry.isBlock(first) || Entry.isBlock(last)) {
+        return res;
+      }
+      res && (options.selection = res.options.selection);
     }
-    const firstEntry = options.selection ? options.selection.at(0)! : sel.at(0)!;
-    const block = this.editor.state.getBlock(firstEntry.id);
-    if (!block || !block.data.parent) return { changes, options };
+    // 执行到这里一定是折叠的选区
+    const entry = options.selection ? options.selection.at(0)! : sel.at(0)!;
+    const block = this.editor.state.getBlock(entry.id);
+    if (!block || !block.data.parent || Entry.isBlock(entry)) {
+      return this.editor.state.apply(changes, options);
+    }
     const parentId = block.data.parent;
     const newData = data || { type: "text", children: [], delta: [], parent: "" };
-    // 块级节点直接在该节点的下方插入新节点
-    if (Entry.isBlock(firstEntry)) {
-      const newBlockChange = this.atom.create(newData);
-      const insertBlockChange = this.atom.insert(parentId, block.index + 1, newBlockChange);
-      changes.push(newBlockChange, insertBlockChange);
-      const entry = Entry.create(newBlockChange.id, POINT_TYPE.TEXT, 0, 0);
-      options.selection = new Range([entry], false);
-      return { changes, options };
-    }
-    const lastEntry = sel.at(-1)!;
-    const lastBlock = lastEntry && this.editor.state.getBlock(lastEntry.id);
-    if (!lastBlock || Entry.isBlock(lastEntry)) return { changes, options };
-    // 文本节点则需要拆分当前节点
-    const start = firstEntry.start;
-    const end = lastEntry.start + lastEntry.len;
+    // 文本节点需要拆分当前节点
+    const start = entry.start;
     const del = new Delta().retain(start).delete(block.length - start);
-    const content = new Delta(lastBlock.data.delta).slice(end, lastBlock.length);
+    const content = new Delta(block.data.delta).slice(start, block.length);
     newData.delta = content.ops;
     const delChange = this.atom.updateText(block.id, del);
     const newBlockChange = this.atom.create(newData);
     const insertBlockChange = this.atom.insert(parentId, block.index + 1, newBlockChange);
     changes.push(delChange, newBlockChange, insertBlockChange);
-    const entry = Entry.create(newBlockChange.id, POINT_TYPE.TEXT, 0, 0);
-    options.selection = new Range([entry], false);
-    return { changes, options };
-  }
-
-  /**
-   * 执行变更结果
-   * @param result
-   */
-  public applyChanges(result: PerformResult | null) {
-    const changes = result ? result.changes : [];
-    const options = result ? result.options : {};
+    const newEntry = Entry.create(newBlockChange.id, POINT_TYPE.TEXT, 0, 0);
+    options.selection = new Range([newEntry], false);
     return this.editor.state.apply(changes, options);
   }
 }

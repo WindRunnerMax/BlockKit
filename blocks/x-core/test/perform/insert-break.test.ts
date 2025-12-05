@@ -23,8 +23,7 @@ describe("perform insert break", () => {
       Point.create("child1", "T", 1)
     );
     const { changes, options } = editor.perform.insertBreak(new Range(range))!;
-    const newId = changes.flat().find(it => it.ops[0].p.length === 0)?.id;
-    editor.state.apply(changes, options);
+    const newId = Object.entries(changes).find(([, it]) => it[0].p.length === 0)?.[0];
     const blockSet = editor.state.toBlockSet();
     expect(Object.keys(blockSet)).toEqual(["root", "child1", newId!]);
     expect(blockSet.child1.data.delta).toEqual([{ insert: "1" }]);
@@ -52,10 +51,8 @@ describe("perform insert break", () => {
       Point.create("child1", "T", 2)
     );
     const { changes, options } = editor.perform.insertBreak(new Range(range))!;
-    const newId = changes.flat().find(it => it.ops[0].p.length === 0)?.id;
-    const res = editor.state.apply(changes, options);
-    expect(res.changes.child1[0].o).toEqual([{ retain: 1 }, { delete: 1 }]);
-    expect(res.changes.child1[1].o).toEqual([{ retain: 1 }, { delete: 1 }]);
+    const newId = Object.entries(changes).find(([, it]) => it[0].p.length === 0)?.[0];
+    expect(changes.child1[0].o).toEqual([{ retain: 1 }, { delete: 1 }]);
     const blockSet = editor.state.toBlockSet();
     expect(Object.keys(blockSet)).toEqual(["root", "child1", newId!]);
     expect(blockSet.child1.data.delta).toEqual([{ insert: "1" }]);
@@ -87,7 +84,10 @@ describe("perform insert break", () => {
       Point.create("child1", "T", 1),
       Point.create("child2", "T", 2)
     );
-    const { changes, options } = editor.perform.insertBreak(new Range(range))!;
-    editor.state.apply(changes, options);
+    const { changes } = editor.perform.insertBreak(new Range(range))!;
+    const blockSet = editor.state.toBlockSet();
+    const newId = Object.entries(changes).find(([, it]) => it[0].p.length === 0)?.[0];
+    expect(blockSet.child1.data.delta?.[0]).toEqual({ insert: "1" });
+    expect(blockSet[newId!].data.delta?.[0]).toEqual({ insert: "9" });
   });
 });
