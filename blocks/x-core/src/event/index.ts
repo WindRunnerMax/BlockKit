@@ -37,7 +37,7 @@ export class Event {
    * 监听事件
    * @param key
    * @param listener
-   * @param priority 默认为 100
+   * @param priority [?=100] 值越小优先级越高
    */
   public on: typeof this.bus["on"] = (key, listener, priority) => {
     return this.bus.on(key, listener, priority);
@@ -47,7 +47,7 @@ export class Event {
    * 一次性事件监听
    * @param key
    * @param listener
-   * @param priority 默认为 100
+   * @param priority [?=100] 值越小优先级越高
    */
   public once: typeof this.bus["once"] = (key, listener, priority) => {
     return this.bus.once(key, listener, priority);

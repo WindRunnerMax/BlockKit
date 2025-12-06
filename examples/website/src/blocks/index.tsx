@@ -1,3 +1,5 @@
+import "./styles/index.scss";
+
 import { Editor as TextEditor, LOG_LEVEL } from "@block-kit/core";
 import type { Delta } from "@block-kit/delta";
 import {
@@ -48,8 +50,13 @@ const App: FC = () => {
   };
 
   return (
-    <BlockKitX editor={block} onCreateTextEditor={onCreateTextEditor}>
-      <EditableX placeholder="Input Placeholder..."></EditableX>
+    <BlockKitX editor={block} onCreateTextEditor={onCreateTextEditor} readonly={false}>
+      <div className="block-kit-editor-container">
+        <div className="block-kit-editable-container">
+          <div className="block-kit-mount-dom"></div>
+          <EditableX placeholder="Input Placeholder..." className="block-kit-editable"></EditableX>
+        </div>
+      </div>
     </BlockKitX>
   );
 };

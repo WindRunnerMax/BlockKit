@@ -14,7 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rm -rf dist && rollup -c && mkdir -p dist/style && cp dist/es/*.css dist/style",
+    "build": "rm -rf dist && rollup -c",
     "lint:ts": "tsc -p tsconfig.build.json --noEmit",
     "lint:circular": "madge --extensions js --circular ./dist"
   },

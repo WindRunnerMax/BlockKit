@@ -36,7 +36,7 @@ export class EventBus<E extends O.Any = EventBusType> {
    * 监听事件
    * @param key
    * @param listener
-   * @param priority 默认为 100
+   * @param priority [?=100] 值越小优先级越高
    */
   public on<T extends EventKeys<E>>(key: T, listener: Listener<E, T>, priority = DEFAULT_PRIORITY) {
     this.addEventListener(key, listener, priority, false);
@@ -46,7 +46,7 @@ export class EventBus<E extends O.Any = EventBusType> {
    * 一次性事件监听
    * @param key
    * @param listener
-   * @param priority 默认为 100
+   * @param priority [?=100] 值越小优先级越高
    */
   public once<T extends EventKeys<E>>(
     key: T,

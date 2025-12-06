@@ -1,6 +1,4 @@
-import { PLACEHOLDER_KEY } from "@block-kit/core";
 import { rewriteRemoveChild } from "@block-kit/react";
-import { ROOT_BLOCK } from "@block-kit/utils";
 import { useForceUpdate, useIsMounted, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { Listener } from "@block-kit/x-core";
 import type { BlockEditor } from "@block-kit/x-core";
@@ -15,7 +13,6 @@ import {
 import type { FC } from "react";
 import React, { Fragment, useLayoutEffect, useMemo, useRef } from "react";
 
-import { useComposing } from "../hooks/use-composing";
 import { useLayoutEffectContext } from "../hooks/use-layout-context";
 import { TextModel } from "./text";
 
@@ -23,13 +20,11 @@ const BlockView: FC<{
   editor: BlockEditor;
   state: BlockState;
   className?: string;
-  placeholder?: string;
 }> = props => {
   const { editor, state } = props;
   const flushing = useRef(false);
   const { mounted } = useIsMounted();
   const { forceUpdate } = useForceUpdate();
-  const { isComposing } = useComposing(editor);
   const { forceLayoutEffect } = useLayoutEffectContext();
 
   /**
@@ -73,26 +68,6 @@ const BlockView: FC<{
   });
 
   /**
-   * 计算 placeholder
-   */
-  const placeholder = useMemo(() => {
-    if (
-      state.parent &&
-      state.parent.data.type === ROOT_BLOCK &&
-      props.placeholder &&
-      !isComposing &&
-      state.parent.children.length === 1 &&
-      !state.children.length &&
-      state.data.delta &&
-      !state.data.delta.length
-    ) {
-      return props.placeholder;
-    }
-    return null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isComposing, props.placeholder, state, state.version]);
-
-  /**
    * 处理子节点块结构
    */
   const children = useMemo(() => {
@@ -105,14 +80,13 @@ const BlockView: FC<{
             key={child.id}
             editor={editor}
             state={child}
-            placeholder={props.placeholder}
           ></BlockModel>
         ))}
       </Fragment>
     );
     return els;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor, state, state.version, props.placeholder]);
+  }, [editor, state, state.version]);
 
   return (
     <div
@@ -121,7 +95,6 @@ const BlockView: FC<{
         [X_BLOCK_KEY]: true,
         [X_BLOCK_TYPE_KEY]: state.data.type,
         [X_BLOCK_ID_KEY]: state.id,
-        [PLACEHOLDER_KEY]: placeholder,
       }}
       className={props.className}
       ref={setModel}

@@ -8,6 +8,6 @@ div[data-block][data-placeholder]::before {
   position: absolute;
 }
 
-.block-kit-x-children {
+div:not(div[data-block-type='ROOT']) > .block-kit-x-children {
   margin-left: 10px;
 }

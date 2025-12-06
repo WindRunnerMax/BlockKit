@@ -1,7 +1,7 @@
 import { IS_MAC } from "./env";
 
 /** 默认节点 */
-export const ROOT_BLOCK = "ROOT";
+export const ROOT_BLOCK = "ROOT" as const;
 
 /** 默认优先级 */
 export const DEFAULT_PRIORITY = 100;

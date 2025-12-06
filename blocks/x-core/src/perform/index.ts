@@ -1,6 +1,7 @@
 import { getFirstUnicodeLen, getLastUnicodeLen } from "@block-kit/core";
 import type { AttributeMap } from "@block-kit/delta";
 import { Delta } from "@block-kit/delta";
+import { ROOT_BLOCK } from "@block-kit/utils";
 import type { BlockDataField } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../editor";
@@ -185,8 +186,8 @@ export class Perform {
     // 如果处于当前行的行首, 需要根据状态处理情况
     if (start.offset === 0) {
       const prevBlock = block.prevSiblingNode();
-      // 如果没有前节点, 则不能执行删除操作
-      if (!prevBlock) return null;
+      // 如果没有前节点, 或者前节点是 root, 则不能执行删除操作
+      if (!prevBlock || prevBlock.data.type === ROOT_BLOCK) return null;
       // 如果前节点是块节点, 则移动选区到前节点上
       if (prevBlock.isBlockType()) {
         const entry = Entry.create(prevBlock.id, POINT_TYPE.BLOCK);

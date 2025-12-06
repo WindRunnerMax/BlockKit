@@ -5,12 +5,14 @@ import { cs, ROOT_BLOCK } from "@block-kit/utils";
 import { useForceUpdate, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { Listener } from "@block-kit/x-core";
 import { EDITOR_STATE, X_SELECTION_KEY } from "@block-kit/x-core";
+import type { ReactNode } from "react";
 import React, { useEffect, useLayoutEffect, useRef } from "react";
 
 import { useEditorStatic } from "../hooks/use-editor";
 import { LayoutEffectContext } from "../hooks/use-layout-context";
 import { useReadonly } from "../hooks/use-readonly";
 import { BlockModel } from "../model/block";
+import { Placeholder } from "../model/ph";
 
 /**
  * Editable 编辑节点
@@ -22,7 +24,7 @@ export const EditableX: React.FC<{
   /** 自动聚焦 */
   autoFocus?: boolean;
   /** 占位文本 */
-  placeholder?: string;
+  placeholder?: ReactNode;
   /**
    * 阻止编辑器主动销毁
    * - 谨慎使用, 编辑器生命周期结束必须主动销毁
@@ -91,7 +93,7 @@ export const EditableX: React.FC<{
    * 监听内容变更事件, 更新当前块视图
    */
   useLayoutEffect(() => {
-    editor.event.on(EDITOR_EVENT.CONTENT_CHANGE, onContentChange, 1000);
+    editor.event.on(EDITOR_EVENT.CONTENT_CHANGE, onContentChange, 10);
     return () => {
       editor.event.off(EDITOR_EVENT.CONTENT_CHANGE, onContentChange);
     };
@@ -136,8 +138,9 @@ export const EditableX: React.FC<{
         overflowWrap: "break-word",
       }}
     >
+      <Placeholder state={root} editor={editor} placeholder={props.placeholder} />
       <LayoutEffectContext.Provider value={onTreeBlockLayoutEffect}>
-        <BlockModel editor={editor} state={root} placeholder={props.placeholder}></BlockModel>
+        <BlockModel editor={editor} state={root}></BlockModel>
       </LayoutEffectContext.Provider>
     </div>
   );
