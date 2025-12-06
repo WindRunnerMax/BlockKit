@@ -3,6 +3,7 @@ import { isString, isUndef } from "@block-kit/utils";
 import type { Block, BlockDataField, JSONOp } from "@block-kit/x-json";
 import { cloneSnapshot, json } from "@block-kit/x-json";
 
+import { STATE_TO_RENDER } from "../../model/utils/weak-map";
 import type { EditorState } from "../index";
 import { clearTreeCache, getNextSiblingNode, getPrevSiblingNode } from "../utils/tree";
 
@@ -99,6 +100,15 @@ export class BlockState {
    */
   public getDOMNode() {
     return this.state.editor.model.getBlockNode(this);
+  }
+
+  /**
+   * 重新渲染块结构 [re-render]
+   * - 需要视图层配合实现渲染
+   */
+  public forceRender() {
+    const update = STATE_TO_RENDER.get(this);
+    update && update();
   }
 
   /**

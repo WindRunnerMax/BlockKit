@@ -90,4 +90,63 @@ describe("perform insert break", () => {
     expect(blockSet.child1.data.delta?.[0]).toEqual({ insert: "1" });
     expect(blockSet[newId!].data.delta?.[0]).toEqual({ insert: "9" });
   });
+
+  it("insert break with cross line with children", () => {
+    const blocks: Blocks = {
+      root: {
+        id: "root",
+        version: 1,
+        data: { type: "ROOT", children: ["child1", "child2"], parent: "" },
+      },
+      child1: {
+        id: "child1",
+        version: 1,
+        data: {
+          type: "text",
+          children: ["grandchild1"],
+          delta: [{ insert: "child1" }],
+          parent: "root",
+        },
+      },
+      child2: {
+        id: "child2",
+        version: 1,
+        data: { type: "text", children: [], delta: [{ insert: "child2" }], parent: "root" },
+      },
+      grandchild1: {
+        id: "grandchild1",
+        version: 1,
+        data: {
+          type: "text",
+          children: ["grandgrandchild1"],
+          delta: [{ insert: "grandchild1" }],
+          parent: "child1",
+        },
+      },
+      grandgrandchild1: {
+        id: "grandgrandchild1",
+        version: 1,
+        data: {
+          type: "text",
+          children: [],
+          delta: [{ insert: "grandgrandchild1" }],
+          parent: "child1",
+        },
+      },
+    };
+    const editor = new BlockEditor({ initial: blocks });
+    const range = normalizeModelRange(
+      editor,
+      Point.create("child1", "T", 3),
+      Point.create("grandchild1", "T", 5)
+    );
+    const { changes } = editor.perform.insertBreak(new Range(range))!;
+    const blockSet = editor.state.toBlockSet();
+    const newId = Object.entries(changes).find(([, it]) => it[0].p.length === 0)?.[0];
+    expect(Object.keys(blockSet)).toEqual(["root", "child1", "child2", "grandgrandchild1", newId]);
+    expect(blockSet.child1.data.delta).toEqual([{ insert: "chi" }]);
+    expect(blockSet[newId!].data.delta).toEqual([{ insert: "child1" }]);
+    expect(blockSet.child1.data.children).toEqual([newId, "grandgrandchild1"]);
+    expect(blockSet.root.data.children).toEqual(["child1", "child2"]);
+  });
 });

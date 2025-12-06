@@ -5,11 +5,18 @@ import { useForceUpdate, useIsMounted, useMemoFn } from "@block-kit/utils/dist/e
 import type { Listener } from "@block-kit/x-core";
 import type { BlockEditor } from "@block-kit/x-core";
 import type { BlockState } from "@block-kit/x-core";
-import { EDITOR_EVENT, X_BLOCK_ID_KEY, X_BLOCK_KEY, X_BLOCK_TYPE_KEY } from "@block-kit/x-core";
+import {
+  EDITOR_EVENT,
+  STATE_TO_RENDER,
+  X_BLOCK_ID_KEY,
+  X_BLOCK_KEY,
+  X_BLOCK_TYPE_KEY,
+} from "@block-kit/x-core";
 import type { FC } from "react";
 import React, { Fragment, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useComposing } from "../hooks/use-composing";
+import { useLayoutEffectContext } from "../hooks/use-layout-context";
 import { TextModel } from "./text";
 
 const BlockView: FC<{
@@ -23,6 +30,7 @@ const BlockView: FC<{
   const { mounted } = useIsMounted();
   const { forceUpdate } = useForceUpdate();
   const { isComposing } = useComposing(editor);
+  const { forceLayoutEffect } = useLayoutEffectContext();
 
   /**
    * 设置行 DOM 节点
@@ -55,6 +63,14 @@ const BlockView: FC<{
       editor.event.off(EDITOR_EVENT.CONTENT_CHANGE, onContentChange);
     };
   }, [editor.event, onContentChange]);
+
+  /**
+   * 跨组件通知布局变更
+   */
+  useLayoutEffect(() => {
+    forceLayoutEffect(state.id);
+    STATE_TO_RENDER.set(state, forceUpdate);
+  });
 
   /**
    * 计算 placeholder
@@ -94,7 +110,6 @@ const BlockView: FC<{
         ))}
       </Fragment>
     );
-
     return els;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, state, state.version, props.placeholder]);

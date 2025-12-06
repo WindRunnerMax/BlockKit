@@ -245,7 +245,6 @@ export class Perform {
     if (op && op.insert) {
       len = getFirstUnicodeLen(op.insert);
     }
-    console.log("object :>> ", start.offset, len);
     const delta = new Delta().retain(start.offset).delete(len);
     changes.push(this.atom.updateText(block.id, delta));
     return this.editor.state.apply(changes, options);
@@ -275,16 +274,18 @@ export class Perform {
     if (!block || !block.data.parent || Entry.isBlock(entry)) {
       return this.editor.state.apply(changes, options);
     }
-    const parentId = block.data.parent;
-    const newData = data || { type: "text", children: [], delta: [], parent: "" };
+
     // 文本节点需要拆分当前节点
     const start = entry.start;
     const del = new Delta().retain(start).delete(block.length - start);
     const content = new Delta(block.data.delta).slice(start, block.length);
+    const newData = data || { type: "text", children: [], delta: [], parent: "" };
     newData.delta = content.ops;
     const delChange = this.atom.updateText(block.id, del);
     const newBlockChange = this.atom.create(newData);
-    const insertBlockChange = this.atom.insert(parentId, block.index + 1, newBlockChange);
+    const parentId = block.children.length ? block.id : block.data.parent;
+    const index = block.children.length ? 0 : block.index + 1;
+    const insertBlockChange = this.atom.insert(parentId, index, newBlockChange);
     changes.push(delChange, newBlockChange, insertBlockChange);
     const newEntry = Entry.create(newBlockChange.id, POINT_TYPE.TEXT, 0, 0);
     options.selection = new Range([newEntry], false);

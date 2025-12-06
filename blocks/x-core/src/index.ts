@@ -10,6 +10,7 @@ export {
   X_TEXT_BLOCK_KEY,
   X_ZERO_KEY,
 } from "./model/types";
+export { STATE_TO_RENDER } from "./model/utils/weak-map";
 export { Entry } from "./selection/modules/entry";
 export { Point } from "./selection/modules/point";
 export { Range } from "./selection/modules/range";
