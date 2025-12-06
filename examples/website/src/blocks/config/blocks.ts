@@ -24,6 +24,16 @@ export const INIT: Blocks = {
   grandchild1: {
     id: "grandchild1",
     version: 1,
-    data: { type: "text", children: [], delta: [{ insert: "grandchild1" }], parent: "child1" },
+    data: {
+      type: "text",
+      children: ["grandgrandchild1"],
+      delta: [{ insert: "grandchild1" }],
+      parent: "child1",
+    },
+  },
+  grandgrandchild1: {
+    id: "grandgrandchild1",
+    version: 1,
+    data: { type: "text", children: [], delta: [{ insert: "grandgrandchild1" }], parent: "child1" },
   },
 };

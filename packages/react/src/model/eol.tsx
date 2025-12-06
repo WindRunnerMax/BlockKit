@@ -6,10 +6,6 @@ import React from "react";
 import { ZeroSpace } from "../preset/zero";
 import { LEAF_TO_ZERO_TEXT } from "../utils/weak-map";
 
-/**
- * EOL Model
- * @param props
- */
 const EOLView: FC<{
   editor: Editor;
   leafState: LeafState;
@@ -29,4 +25,5 @@ const EOLView: FC<{
   );
 };
 
+/** EOL Model */
 export const EOLModel = React.memo(EOLView);

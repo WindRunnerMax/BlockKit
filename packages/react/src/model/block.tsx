@@ -17,10 +17,6 @@ import { rewriteRemoveChild } from "../utils/dirty-dom";
 import { JSX_TO_STATE } from "../utils/weak-map";
 import { LineModel } from "./line";
 
-/**
- * Block Model
- * @param props
- */
 const BlockView: FC<{
   editor: Editor;
   state: BlockState;
@@ -140,4 +136,5 @@ const BlockView: FC<{
   );
 };
 
+/** Block Model */
 export const BlockModel = React.memo(BlockView);

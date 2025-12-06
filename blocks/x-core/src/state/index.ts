@@ -71,6 +71,10 @@ export class EditorState {
    * 判断焦点是否在编辑器内
    */
   public isFocused() {
+    const textarea = this.editor.selection.element;
+    if (textarea && document.activeElement === textarea) {
+      return true;
+    }
     return !!this.get(EDITOR_STATE.FOCUS);
   }
 

@@ -13,10 +13,6 @@ import { JSX_TO_STATE } from "../utils/weak-map";
 import { EOLModel } from "./eol";
 import { LeafModel } from "./leaf";
 
-/**
- * Line Model
- * @param props
- */
 const LineView: FC<{
   editor: Editor;
   index: number;
@@ -136,4 +132,5 @@ const LineView: FC<{
   );
 };
 
+/** Line Model */
 export const LineModel = React.memo(LineView);

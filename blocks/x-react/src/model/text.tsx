@@ -10,10 +10,6 @@ import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { useMetaStatic } from "../hooks/use-meta";
 
-/**
- * Text Model
- * @param props
- */
 const TextView: FC<{
   block: BlockEditor;
   state: BlockState;
@@ -97,4 +93,5 @@ const TextView: FC<{
   );
 };
 
+/** Text Model */
 export const TextModel = React.memo(TextView);

@@ -9,10 +9,6 @@ import { Text } from "../preset/text";
 import { rewriteRemoveChild } from "../utils/dirty-dom";
 import { LEAF_TO_REMOUNT, LEAF_TO_TEXT as LT } from "../utils/weak-map";
 
-/**
- * Leaf Model
- * @param props
- */
 const LeafView: FC<{
   editor: Editor;
   index: number;
@@ -68,4 +64,5 @@ const LeafView: FC<{
   );
 };
 
+/** Leaf Model */
 export const LeafModel = React.memo(LeafView);

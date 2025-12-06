@@ -19,4 +19,5 @@ const PortalView: FC<{ editor: BlockEditor }> = props => {
   );
 };
 
+/** Portal Model */
 export const PortalModel = React.memo(PortalView);

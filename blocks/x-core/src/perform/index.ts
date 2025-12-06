@@ -121,25 +121,25 @@ export class Perform {
       !state.isBlockType() && remain.push(...children);
     }
     // ========== 预设删除后的选区, 需要根据不同的情况处理 ==========
+    // 首个节点为文本节点, 直接设置选区到该位置
     if (Entry.isText(firstEntry)) {
-      // 首个节点为文本节点, 直接设置选区到该位置
       const offset = firstEntry.start;
       const entry = Entry.create(firstBlock.id, POINT_TYPE.TEXT, offset, 0);
       options.selection = new Range([entry], false);
-    } else if (Entry.isText(lastEntry)) {
       // 首个节点非文本节点且尾节点为文本节点的情况下, 设置到尾节点的文本位置
+    } else if (Entry.isText(lastEntry)) {
       const entry = Entry.create(lastBlock.id, POINT_TYPE.TEXT, 0, 0);
       options.selection = new Range([entry], false);
-    } else {
       // 此时首尾节点都是块类型, 需要根据情况判断是否需要创建新的块
+    } else {
       const prevBlock = firstBlock.prev();
+      // 存在前节点且前节点是文本块的情况下, 选区设置到前节点的末尾
       if (prevBlock && !prevBlock.isBlockType()) {
-        // 存在前节点且前节点是文本块的情况下, 选区设置到前节点的末尾
         const offset = prevBlock.length;
         const entry = Entry.create(lastBlock.id, POINT_TYPE.TEXT, offset, 0);
         options.selection = new Range([entry], false);
-      } else {
         // 同级无前节点的情况下需要创建空白的文本节点
+      } else {
         const data: BlockDataField = { type: "text", children: [], delta: [], parent: "" };
         const parentId = firstBlock.data.parent;
         const newBlockChange = this.atom.create(data);

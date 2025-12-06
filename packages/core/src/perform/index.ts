@@ -172,21 +172,21 @@ export class Perform {
     const delta = new Delta().retain(start);
     len && delta.delete(len);
     let point: Point | null = null;
+    // 当光标在行首时, 直接移动行属性
+    // |xx(\n {y:1}) => (\n)|xx(\n {y:1} & attributes)
     if (start === startLine.start) {
-      // 当光标在行首时, 直接移动行属性
-      // |xx(\n {y:1}) => (\n)|xx(\n {y:1} & attributes)
       delta.insertEOL();
       const lineOffset = endLine.length - 1;
       delta.retain(lineOffset - sel.end.offset).retain(1, attributes);
       point = new Point(sel.start.line + 1, 0);
-    } else if (start === startLine.start + startLine.length - 1) {
       // 当光标在行尾时, 将行属性保留在当前行
       // xx|(\n {y:1}) => xx(\n {y:1})(\n attributes)
+    } else if (start === startLine.start + startLine.length - 1) {
       delta.retain(1).insertEOL(attributes);
       point = new Point(sel.start.line + 1, 0);
-    } else {
       // 当光标在行中时, 将行属性保留在当前行, 下一行合并新属性
       // x|x(\n {y:1}) => xx(\n {y:1})(\n {y:1} & attributes)
+    } else {
       delta.insertEOL(startLine.attributes);
       const lineOffset = endLine.length - 1;
       const attrs = { ...startLine.attributes, ...attributes };
