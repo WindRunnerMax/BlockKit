@@ -108,12 +108,15 @@ export class Perform {
         }
         continue;
       }
-      // 块级节点需要删除整个节点, 父节点已经删除的不再处理
       const parentId = state.data.parent;
-      if (parentId && !deleted.has(parentId)) {
+      // 块级节点需要删除整个节点, 父节点已经删除的不再处理
+      const isParentDeleted = parentId && deleted.has(parentId);
+      // 如果父节点是文本节点, 则不会删除所有子节点, 在此处需要继续处理
+      const isTextParentBlock = state.parent && !state.parent.isBlockType();
+      if (!isParentDeleted || isTextParentBlock) {
         const change = this.atom.remove(parentId, state.index);
-        deleted.add(state.id);
         changes.push(change);
+        deleted.add(state.id);
       }
       // 删除的块节点需要将子节点收集, 未删除的需要重新插入到父节点中
       // 由于块节点仅存在直属类型的子节点, 会被直接删除, 因此这里仅文本块需要处理
@@ -242,6 +245,7 @@ export class Perform {
     if (op && op.insert) {
       len = getFirstUnicodeLen(op.insert);
     }
+    console.log("object :>> ", start.offset, len);
     const delta = new Delta().retain(start.offset).delete(len);
     changes.push(this.atom.updateText(block.id, delta));
     return this.editor.state.apply(changes, options);

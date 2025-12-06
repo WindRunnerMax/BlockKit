@@ -38,6 +38,9 @@ export const EditableX: React.FC<{
   const ref = useRef<HTMLDivElement>(null);
   const root = editor.state.getBlock(editor.state.rootId);
 
+  /**
+   * 挂载编辑器 DOM
+   */
   useLayoutEffect(() => {
     const el = ref.current;
     el && editor.mount(el);
@@ -63,8 +66,8 @@ export const EditableX: React.FC<{
     if (flushing.current) return void 0;
     flushing.current = true;
     Promise.resolve().then(() => {
-      mounted.current && forceUpdate();
       flushing.current = false;
+      mounted.current && forceUpdate();
       editor.state.set(EDITOR_STATE.PAINTING, true);
     });
   });

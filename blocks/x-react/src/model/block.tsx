@@ -7,7 +7,7 @@ import type { BlockEditor } from "@block-kit/x-core";
 import type { BlockState } from "@block-kit/x-core";
 import { EDITOR_EVENT, X_BLOCK_ID_KEY, X_BLOCK_KEY, X_BLOCK_TYPE_KEY } from "@block-kit/x-core";
 import type { FC } from "react";
-import React, { useLayoutEffect, useMemo, useRef } from "react";
+import React, { Fragment, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useComposing } from "../hooks/use-composing";
 import { TextModel } from "./text";
@@ -41,8 +41,8 @@ const BlockView: FC<{
     if (flushing.current || !e.changes[state.id]) return void 0;
     flushing.current = true;
     Promise.resolve().then(() => {
-      mounted.current && forceUpdate();
       flushing.current = false;
+      mounted.current && forceUpdate();
     });
   });
 
@@ -80,22 +80,21 @@ const BlockView: FC<{
    * 处理子节点块结构
    */
   const children = useMemo(() => {
-    const els: JSX.Element[] = [];
-    if (state.data.delta) {
-      els.push(<TextModel block={editor} key={state.id} state={state}></TextModel>);
-    }
-    for (const child of state.children) {
-      const view = (
-        <BlockModel
-          className="block-kit-x-children"
-          key={child.id}
-          editor={editor}
-          state={child}
-          placeholder={props.placeholder}
-        ></BlockModel>
-      );
-      els.push(view);
-    }
+    const els = (
+      <Fragment>
+        {state.data.delta && <TextModel block={editor} key={state.id} state={state}></TextModel>}
+        {state.children.map(child => (
+          <BlockModel
+            className="block-kit-x-children"
+            key={child.id}
+            editor={editor}
+            state={child}
+            placeholder={props.placeholder}
+          ></BlockModel>
+        ))}
+      </Fragment>
+    );
+
     return els;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, state, state.version, props.placeholder]);

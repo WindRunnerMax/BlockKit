@@ -2,15 +2,6 @@ import type { Blocks } from "@block-kit/x-json";
 
 import { BlockEditor, normalizeModelRange, Point, Range } from "../../src";
 
-// - A
-//   - B
-//     - C
-//       - D
-//         - E
-//       - F
-//     - G
-//   - H
-// - I
 const getBlocks = (): Blocks => ({
   root: {
     id: "root",
@@ -92,5 +83,68 @@ describe("perform delete-tree", () => {
     expect(blockSet.G.data.parent).toEqual("B");
     expect(blockSet.D.data.children).toEqual(["E"]);
     expect(blockSet.E.data.parent).toEqual("D");
+  });
+
+  it("apply text node", () => {
+    const blocks: Blocks = {
+      root: {
+        id: "root",
+        version: 1,
+        data: { type: "ROOT", children: ["child1", "child2"], parent: "" },
+      },
+      child1: {
+        id: "child1",
+        version: 1,
+        data: {
+          type: "text",
+          children: ["grandchild1"],
+          delta: [{ insert: "child1" }],
+          parent: "root",
+        },
+      },
+      child2: {
+        id: "child2",
+        version: 1,
+        data: { type: "text", children: [], delta: [{ insert: "child2" }], parent: "root" },
+      },
+      grandchild1: {
+        id: "grandchild1",
+        version: 1,
+        data: {
+          type: "text",
+          children: ["greatgrandchild1"],
+          delta: [{ insert: "grandchild1" }],
+          parent: "child1",
+        },
+      },
+      greatgrandchild1: {
+        id: "greatgrandchild1",
+        version: 1,
+        data: {
+          type: "text",
+          children: [],
+          delta: [{ insert: "greatgrandchild1" }],
+          parent: "child1",
+        },
+      },
+    };
+    // root
+    // ├── child1
+    // │   └── grandchild1
+    // │       └── greatgrandchild1
+    // └── child2
+    const editor = new BlockEditor({ initial: blocks });
+    const range = normalizeModelRange(
+      editor,
+      Point.create("child1", "T", 3),
+      Point.create("greatgrandchild1", "T", 10)
+    );
+    editor.perform.deleteFragment(new Range(range))!;
+    const blockSet = editor.state.toBlockSet();
+    expect(Object.keys(blockSet)).toEqual(["root", "child1", "child2"]);
+    expect(blockSet.root.data.children).toEqual(["child1", "child2"]);
+    expect(blockSet.child1.data.children).toEqual([]);
+    expect(blockSet.child2.data.children).toEqual([]);
+    expect(blockSet.child1.data.delta).toEqual([{ insert: "chichild1" }]);
   });
 });

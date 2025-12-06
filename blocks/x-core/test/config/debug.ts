@@ -28,9 +28,11 @@ export const logTreeState = (editor: BlockEditor): void => {
       // 3. 递归遍历子节点
       for (let i = 0; i < node.children.length; i++) {
         const child = node.children[i];
+        if (child.data.parent !== node.id) {
+          console.warn(`${child.data.parent} Not Peer with Parent Node ${node.id}`);
+        }
         // 判断子节点是否是它父节点的最后一个子节点
         const childIsTail = i === node.children.length - 1;
-
         traverse(child, nextPrefix, childIsTail);
       }
     }

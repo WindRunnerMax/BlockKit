@@ -13,6 +13,7 @@ describe("perform delete", () => {
   });
 
   it("delete backward emoji", () => {
+    // "🧑‍🎨".length = 5
     const delta = new Delta().insert("text🧑‍🎨🧑‍🎨123").insertEOL();
     const editor = new Editor({ delta });
     const sel = new Range(new Point(0, 9), new Point(0, 9));

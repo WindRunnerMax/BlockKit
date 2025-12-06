@@ -4,6 +4,7 @@ import { cloneOps } from "@block-kit/delta";
 import { ROOT_BLOCK } from "@block-kit/utils";
 
 import type { Editor } from "../../editor";
+import { BLOCK_LIKE } from "../../editor/utils/constant";
 import { Key } from "../utils/key";
 import { LineState } from "./line-state";
 
@@ -22,8 +23,9 @@ export class BlockState {
     let offset = 0;
     this.lines = [];
     // 初始化创建 LineState
-    base.eachLine((delta, attributes, index) => {
-      const lineState = new LineState(delta, attributes, this);
+    const delta = base.ops.length ? base : new Delta(BLOCK_LIKE);
+    delta.eachLine((line, attributes, index) => {
+      const lineState = new LineState(line, attributes, this);
       lineState.index = index;
       lineState.start = offset;
       lineState.key = Key.getId(lineState);

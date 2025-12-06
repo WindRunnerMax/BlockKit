@@ -233,37 +233,37 @@ export class BlockState {
     const deletes: Set<string> = new Set();
     for (const op of changes) {
       // 若是 children 的新增变更, 则需要同步相关的 Block 状态
-      if (op.p[0] === "children" && isString(op.li)) {
+      LI_OP: if (op.p[0] === "children" && isString(op.li)) {
         isChildrenChanged = true;
         const liBlock = this.state.getOrCreateBlock(op.li);
         // 文本类型的节点仅需要处理本身
         if (!liBlock.isBlockType()) {
           liBlock.restore();
           inserts.add(liBlock.id);
-          // 块级节点需要护理处理本身及其子树节点
-        } else {
-          const nodes = liBlock.getTreeNodes();
-          for (const child of nodes) {
-            child.restore();
-            inserts.add(child.id);
-          }
+          break LI_OP;
+        }
+        // 块级节点需要护理处理本身及其子树节点
+        const nodes = liBlock.getTreeNodes();
+        for (const child of nodes) {
+          child.restore();
+          inserts.add(child.id);
         }
       }
       // 若是 children 的删除变更, 则需要同步相关的 Block 状态
-      if (op.p[0] === "children" && isString(op.ld)) {
+      LD_OP: if (op.p[0] === "children" && isString(op.ld)) {
         isChildrenChanged = true;
         const ldBlock = this.state.getOrCreateBlock(op.ld);
-        // 文本类型的节点仅需要处理本身
+        // 文本类型的节点仅需要处理本身的删除状态, 子节点需要选区状态来维护
         if (!ldBlock.isBlockType()) {
           ldBlock.remove();
           deletes.add(ldBlock.id);
-          // 块级节点需要护理处理本身及其子树节点
-        } else {
-          const nodes = ldBlock.getTreeNodes();
-          for (const child of nodes) {
-            child.remove();
-            deletes.add(child.id);
-          }
+          break LD_OP;
+        }
+        // 块级节点需要护理处理本身及其子树节点
+        const nodes = ldBlock.getTreeNodes();
+        for (const child of nodes) {
+          child.remove();
+          deletes.add(child.id);
         }
       }
     }

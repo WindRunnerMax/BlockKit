@@ -1,5 +1,5 @@
 import { EDITOR_EVENT, EDITOR_STATE } from "@block-kit/core";
-import { cloneOp, Delta, EOL_OP } from "@block-kit/delta";
+import { Delta } from "@block-kit/delta";
 import { BlockKit, LineModel, rewriteRemoveChild } from "@block-kit/react";
 import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { BlockEditor, BlockState, Listener } from "@block-kit/x-core";
@@ -20,8 +20,7 @@ const TextView: FC<{
 
   const editor = useMemo(() => {
     const ops = props.state.data.delta;
-    const delta = ops && ops.length ? props.state.data.delta : [cloneOp(EOL_OP)];
-    const text = onCreateTextEditorRef.current(new Delta(delta));
+    const text = onCreateTextEditorRef.current(new Delta(ops));
     props.block.model.setTextEditor(props.state, text);
     return text;
   }, [props.block.model, props.state]);
