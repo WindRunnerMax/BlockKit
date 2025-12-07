@@ -212,6 +212,25 @@ export class Perform {
   }
 
   /**
+   * 移动选区内容片段到目标选区处
+   * @param from
+   * @param to
+   */
+  public moveFragment(from: Range, to: Range) {
+    const rawFrom = RawRange.fromRange(this.editor, from);
+    const rawTo = RawRange.fromRange(this.editor, to);
+    if (!rawFrom || !rawTo) return void 0;
+    const fragment = this.editor.lookup.getFragment(from);
+    if (!fragment) return void 0;
+    const delDelta = new Delta().retain(rawFrom.start).delete(rawFrom.len);
+    const toStart = delDelta.transformPosition(rawTo.start);
+    const insertDelta = new Delta().retain(toStart).merge(new Delta(fragment));
+    const composed = delDelta.compose(insertDelta);
+    this.editor.state.apply(composed, { range: rawTo });
+    return void 0;
+  }
+
+  /**
    * 在选区处应用 Mark
    * @param sel
    * @param attributes

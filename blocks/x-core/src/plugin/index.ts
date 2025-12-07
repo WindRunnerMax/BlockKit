@@ -1,6 +1,10 @@
 import type { BlockEditor } from "../editor";
+import type { CorePlugin } from "./modules/implement";
 
 export class Plugin {
+  /** key 块渲染映射 */
+  public map: Record<string, CorePlugin> = {};
+
   /**
    * 构造函数
    * @param editor

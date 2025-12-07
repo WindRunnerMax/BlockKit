@@ -15,7 +15,7 @@ const ENTRIES = ["src/**/*.{ts,tsx}"];
  * https://rollupjs.org/configuration-options/
  * @typedef { import("rollup").RollupOptions } RollupConfig
  * @return { Promise<RollupConfig[]> }
- * */
+ */
 export default async () => {
   const inputs = await Promise.all(ENTRIES.map(item => glob(item, { ignore: IGNORES })))
     .then(res => res.reduce((pre, cur) => [...pre, ...cur]))

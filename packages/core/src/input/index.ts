@@ -4,6 +4,7 @@ import type { Editor } from "../editor";
 import { EDITOR_EVENT } from "../event/bus/";
 import { Range } from "../selection/modules/range";
 import { DIRECTION, GRANULARITY } from "../selection/types";
+import { toModelRange } from "../selection/utils/model";
 import { EDITOR_STATE } from "../state/types";
 
 export class Input {
@@ -42,6 +43,34 @@ export class Input {
       return void 0;
     }
     switch (inputType) {
+      case "insertFromPaste":
+      case "insertFromYank":
+      case "insertReplacementText":
+      case "insertText": {
+        this.editor.perform.insertText(sel, data || "");
+        break;
+      }
+      case "insertLineBreak":
+      case "insertParagraph": {
+        this.editor.perform.insertBreak(sel);
+        break;
+      }
+      case "insertFromDrop": {
+        if (!event.getTargetRanges) break;
+        const domRange = event.getTargetRanges()[0];
+        const range = domRange && toModelRange(this.editor, domRange, false);
+        range && this.editor.perform.moveFragment(sel, range);
+        break;
+      }
+      case "deleteContent":
+      case "deleteContentBackward": {
+        this.editor.perform.deleteBackward(sel);
+        break;
+      }
+      case "deleteContentForward": {
+        this.editor.perform.deleteForward(sel);
+        break;
+      }
       // case "deleteByDrag":
       case "deleteByComposition":
       case "deleteByCut": {
@@ -53,31 +82,9 @@ export class Input {
         this.editor.perform.deleteBackward(Range.aggregate(newRange, sel) || sel);
         break;
       }
-      case "deleteContent":
-      case "deleteContentBackward": {
-        this.editor.perform.deleteBackward(sel);
-        break;
-      }
       case "deleteWordForward": {
         const newRange = this.editor.selection.move(GRANULARITY.WORD);
         this.editor.perform.deleteBackward(Range.aggregate(newRange, sel) || sel);
-        break;
-      }
-      case "deleteContentForward": {
-        this.editor.perform.deleteForward(sel);
-        break;
-      }
-      case "insertLineBreak":
-      case "insertParagraph": {
-        this.editor.perform.insertBreak(sel);
-        break;
-      }
-      // case "insertFromDrop":
-      case "insertFromPaste":
-      case "insertFromYank":
-      case "insertReplacementText":
-      case "insertText": {
-        data && this.editor.perform.insertText(sel, data);
         break;
       }
       default:

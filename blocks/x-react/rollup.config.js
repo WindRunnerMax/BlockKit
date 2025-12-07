@@ -14,7 +14,7 @@ const COMPOSE_ENTRY = ["src/**/*.{ts,tsx}"];
 /**
  * @typedef { import("rollup").RollupOptions } RollupConfig
  * @return { Promise<RollupConfig[]> }
- * */
+ */
 export default async () => {
   const dirsMap = await Promise.all(COMPOSE_ENTRY.map(item => glob(item, { ignore: IGNORE_ENTRY })))
     .then(res => res.reduce((pre, cur) => [...pre, ...cur]))
