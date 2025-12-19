@@ -47,6 +47,10 @@ export class NativeEvent {
     this.event.emit(NATIVE_EVENTS.KEY_DOWN, e);
   };
 
+  protected onKeydownCapture = (e: KeyboardEvent) => {
+    this.event.emit(NATIVE_EVENTS.KEY_DOWN_CAPTURE, e);
+  };
+
   protected onKeypress = (e: KeyboardEvent) => {
     this.event.emit(NATIVE_EVENTS.KEY_PRESS, e);
   };
@@ -65,14 +69,20 @@ export class NativeEvent {
     this.event.emit(NATIVE_EVENTS.BLUR, e);
   };
 
+  protected onFocusCapture = (e: FocusEvent) => {
+    this.event.emit(NATIVE_EVENTS.FOCUS_CAPTURE, e);
+  };
+
+  protected onBlurCapture = (e: FocusEvent) => {
+    this.event.emit(NATIVE_EVENTS.BLUR_CAPTURE, e);
+  };
+
   protected onFocusIn = (e: FocusEvent) => {
-    this.editor.state.set(EDITOR_STATE.FOCUSIN, true);
-    this.event.emit(NATIVE_EVENTS.FOCUS, e);
+    this.event.emit(NATIVE_EVENTS.FOCUSIN, e);
   };
 
   protected onFocusOut = (e: FocusEvent) => {
-    this.editor.state.set(EDITOR_STATE.FOCUSIN, false);
-    this.event.emit(NATIVE_EVENTS.BLUR, e);
+    this.event.emit(NATIVE_EVENTS.FOCUSOUT, e);
   };
 
   protected onSelectionChange = (e: Event) => {
@@ -113,10 +123,14 @@ export class NativeEvent {
     container.addEventListener(NATIVE_EVENTS.CUT, this.onCut);
     container.addEventListener(NATIVE_EVENTS.PASTE, this.onPaste);
     container.addEventListener(NATIVE_EVENTS.KEY_DOWN, this.onKeydown);
+    container.addEventListener(NATIVE_EVENTS.KEY_DOWN, this.onKeydownCapture, true);
     container.addEventListener(NATIVE_EVENTS.KEY_PRESS, this.onKeypress);
     container.addEventListener(NATIVE_EVENTS.KEY_UP, this.onKeyup);
     container.addEventListener(NATIVE_EVENTS.FOCUS, this.onFocus);
     container.addEventListener(NATIVE_EVENTS.BLUR, this.onBlur);
+    // focus/blur 事件不冒泡, 在捕获阶段处理, 可以处理其内部编辑节点的焦点状态
+    container.addEventListener(NATIVE_EVENTS.FOCUS, this.onFocusCapture, true);
+    container.addEventListener(NATIVE_EVENTS.BLUR, this.onBlurCapture, true);
     container.addEventListener(NATIVE_EVENTS.FOCUSIN, this.onFocusIn);
     container.addEventListener(NATIVE_EVENTS.FOCUSOUT, this.onFocusOut);
     container.addEventListener(NATIVE_EVENTS.MOUSE_DOWN, this.onMouseDown);
@@ -139,9 +153,12 @@ export class NativeEvent {
     container.removeEventListener(NATIVE_EVENTS.CUT, this.onCut);
     container.removeEventListener(NATIVE_EVENTS.PASTE, this.onPaste);
     container.removeEventListener(NATIVE_EVENTS.KEY_DOWN, this.onKeydown);
+    container.removeEventListener(NATIVE_EVENTS.KEY_DOWN, this.onKeydownCapture, true);
     container.removeEventListener(NATIVE_EVENTS.KEY_UP, this.onKeyup);
     container.removeEventListener(NATIVE_EVENTS.FOCUS, this.onFocus);
     container.removeEventListener(NATIVE_EVENTS.BLUR, this.onBlur);
+    container.removeEventListener(NATIVE_EVENTS.FOCUS, this.onFocusCapture, true);
+    container.removeEventListener(NATIVE_EVENTS.BLUR, this.onBlurCapture, true);
     container.removeEventListener(NATIVE_EVENTS.FOCUSIN, this.onFocusIn);
     container.removeEventListener(NATIVE_EVENTS.FOCUSOUT, this.onFocusOut);
     container.removeEventListener(NATIVE_EVENTS.MOUSE_DOWN, this.onMouseDown);

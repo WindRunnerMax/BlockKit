@@ -13,8 +13,6 @@ export const EDITOR_STATE = {
   MOUSE_DOWN: "MOUSE_DOWN",
   /** 焦点状态(捕获) */
   FOCUS: "FOCUS",
-  /** 焦点状态(冒泡) */
-  FOCUSIN: "FOCUSIN",
   /** 渲染状态 */
   PAINTING: "PAINTING",
 } as const;

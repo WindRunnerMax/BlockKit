@@ -41,6 +41,7 @@ import { SCHEMA } from "./config/schema";
 
 const App: FC = () => {
   const [readonly] = useState(false);
+
   const editor = useMemo(() => {
     const instance = new Editor({ schema: SCHEMA, delta: INIT, logLevel: LOG_LEVEL.DEBUG });
     instance.plugin.register([

@@ -83,13 +83,19 @@ describe("event-bus", () => {
     };
     const event = new EventBus<E>();
     const spy = jest.fn();
+    const spy2 = jest.fn();
+    const spy3 = jest.fn();
     event.on("test11", spy);
     event.on("test11", (_, context) => {
       context.prevent();
     });
+    event.registerDefault("test11", spy2);
+    event.registerDefault("test22", spy3);
     const prevented1 = event.emit("test11", null);
     const prevented2 = event.emit("test22", { a: 1 });
     expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy2).toHaveBeenCalledTimes(0);
+    expect(spy3).toHaveBeenCalledTimes(1);
     expect(prevented1).toBe(true);
     expect(prevented2).toBe(false);
   });

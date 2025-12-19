@@ -16,6 +16,7 @@ import { DELTA, PLACEHOLDERS, SCHEMA, SELECTOR } from "./constant";
 
 const App: FC = () => {
   const editor = useMemo(() => {
+    // 需要保证 Editor 实例的稳定, 不能重复创建实例, 即 useMemo 的依赖数组需要为 []
     const instance = new Editor({ schema: SCHEMA, delta: DELTA, logLevel: LOG_LEVEL.DEBUG });
     instance.plugin.register([
       new EditableInputPlugin({ placeholders: PLACEHOLDERS }),

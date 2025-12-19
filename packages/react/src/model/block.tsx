@@ -24,6 +24,8 @@ const BlockView: FC<{
    */
   const setModel = useMemoFn((ref: HTMLDivElement | null) => {
     if (ref) {
+      // ref 触发时机最早 ref -> layout effect -> effect
+      // 需要保证 editor 稳定, 重渲染并不会触发执行, 导致 DOM 映射关系失效
       editor.model.setBlockModel(ref, state);
       rewriteRemoveChild(ref);
     }

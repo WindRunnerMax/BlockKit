@@ -8,14 +8,17 @@ export const NATIVE_EVENTS = {
   CUT: "cut",
   PASTE: "paste",
   KEY_DOWN: "keydown",
+  KEY_DOWN_CAPTURE: "keydown_capture",
   KEY_PRESS: "keypress",
   KEY_UP: "keyup",
   BEFORE_INPUT: "beforeinput",
   INPUT: "input",
   FOCUS: "focus",
+  BLUR: "blur",
+  FOCUS_CAPTURE: "focus_capture",
+  BLUR_CAPTURE: "blur_capture",
   FOCUSIN: "focusin",
   FOCUSOUT: "focusout",
-  BLUR: "blur",
   SELECTION_CHANGE_NATIVE: "selectionchange",
   MOUSE_DOWN: "mousedown",
   MOUSE_UP: "mouseup",
@@ -34,10 +37,13 @@ export type NativeEventMap = {
   [NATIVE_EVENTS.CUT]: ClipboardEvent;
   [NATIVE_EVENTS.PASTE]: ClipboardEvent;
   [NATIVE_EVENTS.KEY_DOWN]: KeyboardEvent;
+  [NATIVE_EVENTS.KEY_DOWN_CAPTURE]: KeyboardEvent;
   [NATIVE_EVENTS.KEY_PRESS]: KeyboardEvent;
   [NATIVE_EVENTS.KEY_UP]: KeyboardEvent;
   [NATIVE_EVENTS.FOCUS]: FocusEvent;
   [NATIVE_EVENTS.BLUR]: FocusEvent;
+  [NATIVE_EVENTS.FOCUS_CAPTURE]: FocusEvent;
+  [NATIVE_EVENTS.BLUR_CAPTURE]: FocusEvent;
   [NATIVE_EVENTS.FOCUSIN]: FocusEvent;
   [NATIVE_EVENTS.FOCUSOUT]: FocusEvent;
   [NATIVE_EVENTS.SELECTION_CHANGE_NATIVE]: Event;
