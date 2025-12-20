@@ -1,12 +1,12 @@
 import { EDITOR_EVENT, EDITOR_STATE } from "@block-kit/core";
 import { Delta } from "@block-kit/delta";
 import { BlockKit, LineModel, rewriteRemoveChild } from "@block-kit/react";
-import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
+import { useMemoFn, useSafeState } from "@block-kit/utils/dist/es/hooks";
 import type { BlockEditor, BlockState, Listener } from "@block-kit/x-core";
 import { X_TEXT_BLOCK_KEY } from "@block-kit/x-core";
 import { isTextDeltaOp } from "@block-kit/x-json";
 import type { FC } from "react";
-import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useLayoutEffect, useMemo, useRef } from "react";
 
 import { useMetaStatic } from "../hooks/use-meta";
 
@@ -27,7 +27,7 @@ const TextView: FC<{
 
   const flushing = useRef(false);
   const state = editor.state.block;
-  const [lines, setLines] = useState(() => state.getLines());
+  const [lines, setLines] = useSafeState(() => state.getLines());
 
   /**
    * 设置 Block DOM 节点

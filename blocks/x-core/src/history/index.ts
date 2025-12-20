@@ -2,7 +2,7 @@ import { isRedo, isUndo } from "@block-kit/core";
 import { isRetainOp } from "@block-kit/delta";
 import { Bind } from "@block-kit/utils";
 import type { BlocksChange } from "@block-kit/x-json";
-import { isTextDeltaOp } from "@block-kit/x-json";
+import { isEmptyChanges, isTextDeltaOp } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../editor";
 import type { ContentChangeEvent } from "../event/bus/";
@@ -237,7 +237,7 @@ export class History {
   @Bind
   protected onContentChange(event: ContentChangeEvent) {
     const { changes, previous, source, id } = event;
-    if (!changes.ops.length || source === APPLY_SOURCE.HISTORY) {
+    if (isEmptyChanges(changes) || source === APPLY_SOURCE.HISTORY) {
       return void 0;
     }
     if (event.source === APPLY_SOURCE.REMOTE || event.options.undoable === false) {
@@ -264,7 +264,7 @@ export class History {
     } else {
       this.lastRecord = timestamp;
     }
-    if (!inverted.ops.length) {
+    if (isEmptyChanges(inverted)) {
       return void 0;
     }
     this.undoStack.push({ changes: inverted, range: undoRange, id: idSet });
@@ -322,7 +322,7 @@ export class History {
           let index = 0;
           if (isRetainOp(op.o[0])) index = op.o[0].retain;
           const entry = Entry.create(id, POINT_TYPE.TEXT, index, 0);
-          const range = new Range([entry]);
+          const range = new Range(entry);
           return this.editor.selection.set(range);
         }
       }

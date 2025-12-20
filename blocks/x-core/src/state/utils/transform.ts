@@ -1,7 +1,6 @@
-import { SIDE } from "@block-kit/ot-json";
 import { isString } from "@block-kit/utils";
 import type { BlockMap, BlocksChange } from "@block-kit/x-json";
-import { json } from "@block-kit/x-json";
+import { json, SIDE } from "@block-kit/x-json";
 
 import type { Range } from "../../selection/modules/range";
 import { transformPosition } from "./normalize";
@@ -14,9 +13,12 @@ export class Transform {
    */
   public static compose(base: BlocksChange, other: BlocksChange) {
     const changes: BlocksChange = { ...base };
-    for (const [key, ops] of Object.entries(other)) {
-      if (!changes[key]) continue;
-      changes[key] = json.compose(changes[key], ops);
+    for (const [id, ops] of Object.entries(other)) {
+      if (!changes[id]) {
+        changes[id] = ops;
+        continue;
+      }
+      changes[id] = json.compose(changes[id], ops);
     }
     return changes;
   }
@@ -28,9 +30,9 @@ export class Transform {
    */
   public static invert(base: BlocksChange, snapshot: BlockMap) {
     const changes: BlocksChange = {};
-    for (const [key, ops] of Object.entries(base)) {
-      if (!changes[key] || !snapshot[key]) continue;
-      changes[key] = json.invert(ops, snapshot[key].data || {});
+    for (const [id, ops] of Object.entries(base)) {
+      if (!ops || !snapshot[id]) continue;
+      changes[id] = json.invert(ops, snapshot[id].data || {});
     }
     return changes;
   }

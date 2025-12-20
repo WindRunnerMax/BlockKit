@@ -2,6 +2,7 @@ import { Schema } from "@block-kit/core";
 import { LOG_LEVEL, Logger } from "@block-kit/core";
 
 import { Event } from "../event";
+import { History } from "../history";
 import { Input } from "../input";
 import { Lookup } from "../lookup";
 import { Model } from "../model";
@@ -37,6 +38,8 @@ export class BlockEditor {
   public perform: Perform;
   /** 输入模块 */
   public input: Input;
+  /** 历史模块 */
+  public history: History;
 
   /**
    * 构造函数
@@ -56,6 +59,7 @@ export class BlockEditor {
     this.perform = new Perform(this);
     this.input = new Input(this);
     this.plugin = new Plugin(this);
+    this.history = new History(this);
   }
 
   /**
@@ -101,6 +105,7 @@ export class BlockEditor {
     this.event.unbind();
     this.plugin.destroy();
     this.selection.destroy();
+    this.history.destroy();
     this.state.set(EDITOR_STATE.MOUNTED, false);
   }
 }

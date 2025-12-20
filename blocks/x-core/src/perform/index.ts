@@ -129,11 +129,11 @@ export class Perform {
     if (Entry.isText(firstEntry)) {
       const offset = firstEntry.start;
       const entry = Entry.create(firstBlock.id, POINT_TYPE.TEXT, offset, 0);
-      options.selection = new Range([entry], false);
+      options.selection = new Range(entry, false);
       // 首个节点非文本节点且尾节点为文本节点的情况下, 设置到尾节点的文本位置
     } else if (Entry.isText(lastEntry)) {
       const entry = Entry.create(lastBlock.id, POINT_TYPE.TEXT, 0, 0);
-      options.selection = new Range([entry], false);
+      options.selection = new Range(entry, false);
       // 此时首尾节点都是块类型, 需要根据情况判断是否需要创建新的块
     } else {
       const prevBlock = firstBlock.prev();
@@ -141,7 +141,7 @@ export class Perform {
       if (prevBlock && !prevBlock.isBlockType()) {
         const offset = prevBlock.length;
         const entry = Entry.create(lastBlock.id, POINT_TYPE.TEXT, offset, 0);
-        options.selection = new Range([entry], false);
+        options.selection = new Range(entry, false);
         // 同级无前节点的情况下需要创建空白的文本节点
       } else {
         const data: BlockDataField = { type: "text", children: [], delta: [], parent: "" };
@@ -150,7 +150,7 @@ export class Perform {
         const insertBlockChange = this.atom.insert(parentId, 0, newBlockChange);
         changes.push(newBlockChange, insertBlockChange);
         const entry = Entry.create(newBlockChange.id, POINT_TYPE.TEXT, 0, 0);
-        options.selection = new Range([entry], false);
+        options.selection = new Range(entry, false);
       }
     }
     // ========== 处理保留的子节点插入 ==========
@@ -191,7 +191,7 @@ export class Perform {
       // 如果前节点是块节点, 则移动选区到前节点上
       if (prevBlock.isBlockType()) {
         const entry = Entry.create(prevBlock.id, POINT_TYPE.BLOCK);
-        options.selection = new Range([entry], false);
+        options.selection = new Range(entry, false);
         return this.editor.state.apply(changes, options);
       }
       // 将当前节点的内容合并到前节点中, 并且删除当前节点
@@ -233,7 +233,7 @@ export class Perform {
       // 如果后节点是块节点, 则移动选区到后节点上
       if (nextBlock.isBlockType()) {
         const entry = Entry.create(nextBlock.id, POINT_TYPE.BLOCK);
-        options.selection = new Range([entry], false);
+        options.selection = new Range(entry, false);
         return this.editor.state.apply(changes, options);
       }
       // 将当前节点的内容合并到前节点中, 并且删除当前节点
@@ -289,7 +289,7 @@ export class Perform {
     const insertBlockChange = this.atom.insert(parentId, index, newBlockChange);
     changes.push(delChange, newBlockChange, insertBlockChange);
     const newEntry = Entry.create(newBlockChange.id, POINT_TYPE.TEXT, 0, 0);
-    options.selection = new Range([newEntry], false);
+    options.selection = new Range(newEntry, false);
     return this.editor.state.apply(changes, options);
   }
 }

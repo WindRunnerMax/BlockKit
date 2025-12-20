@@ -43,7 +43,7 @@ export const useMountState = <S = undefined>(value: S, mounted: MutableRefObject
  * 安全地使用 useState
  * @param value 状态
  */
-export const useSafeState = <S = undefined>(value: S) => {
+export const useSafeState = <S = undefined>(value: S | (() => S)) => {
   const [state, setStateOrigin] = useState<S>(value);
   const unmounted = useRef(false);
 

@@ -20,7 +20,8 @@ export class Range {
   public readonly length: number;
 
   /** 构造函数 */
-  public constructor(entries: RangeEntry[], isBackward?: boolean) {
+  public constructor(nodes: RangeEntry | RangeEntry[], isBackward?: boolean) {
+    const entries = Array.isArray(nodes) ? nodes : [nodes];
     this.nodes = entries;
     this.length = entries.length;
     this.isBackward = !!isBackward;

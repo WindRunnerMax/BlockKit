@@ -85,6 +85,7 @@ export const EditableX: React.FC<{
   const onContentChange: Listener<"CONTENT_CHANGE"> = useMemoFn(e => {
     flushing.current = new Set();
     for (const blockId of Object.keys(e.changes)) {
+      if (e.deletes.has(blockId)) continue;
       flushing.current.add(blockId);
     }
   });
