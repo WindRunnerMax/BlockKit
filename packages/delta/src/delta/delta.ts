@@ -457,7 +457,8 @@ export class Delta {
 
   /**
    * 反转增量 invert
-   * @param base
+   * - 参数为变更应用前的状态快照, 以记录原属性值
+   * @param base previous snapshot
    * @example inverted = delta.invert(base)
    * @example base.compose(delta).compose(inverted) === base
    * @link https://www.npmjs.com/package/quill-delta/v/4.2.2#invert

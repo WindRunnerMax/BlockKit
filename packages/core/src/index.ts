@@ -60,6 +60,7 @@ export { Perform } from "./perform";
 export { Plugin } from "./plugin";
 export { CorePlugin } from "./plugin/modules/implement";
 export { Priority, PRIORITY_KEY } from "./plugin/modules/priority";
+export { getPluginPriority } from "./plugin/modules/priority";
 export { CALLER_TYPE, PLUGIN_FUNC } from "./plugin/types";
 export type { LeafContext, LineContext } from "./plugin/types/context";
 export type { Rect } from "./rect/types";

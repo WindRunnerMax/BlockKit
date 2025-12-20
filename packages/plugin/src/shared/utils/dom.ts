@@ -7,7 +7,6 @@ import type { EventContext } from "@block-kit/utils";
  */
 export const preventContextEvent = (event: Event, context: EventContext) => {
   context.stop();
-  context.prevent();
   event.preventDefault();
   event.stopPropagation();
 };

@@ -187,14 +187,14 @@ export class BlockState {
       const parent = this.state.getBlock(this.data.parent);
       this.parent = parent || null;
       const len = this.data.children.length;
-      this.children = [];
+      this.children.length = 0;
       for (let i = 0; i < len; i++) {
         const id = this.data.children[i];
         const child = this.state.getOrCreateBlock(id);
         child.index = i;
         child.parent = this;
         child.data.parent = this.id;
-        this.children[i] = child;
+        this.children.push(child);
       }
     }
     // ============ Update Depth ============

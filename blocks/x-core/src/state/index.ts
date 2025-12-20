@@ -149,10 +149,10 @@ export class EditorState {
    * @param options
    */
   public apply(changes: BatchApplyChange, options: ApplyOptions = {}) {
-    const { source = APPLY_SOURCE.USER, autoCaret = true } = options;
+    const { source = APPLY_SOURCE.USER, autoCaret = true, preventNormalize = false } = options;
     const previous = this.toBlockSet();
     this._cache = null;
-    const normalized = normalizeBlocksChange(changes);
+    const normalized = normalizeBlocksChange(changes, preventNormalize);
 
     this.editor.event.trigger(EDITOR_EVENT.CONTENT_WILL_CHANGE, {
       options,

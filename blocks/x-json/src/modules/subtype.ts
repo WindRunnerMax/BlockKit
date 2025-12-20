@@ -13,18 +13,18 @@ declare module "@block-kit/ot-json/dist/es/subtype" {
 
 export const deltaType: Subtype = {
   name: "delta",
-  apply: (snapshot: Op[], delta: Op[]) => {
+  apply(snapshot: Op[], delta: Op[]) {
     const delta1 = new Delta(snapshot);
     const delta2 = new Delta(delta);
     return delta1.compose(delta2).ops;
   },
-  compose: (ops1: Op[], ops2: Op[]) => {
+  compose(ops1: Op[], ops2: Op[]) {
     const delta1 = new Delta(ops1);
     const delta2 = new Delta(ops2);
     // compose("A", "B") => BA => delta2 compose delta1
     return delta2.compose(delta1).ops;
   },
-  transform: (ops1: Op[], ops2: Op[], side) => {
+  transform(ops1: Op[], ops2: Op[], side) {
     const delta1 = new Delta(ops1);
     const delta2 = new Delta(ops2);
     return delta2.transform(delta1, side === SIDE.LEFT).ops;

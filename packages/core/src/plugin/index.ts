@@ -24,6 +24,16 @@ export class Plugin {
    * 销毁插件
    */
   public destroy(): void {
+    if (CorePlugin.editor === this.editor) {
+      CorePlugin.editor = null;
+    }
+    this.reset();
+  }
+
+  /**
+   * 重置插件容器
+   */
+  public reset(): void {
     for (const plugin of this.current) {
       plugin.destroy();
     }
@@ -43,7 +53,7 @@ export class Plugin {
      * @param plugins
      */
     function _register(this: Plugin, plugins: CorePlugin[]) {
-      this.destroy();
+      this.reset();
       const map: Record<string, CorePlugin> = {};
       for (const plugin of plugins) {
         map[plugin.key] = plugin;
@@ -56,6 +66,21 @@ export class Plugin {
       CorePlugin.editor = null;
     }
     return _register;
+  }
+
+  /**
+   * 根据调用函数名, 获取带优先级的插件列表
+   * @param key
+   */
+  public getPriorityPlugins<T extends PluginFuncKeys>(key: T): PluginRequiredKeyFunc<T>[] {
+    const cache = this.cache[key] as PluginRequiredKeyFunc<T>[];
+    if (cache) return cache;
+    // 先过滤存在该 key 的插件
+    const plugins = this.current.filter(plugin => plugin[key]);
+    // 再根据优先级排序
+    plugins.sort((a, b) => getPluginPriority(key, a) - getPluginPriority(key, b));
+    this.cache[key] = plugins;
+    return plugins as PluginRequiredKeyFunc<T>[];
   }
 
   /**
@@ -78,20 +103,5 @@ export class Plugin {
       }
     }
     return context;
-  }
-
-  /**
-   * 根据调用函数名, 获取带优先级的插件列表
-   * @param key
-   */
-  public getPriorityPlugins<T extends PluginFuncKeys>(key: T): PluginRequiredKeyFunc<T>[] {
-    const cache = this.cache[key] as PluginRequiredKeyFunc<T>[];
-    if (cache) return cache;
-    // 先过滤存在该 key 的插件
-    const plugins = this.current.filter(plugin => plugin[key]);
-    // 再根据优先级排序
-    plugins.sort((a, b) => getPluginPriority(key, a) - getPluginPriority(key, b));
-    this.cache[key] = plugins;
-    return plugins as PluginRequiredKeyFunc<T>[];
   }
 }

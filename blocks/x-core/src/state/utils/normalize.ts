@@ -14,7 +14,8 @@ import type { ApplyChange } from "../types";
  * @returns
  */
 export const normalizeBlocksChange = (
-  changes: Array<ApplyChange | ApplyChange[]>
+  changes: Array<ApplyChange | ApplyChange[]>,
+  preventNormalize: boolean
 ): BlocksChange => {
   // 将相同 Block Id 的变更合并
   const mergedChange: BlocksChange = {};
@@ -27,6 +28,7 @@ export const normalizeBlocksChange = (
       mergedChange[blockId].push(...ops);
     }
   }
+  if (preventNormalize) return mergedChange;
   // 对每个 Block 的变更进行规范化处理
   const normalized: BlocksChange = {};
   for (const [changeId, ops] of Object.entries(mergedChange)) {
@@ -36,12 +38,26 @@ export const normalizeBlocksChange = (
 };
 
 /**
+ * 从 BlocksChange 恢复为 ApplyChange
+ * @param changes
+ */
+export const restoreApplyChange = (changes: BlocksChange): ApplyChange[] => {
+  const applies: ApplyChange[] = [];
+  for (const [id, ops] of Object.entries(changes)) {
+    applies.push({ id, ops });
+  }
+  return applies;
+};
+
+/**
  * 根据内容变更事件，转换选区位置
- * @param state
  * @param payload
  * @param range
  */
-export const transformPosition = (payload: ContentChangeEvent, range: Range) => {
+export const transformPosition = (
+  payload: Pick<ContentChangeEvent, "inserts" | "deletes" | "changes">,
+  range: Range
+) => {
   const entries = range.clone().nodes;
   const newEntries: typeof entries = [];
   const { deletes, inserts } = payload;

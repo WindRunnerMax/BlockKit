@@ -55,6 +55,7 @@ export class BlockEditor {
     this.lookup = new Lookup(this);
     this.perform = new Perform(this);
     this.input = new Input(this);
+    this.plugin = new Plugin(this);
   }
 
   /**
@@ -98,6 +99,7 @@ export class BlockEditor {
   public destroy(this: BlockEditor) {
     this.input.destroy();
     this.event.unbind();
+    this.plugin.destroy();
     this.selection.destroy();
     this.state.set(EDITOR_STATE.MOUNTED, false);
   }

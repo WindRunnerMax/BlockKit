@@ -49,6 +49,8 @@ export type ApplyOptions = {
   selection?: Range;
   /** 自动记录到 History */
   undoable?: boolean;
+  /** 阻止规范化变更 */
+  preventNormalize?: boolean;
   /** 额外携带的信息 */
   extra?: unknown;
 };

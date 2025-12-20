@@ -20,7 +20,8 @@ export abstract class CorePlugin {
 
   /**
    * 插件唯一标识
-   * - renderBlock 会匹配 Block 的 type 字段
+   * - 渲染块结构时会匹配 Block 的 type 字段
+   * - 意味着块结构需要一一对应, 取代了 match 方法的作用
    */
   public abstract readonly key: string;
 
@@ -36,7 +37,7 @@ export abstract class CorePlugin {
   public renderWrap?(state: WrapContext): P.Any;
 
   /**
-   * 渲染块级节点
+   * 渲染块级节点 Block
    * - 调度优先级值越大 DOM 结构在越外层
    */
   public renderBlock?(state: BlockContext): P.Any;

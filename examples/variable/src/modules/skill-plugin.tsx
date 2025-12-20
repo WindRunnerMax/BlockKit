@@ -63,6 +63,7 @@ export class SkillInputPlugin extends EditorPlugin {
     if (!firstLeaf || !sel) return void 0;
     const current = sel;
     if (
+      current.start.line === 0 &&
       current.start.offset === 0 &&
       firstLeaf.op.attributes &&
       firstLeaf.op.attributes[SKILL_KEY]
