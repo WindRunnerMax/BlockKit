@@ -9,6 +9,7 @@ export abstract class CorePlugin {
   public static editor: BlockEditor | null = null;
   /** 自动注入编辑器实例 */
   protected editor!: BlockEditor;
+
   /** 构造函数 */
   constructor() {
     if (!CorePlugin.editor) {
@@ -16,47 +17,57 @@ export abstract class CorePlugin {
     }
     this.editor = CorePlugin.editor;
   }
+
   /**
    * 插件唯一标识
    * - renderBlock 会匹配 Block 的 type 字段
    */
   public abstract readonly key: string;
+
   /**
    * 插件销毁时调度
    */
   public abstract destroy(): void;
+
   /**
    * 渲染块级包裹节点
    * - 调度优先级值越大 DOM 结构在越外层
    */
   public renderWrap?(state: WrapContext): P.Any;
+
   /**
    * 渲染块级节点
    * - 调度优先级值越大 DOM 结构在越外层
    */
   public renderBlock?(state: BlockContext): P.Any;
+
   /**
    * 将 Blocks 序列化为 HTML
    */
   public serialize?(context: P.Any): P.Any;
+
   /**
    * 将 HTML 反序列化为 Blocks
    */
   public deserialize?(context: P.Any): P.Any;
+
   /**
    * 内容即将写入剪贴板
    */
   public willSetToClipboard?(context: P.Any): P.Any;
+
   /**
    * 粘贴的内容即将应用到编辑器
    */
   public willApplyPasteDelta?(context: P.Any): P.Any;
+
   /**
    * 编辑器行结构布局计算后同步调用
    * - 通常仅用于行级别的 Dirty DOM 检查, 务必谨慎调度
    * - 重渲染 Layout 同步调用, 需要严格避免复杂计算以及布局处理
    */
   public willPaintBlockState?(blockState: BlockState): void;
+
   /**
    * 编辑器行结构布局计算后异步调用
    */

@@ -10,3 +10,7 @@ export type SelectorPluginOptions = {
   selector?: O.Map<string[]>;
   optionsWidth?: number;
 };
+
+export type SkillPluginOptions = {
+  cleanable?: boolean;
+};

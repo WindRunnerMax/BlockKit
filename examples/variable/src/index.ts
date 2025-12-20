@@ -1,6 +1,8 @@
 export { EditableTextInput } from "./components/editable-input";
+export { SkillInput } from "./components/skill-input";
 export { EditableInputPlugin } from "./modules/editable-plugin";
 export { SelectorInputPlugin } from "./modules/selector-plugin";
+export { SkillInputPlugin } from "./modules/skill-plugin";
 export {
   SEL_CLS_PREFIX,
   SEL_KEY,

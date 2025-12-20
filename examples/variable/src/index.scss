@@ -72,3 +72,43 @@
     }
   }
 }
+
+/** 技能模板 */
+.editable-skill-leaf {
+  span[data-zero-space] {
+    color: transparent;
+  }
+}
+
+.editable-skill-container {
+  border-radius: 4px;
+  color: #0057ff;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: bold;
+  margin: 1px 3px;
+  padding: 0 5px;
+  position: relative;
+  user-select: none;
+
+  &:hover {
+    background: rgba(0, 102, 255, 0.06);
+
+    .editable-selector-close {
+      display: block;
+    }
+  }
+
+  .editable-selector-close {
+    background: rgb(0, 0, 0, 0.7);
+    border-radius: 50%;
+    color: #fff;
+    display: none;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 1px;
+    position: absolute;
+    right: -5px;
+    top: -5px;
+  }
+}

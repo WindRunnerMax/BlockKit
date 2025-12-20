@@ -4,7 +4,7 @@ import "@arco-design/web-react/es/style/index.less";
 
 import { IconArrowUp, IconGithub } from "@arco-design/web-react/icon";
 import { cs, preventNativeEvent } from "@block-kit/utils";
-import { Editor, LOG_LEVEL, SelectorInputPlugin } from "@block-kit/variable";
+import { Editor, LOG_LEVEL, SelectorInputPlugin, SkillInputPlugin } from "@block-kit/variable";
 import { Delta } from "@block-kit/variable";
 import { BlockKit, Editable } from "@block-kit/variable";
 import { EditableInputPlugin } from "@block-kit/variable";
@@ -21,6 +21,7 @@ const App: FC = () => {
     instance.plugin.register([
       new EditableInputPlugin({ placeholders: PLACEHOLDERS }),
       new SelectorInputPlugin({ selector: SELECTOR }),
+      new SkillInputPlugin(),
     ]);
     return instance;
   }, []);

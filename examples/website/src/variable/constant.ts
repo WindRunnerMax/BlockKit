@@ -2,10 +2,12 @@ import type { O } from "@block-kit/utils/dist/es/types";
 import type { EditorSchema } from "@block-kit/variable";
 import { Delta, SEL_KEY, SEL_VALUE_KEY } from "@block-kit/variable";
 import { VARS_KEY, VARS_VALUE_KEY } from "@block-kit/variable";
+import { SKILL_KEY } from "@block-kit/variable/src/utils/constant";
 
 export const SCHEMA: EditorSchema = {
   [VARS_KEY]: { void: true, inline: true },
   [SEL_KEY]: { void: true, inline: true },
+  [SKILL_KEY]: { void: true, inline: true },
 };
 
 export const PLACEHOLDERS: O.Map<string> = {
@@ -19,6 +21,9 @@ export const SELECTOR: O.Map<string[]> = {
 };
 
 export const DELTA = new Delta()
+  .insert(" ", {
+    [SKILL_KEY]: "帮我写作",
+  })
   .insert("我是一位")
   .insert(" ", {
     [VARS_KEY]: "role",

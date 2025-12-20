@@ -5,15 +5,13 @@ import type { O } from "./types";
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface EventBusType {}
 export type EventKeys<E extends O.Any> = keyof E;
-export type EventContext = Omit<InternalEventContext, "_stopped" | "_prevented">;
+export type EventContext = Omit<InternalEventContext, "_stopped">;
 export type Listeners<E extends O.Any> = { [T in EventKeys<E>]?: EventHandler<E, T>[] };
 
 export type InternalEventContext = {
   /** 事件名 */ key: string | number | symbol;
   /** @internal 已停止顺序执行 */ _stopped: boolean;
-  /** @internal 已阻止默认行为 */ _prevented: boolean;
   /** 停止顺序执行 */ stop: () => void;
-  /** 阻止默认行为 */ prevent: () => void;
 };
 
 export type Listener<E extends O.Any, T extends EventKeys<E>> = (
@@ -30,8 +28,6 @@ export type EventHandler<E extends O.Any, T extends EventKeys<E>> = {
 export class EventBus<E extends O.Any = EventBusType> {
   /** 事件监听器 */
   private listeners: Listeners<E> = {};
-  /** 默认行为 */
-  private defaults: Listeners<E> = {};
 
   /**
    * 监听事件
@@ -93,57 +89,16 @@ export class EventBus<E extends O.Any = EventBusType> {
   }
 
   /**
-   * 注册事件默认行为
-   * @param key
-   * @param listener
-   * @param priority [?=100] 值越小优先级越高
-   */
-  public registerDefault<T extends EventKeys<E>>(
-    key: T,
-    listener: Listener<E, T>,
-    priority: number = DEFAULT_PRIORITY
-  ) {
-    if (!isFunction(listener)) return void 0;
-    const handler: EventHandler<E, T>[] = this.defaults[key] || [];
-    if (!handler.some(item => item.listener === listener)) {
-      handler.push({ listener, priority, once: false });
-    }
-    handler.sort((a, b) => a.priority - b.priority);
-    this.defaults[key] = <EventHandler<E, T>[]>handler;
-  }
-
-  /**
-   * 移除事件默认行为
-   * @param key
-   * @param listener
-   */
-  public unregisterDefault<T extends EventKeys<E>>(key: T, listener: Listener<E, T>) {
-    const handler = this.defaults[key];
-    if (!handler) return void 0;
-    const next = handler.filter(item => item.listener !== listener);
-    this.defaults[key] = <EventHandler<E, T>[]>next;
-  }
-
-  /**
    * 触发事件
    * @param key
    * @param listener
-   * @returns prevented
    */
-  public emit<T extends EventKeys<E>>(key: T, payload: E[T]): boolean {
-    // 事件 Context
+  public emit<T extends EventKeys<E>>(key: T, payload: E[T]) {
     const context: InternalEventContext = {
       key: key,
       _stopped: false,
-      _prevented: false,
-      stop: () => {
-        context._stopped = true;
-      },
-      prevent: () => {
-        context._prevented = true;
-      },
+      stop: () => (context._stopped = true),
     };
-    // 事件处理程序
     const listeners = this.listeners[key] || [];
     for (const item of listeners) {
       try {
@@ -154,18 +109,7 @@ export class EventBus<E extends O.Any = EventBusType> {
       item.once && this.off(key, item.listener);
       if (context._stopped) break;
     }
-    if (context._prevented) return context._prevented;
-    // 默认行为处理程序
-    const defaults = this.defaults[key] || [];
-    for (const item of defaults) {
-      try {
-        item.listener(payload, context);
-      } catch (error) {
-        console.error(`EventBus: Error For Default`, item, error);
-      }
-      if (context._prevented) break;
-    }
-    return context._prevented;
+    return context;
   }
 
   /**

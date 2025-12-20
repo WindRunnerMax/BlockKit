@@ -59,5 +59,7 @@
 
 .editable-vars .block-kit-editable-text:not([data-vars-placeholder]) {
   display: inline;
+  padding-bottom: 3px;
+  padding-top: 3px;
   word-break: break-all;
 }

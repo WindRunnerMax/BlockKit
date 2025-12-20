@@ -24,6 +24,22 @@ describe("event-bus", () => {
     expect(spy2).toHaveBeenCalledTimes(1);
   });
 
+  it("priority", () => {
+    const event = new EventBus();
+    const seq: unknown[] = [];
+    const spy1 = jest.fn(() => {
+      seq.push(spy1);
+    });
+    const spy2 = jest.fn(() => {
+      seq.push(spy2);
+    });
+    event.on("test", spy2, 2);
+    event.on("test", spy1, 1);
+    event.emit("test", null);
+    expect(seq[0]).toBe(spy1);
+    expect(seq[1]).toBe(spy2);
+  });
+
   it("once", () => {
     const event = new EventBus();
     const spy = jest.fn();
@@ -74,29 +90,5 @@ describe("event-bus", () => {
     event.emit("test11", null);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy1).toHaveBeenCalledTimes(0);
-  });
-
-  it("prevent event", () => {
-    type E = {
-      test11: null;
-      test22: { a: 1 };
-    };
-    const event = new EventBus<E>();
-    const spy = jest.fn();
-    const spy2 = jest.fn();
-    const spy3 = jest.fn();
-    event.on("test11", spy);
-    event.on("test11", (_, context) => {
-      context.prevent();
-    });
-    event.registerDefault("test11", spy2);
-    event.registerDefault("test22", spy3);
-    const prevented1 = event.emit("test11", null);
-    const prevented2 = event.emit("test22", { a: 1 });
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy2).toHaveBeenCalledTimes(0);
-    expect(spy3).toHaveBeenCalledTimes(1);
-    expect(prevented1).toBe(true);
-    expect(prevented2).toBe(false);
   });
 });
