@@ -55,6 +55,6 @@ describe("history undo-redo", () => {
     editor.history.undo();
     // @ts-expect-error protected property
     const stack = editor.history.redoStack;
-    expect(stack[0]).toBeTruthy();
+    expect(stack[0].latestRange).toEqual(new Range(Entry.create("child1", "T", 3, 0)));
   });
 });

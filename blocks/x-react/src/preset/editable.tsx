@@ -1,17 +1,18 @@
 import "../styles/editable.scss";
 
 import { EDITOR_EVENT, EDITOR_KEY } from "@block-kit/core";
-import { cs, ROOT_BLOCK } from "@block-kit/utils";
+import { cs } from "@block-kit/utils";
 import { useForceUpdate, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { Listener } from "@block-kit/x-core";
 import { EDITOR_STATE, X_SELECTION_KEY } from "@block-kit/x-core";
 import type { ReactNode } from "react";
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 
 import { useEditorStatic } from "../hooks/use-editor";
 import { LayoutEffectContext } from "../hooks/use-layout-context";
 import { useReadonly } from "../hooks/use-readonly";
 import { BlockModel } from "../model/block";
+import { PaintEffectModel } from "../model/effect";
 import { Placeholder } from "../model/ph";
 
 /**
@@ -35,49 +36,10 @@ export const EditableX: React.FC<{
   const { className, preventDestroy } = props;
   const { editor } = useEditorStatic();
   const { readonly } = useReadonly();
-  const { forceUpdate } = useForceUpdate();
+  const { index: updateIndex, forceUpdate } = useForceUpdate();
   const ref = useRef<HTMLDivElement>(null);
   const flushing = useRef<Set<string> | null>(null);
   const root = editor.state.getBlock(editor.state.rootId);
-
-  /**
-   * 视图更新需要重新设置选区 无依赖数组
-   */
-  useLayoutEffect(() => {
-    const selection = editor.selection.get();
-    // 同步计算完成后更新浏览器选区, 等待 Paint
-    if (editor.state.isFocused() && selection) {
-      editor.logger.debug("UpdateDOMSelection");
-      editor.selection.updateDOMSelection(true);
-    }
-  });
-
-  /**
-   * 视图更新需要触发视图绘制完成事件 无依赖数组
-   * state  -> parent -> node -> child ->|
-   * effect <- parent <- node <- child <-|
-   */
-  useEffect(() => {
-    editor.logger.debug("OnPaint");
-    editor.state.set(EDITOR_STATE.PAINTING, false);
-    Promise.resolve().then(() => {
-      editor.event.trigger(EDITOR_EVENT.PAINT, { id: ROOT_BLOCK });
-    });
-  });
-
-  /**
-   * 子节点的布局变更通知
-   * @param id
-   */
-  const onTreeBlockLayoutEffect = useMemoFn((id: string) => {
-    if (!flushing.current) return void 0;
-    flushing.current.delete(id);
-    if (!flushing.current.size) {
-      forceUpdate();
-      flushing.current = null;
-      editor.state.set(EDITOR_STATE.PAINTING, true);
-    }
-  });
 
   /**
    * 数据同步变更, 异步批量绘制变更
@@ -99,6 +61,20 @@ export const EditableX: React.FC<{
       editor.event.off(EDITOR_EVENT.CONTENT_CHANGE, onContentChange);
     };
   }, [editor.event, onContentChange]);
+
+  /**
+   * 子节点的布局变更通知
+   * @param id
+   */
+  const onTreeBlockLayoutEffect = useMemoFn((id: string) => {
+    if (!flushing.current) return void 0;
+    flushing.current.delete(id);
+    if (!flushing.current.size) {
+      forceUpdate();
+      flushing.current = null;
+      editor.state.set(EDITOR_STATE.PAINTING, true);
+    }
+  });
 
   /**
    * 挂载编辑器 DOM
@@ -139,6 +115,7 @@ export const EditableX: React.FC<{
         overflowWrap: "break-word",
       }}
     >
+      <PaintEffectModel editor={editor} updateIndex={updateIndex} />
       <Placeholder state={root} editor={editor} placeholder={props.placeholder} />
       <LayoutEffectContext.Provider value={onTreeBlockLayoutEffect}>
         <BlockModel editor={editor} state={root}></BlockModel>

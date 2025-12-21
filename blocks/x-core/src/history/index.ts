@@ -69,8 +69,8 @@ export class History {
     this.redoStack.push({
       id: item.id,
       changes: inverted,
-      // 如果直接取编辑器选区也可以, 但不够准确, 存在用户移动光标的场景
-      range: this.transformRange(item.range, inverted),
+      range: item.latestRange,
+      latestRange: item.range,
     });
     this.lastRecord = 0;
     const { HISTORY } = APPLY_SOURCE;
@@ -94,7 +94,8 @@ export class History {
     this.undoStack.push({
       id: item.id,
       changes: inverted,
-      range: this.transformRange(item.range, inverted),
+      range: item.latestRange,
+      latestRange: item.range,
     });
     this.lastRecord = 0;
     const { HISTORY } = APPLY_SOURCE;
@@ -174,6 +175,7 @@ export class History {
       // 因为 undo 后的执行顺序是 merge -> base
       changes: Transform.compose(mergeDelta, baseItem.changes),
       range: baseItem.range,
+      latestRange: mergeItem.range,
     };
     this.undoStack.splice(mergeIndex, 1);
     return true;
@@ -267,7 +269,9 @@ export class History {
     if (isEmptyChanges(inverted)) {
       return void 0;
     }
-    this.undoStack.push({ changes: inverted, range: undoRange, id: idSet });
+    const latestRange = this.editor.selection.get();
+    const item: StackItem = { changes: inverted, range: undoRange, id: idSet, latestRange };
+    this.undoStack.push(item);
     if (this.undoStack.length > this.STACK_SIZE) {
       this.undoStack.shift();
     }
@@ -282,10 +286,13 @@ export class History {
     let remoteChanges = changes;
     for (let i = stack.length - 1; i >= 0; i--) {
       const prevItem = stack[i];
+      const range = prevItem.range;
+      const latestRange = prevItem.latestRange;
       stack[i] = {
         id: prevItem.id,
         changes: Transform.transform(remoteChanges, prevItem.changes, true),
-        range: prevItem.range && this.transformRange(prevItem.range, remoteChanges),
+        range: range && this.transformRange(range, remoteChanges),
+        latestRange: latestRange && this.transformRange(latestRange, remoteChanges),
       };
       remoteChanges = Transform.transform(prevItem.changes, remoteChanges);
       if (!stack[i].changes.ops.length) {

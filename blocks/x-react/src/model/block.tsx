@@ -24,7 +24,7 @@ const BlockView: FC<{
   const { editor, state } = props;
   const flushing = useRef(false);
   const { mounted } = useIsMounted();
-  const { forceUpdate } = useForceUpdate();
+  const { index: updateIndex, forceUpdate } = useForceUpdate();
   const { forceLayoutEffect } = useLayoutEffectContext();
 
   /**
@@ -65,7 +65,7 @@ const BlockView: FC<{
   useLayoutEffect(() => {
     forceLayoutEffect(state.id);
     STATE_TO_RENDER.set(state, forceUpdate);
-  });
+  }, [forceLayoutEffect, forceUpdate, state, updateIndex]);
 
   /**
    * 处理子节点块结构
