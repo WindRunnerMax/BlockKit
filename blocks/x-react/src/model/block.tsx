@@ -1,6 +1,6 @@
 import { rewriteRemoveChild } from "@block-kit/react";
 import { useForceUpdate, useIsMounted, useMemoFn } from "@block-kit/utils/dist/es/hooks";
-import type { CorePlugin, Listener } from "@block-kit/x-core";
+import type { Listener } from "@block-kit/x-core";
 import type { BlockEditor } from "@block-kit/x-core";
 import type { BlockState } from "@block-kit/x-core";
 import {
@@ -22,6 +22,7 @@ const BlockView: FC<{
   editor: BlockEditor;
   state: BlockState;
   className?: string;
+  style?: React.CSSProperties;
 }> = props => {
   const { editor, state } = props;
   const flushing = useRef(false);
@@ -77,36 +78,36 @@ const BlockView: FC<{
       <Fragment>
         {state.data.delta && <TextModel block={editor} key={state.id} state={state}></TextModel>}
         {state.children.map(child => {
-          let block: JSX.Element | null = null;
-          let plugin: CorePlugin | undefined;
           const blockContext: ReactBlockContext = {
             key: child.id,
             classList: ["block-kit-x-children"],
             blockState: child,
             style: {},
           };
-          if ((plugin = editor.plugin.map[child.data.type]) && plugin.renderBlock) {
-            block = plugin.renderBlock(blockContext);
-          }
-          if (!block) {
-            block = React.createElement(BlockModel, {
-              className: blockContext.classList.join(" "),
-              key: blockContext.key,
-              editor: editor,
-              state: child,
-            });
+          const plugin = editor.plugin.map[child.data.type];
+          if (plugin) {
+            blockContext.children = plugin.renderBlock(blockContext);
           }
           const wrapBlockContext: ReactWrapContext = {
-            classList: [],
+            classList: blockContext.classList,
             blockState: child,
-            style: {},
-            children: block,
+            style: blockContext.style,
+            children: blockContext.children,
           };
           const plugins = editor.plugin.getPriorityPlugins(PLUGIN_FUNC.RENDER_WRAP);
           for (const wrapPlugin of plugins) {
             wrapBlockContext.children = wrapPlugin.renderWrap(wrapBlockContext);
           }
-          return block;
+          if (!wrapBlockContext.children) {
+            wrapBlockContext.children = React.createElement(BlockModel, {
+              className: blockContext.classList.join(" "),
+              key: blockContext.key,
+              editor: editor,
+              state: child,
+              style: blockContext.style,
+            });
+          }
+          return wrapBlockContext.children;
         })}
       </Fragment>
     );
@@ -124,6 +125,7 @@ const BlockView: FC<{
       }}
       className={props.className}
       ref={setModel}
+      style={props.style}
     >
       {children}
     </div>

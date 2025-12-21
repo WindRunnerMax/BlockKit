@@ -8,6 +8,7 @@ declare module "@block-kit/x-json/dist/es/types/interface" {
       type: typeof HEADING_KEY;
       align?: string;
       delta: Op[];
+      level: string;
     };
   }
 }

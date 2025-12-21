@@ -17,8 +17,16 @@ export const fromDOMRect = (rect: DOMRect): Rect => {
 
 /**
  * 取 Rect 相对位置
- * @param rect
- * @param base
+ * - 表示目标矩形相对于基础矩形的位置
+ * ----------------- (base)
+ * |               |
+ * |      ----------------- (target)
+ * |      |        |      |
+ * -----------------      |
+ *        |               |
+ *        -----------------
+ * @param rect 目标 Rect
+ * @param base 基础 Rect
  */
 export const relativeTo = (rect: Rect, base: Rect): Rect => {
   return {

@@ -1,8 +1,9 @@
-import { EDITOR_EVENT, VOID_KEY } from "@block-kit/core";
+import type { Rect } from "@block-kit/core";
+import { EDITOR_EVENT, relativeTo, VOID_KEY } from "@block-kit/core";
 import { MountNode, preventReactEvent, useEditorStatic } from "@block-kit/react";
 import { cs, preventNativeEvent } from "@block-kit/utils";
 import type { FC } from "react";
-import { useState } from "react";
+import { createElement, useEffect, useRef, useState } from "react";
 
 import { SEL_KEY } from "../utils/constant";
 
@@ -15,8 +16,32 @@ export const SelectorOptions: FC<{
   onChange: (v: string) => void;
   className?: string;
 }> = props => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !el.parentElement) return void 0;
+    const rect = el.getBoundingClientRect();
+    const baseRect: Rect =
+      el.parentElement === document.body
+        ? {
+            top: 0,
+            left: 0,
+            bottom: window.innerHeight,
+            right: window.innerWidth,
+            height: window.innerHeight,
+            width: window.innerWidth,
+          }
+        : el.parentElement.getBoundingClientRect();
+    const relative = relativeTo(rect, baseRect);
+    if (relative.bottom > baseRect.height) {
+      el.style.transform = "translateY(calc(-100% - 2em))";
+    }
+  }, []);
+
   return (
     <div
+      ref={ref}
       className={cs("editable-selector-options", props.className)}
       style={{ left: props.left, top: props.top, width: props.width }}
       onMouseDown={preventNativeEvent}
@@ -58,16 +83,14 @@ export const SelectorInput: FC<{
         MountNode.unmount(editor, SEL_KEY);
         setIsOpen(false);
       };
-      const Element = (
-        <SelectorOptions
-          value={props.value}
-          width={props.optionsWidth}
-          left={rect.left + rect.width / 2 - props.optionsWidth / 2}
-          top={rect.top + rect.height}
-          options={props.options}
-          onChange={onChange}
-        ></SelectorOptions>
-      );
+      const Element = createElement(SelectorOptions, {
+        value: props.value,
+        width: props.optionsWidth,
+        left: rect.left + rect.width / 2 - props.optionsWidth / 2,
+        top: rect.top + rect.height + 4,
+        options: props.options,
+        onChange: onChange,
+      });
       MountNode.mount(editor, SEL_KEY, Element);
       const onMouseDown = () => {
         setIsOpen(false);

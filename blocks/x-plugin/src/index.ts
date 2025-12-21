@@ -1,4 +1,4 @@
-import "./index.scss";
-
+export { AlignXPlugin } from "./align";
+export { ALIGN_KEY } from "./align/types/index";
+export { HeadingXPlugin } from "./heading";
 export { HEADING_KEY } from "./heading/types/index";
-export type { BlockModule } from "@block-kit/x-json";

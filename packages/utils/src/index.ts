@@ -68,7 +68,7 @@ export {
 } from "./is";
 export { TSON } from "./json";
 export { Literal } from "./literal";
-export { sleep, to } from "./native";
+export { hasOwnProperty, sleep, to } from "./native";
 export { RegExec } from "./regexp";
 export type { Rect, ResizeCallback } from "./resize";
 export { Resize } from "./resize";

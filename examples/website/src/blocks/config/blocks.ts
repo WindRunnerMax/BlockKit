@@ -4,7 +4,19 @@ export const INIT: Blocks = {
   root: {
     id: "root",
     version: 1,
-    data: { type: "ROOT", children: ["child1", "child2"], parent: "" },
+    data: { type: "ROOT", children: ["h1", "child1", "child2"], parent: "" },
+  },
+  h1: {
+    id: "h1",
+    version: 1,
+    data: {
+      type: "heading",
+      level: "h1",
+      children: [],
+      align: "center",
+      delta: [{ insert: "BlockKitX" }],
+      parent: "root",
+    },
   },
   child1: {
     id: "child1",

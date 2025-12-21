@@ -2,7 +2,7 @@ import type { O } from "@block-kit/utils/dist/es/types";
 import type { EditorSchema } from "@block-kit/variable";
 import { Delta, SEL_KEY, SEL_VALUE_KEY } from "@block-kit/variable";
 import { VARS_KEY, VARS_VALUE_KEY } from "@block-kit/variable";
-import { SKILL_KEY } from "@block-kit/variable/src/utils/constant";
+import { SKILL_KEY } from "@block-kit/variable";
 
 export const SCHEMA: EditorSchema = {
   [VARS_KEY]: { void: true, inline: true },

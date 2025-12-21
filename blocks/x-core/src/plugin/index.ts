@@ -7,7 +7,7 @@ import type { CallerMap, CallerType, PluginFuncKeys, PluginRequiredKeyFunc } fro
 
 export class Plugin {
   /** key 块渲染映射 */
-  public map: Record<string, CorePlugin> = {};
+  public map: Record<string, PluginRequiredKeyFunc<"renderBlock">> = {};
   /** 当前注册的插件 */
   public current: CorePlugin[] = [];
   /** 插件缓存 */
@@ -56,9 +56,11 @@ export class Plugin {
       this.reset();
       const map: Record<string, CorePlugin> = {};
       for (const plugin of plugins) {
+        if (plugin.renderBlock) {
+          this.map[plugin.key] = plugin as PluginRequiredKeyFunc<"renderBlock">;
+        }
         map[plugin.key] = plugin;
       }
-      this.map = map;
       this.current = Object.values(map);
       CorePlugin.editor = null;
     }

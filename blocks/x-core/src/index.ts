@@ -12,6 +12,7 @@ export {
 } from "./model/types";
 export { STATE_TO_RENDER } from "./model/utils/weak-map";
 export { CorePlugin } from "./plugin/modules/implement";
+export type { PluginRequiredKeyFunc } from "./plugin/types";
 export { CALLER_TYPE, PLUGIN_FUNC } from "./plugin/types";
 export type { BlockContext, WrapContext } from "./plugin/types/context";
 export { Entry } from "./selection/modules/entry";

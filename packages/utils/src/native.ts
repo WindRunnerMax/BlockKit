@@ -1,3 +1,5 @@
+import type { P } from "./types";
+
 /**
  * 异步延迟 [非精准]
  * @param ms 毫秒
@@ -24,4 +26,16 @@ export const to = <T, U extends Error>(
       }
       return [error, undefined];
     });
+};
+
+/**
+ * 检查对象是否含有指定的自有属性
+ * @param element
+ * @param key
+ */
+export const hasOwnProperty = <T extends P.Any, K extends PropertyKey>(
+  element: T,
+  key: K
+): element is T & Record<K, unknown> => {
+  return Object.prototype.hasOwnProperty.call(element, key);
 };
