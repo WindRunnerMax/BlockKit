@@ -350,10 +350,10 @@ importers:
         specifier: 'workspace: *'
         version: link:../../packages/utils
       react:
-        specifier: '>=16'
+        specifier: '>=17'
         version: 17.0.2
       react-dom:
-        specifier: '>=16'
+        specifier: '>=17'
         version: 17.0.2(react@17.0.2)
     devDependencies:
       '@types/react':
