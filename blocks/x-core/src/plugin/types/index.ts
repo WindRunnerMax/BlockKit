@@ -19,8 +19,8 @@ export const CALLER_TYPE = {
 /** 插件原型方法 */
 export const PLUGIN_FUNC = {
   ...CALLER_TYPE,
-  RENDER_LINE: "renderLine",
-  RENDER_LEAF: "renderLeaf",
+  RENDER_WRAP: "renderWrap",
+  RENDER_BLOCK: "renderBlock",
 } as const;
 
 export type CallerMap = {

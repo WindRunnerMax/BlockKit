@@ -1,10 +1,11 @@
 import { rewriteRemoveChild } from "@block-kit/react";
 import { useForceUpdate, useIsMounted, useMemoFn } from "@block-kit/utils/dist/es/hooks";
-import type { Listener } from "@block-kit/x-core";
+import type { CorePlugin, Listener } from "@block-kit/x-core";
 import type { BlockEditor } from "@block-kit/x-core";
 import type { BlockState } from "@block-kit/x-core";
 import {
   EDITOR_EVENT,
+  PLUGIN_FUNC,
   STATE_TO_RENDER,
   X_BLOCK_ID_KEY,
   X_BLOCK_KEY,
@@ -14,6 +15,7 @@ import type { FC } from "react";
 import React, { Fragment, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useLayoutEffectContext } from "../hooks/use-layout-context";
+import type { ReactBlockContext, ReactWrapContext } from "../plugin/types";
 import { TextModel } from "./text";
 
 const BlockView: FC<{
@@ -24,7 +26,7 @@ const BlockView: FC<{
   const { editor, state } = props;
   const flushing = useRef(false);
   const { mounted } = useIsMounted();
-  const { index: updateIndex, forceUpdate } = useForceUpdate();
+  const { index, forceUpdate } = useForceUpdate();
   const { forceLayoutEffect } = useLayoutEffectContext();
 
   /**
@@ -65,7 +67,7 @@ const BlockView: FC<{
   useLayoutEffect(() => {
     forceLayoutEffect(state.id);
     STATE_TO_RENDER.set(state, forceUpdate);
-  }, [forceLayoutEffect, forceUpdate, state, updateIndex]);
+  }, [forceLayoutEffect, forceUpdate, state, index]);
 
   /**
    * 处理子节点块结构
@@ -74,19 +76,43 @@ const BlockView: FC<{
     const els = (
       <Fragment>
         {state.data.delta && <TextModel block={editor} key={state.id} state={state}></TextModel>}
-        {state.children.map(child => (
-          <BlockModel
-            className="block-kit-x-children"
-            key={child.id}
-            editor={editor}
-            state={child}
-          ></BlockModel>
-        ))}
+        {state.children.map(child => {
+          let block: JSX.Element | null = null;
+          let plugin: CorePlugin | undefined;
+          const blockContext: ReactBlockContext = {
+            key: child.id,
+            classList: ["block-kit-x-children"],
+            blockState: child,
+            style: {},
+          };
+          if ((plugin = editor.plugin.map[child.data.type]) && plugin.renderBlock) {
+            block = plugin.renderBlock(blockContext);
+          }
+          if (!block) {
+            block = React.createElement(BlockModel, {
+              className: blockContext.classList.join(" "),
+              key: blockContext.key,
+              editor: editor,
+              state: child,
+            });
+          }
+          const wrapBlockContext: ReactWrapContext = {
+            classList: [],
+            blockState: child,
+            style: {},
+            children: block,
+          };
+          const plugins = editor.plugin.getPriorityPlugins(PLUGIN_FUNC.RENDER_WRAP);
+          for (const wrapPlugin of plugins) {
+            wrapBlockContext.children = wrapPlugin.renderWrap(wrapBlockContext);
+          }
+          return block;
+        })}
       </Fragment>
     );
     return els;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor, state, state.version]);
+  }, [state.version, editor, state, editor.plugin]);
 
   return (
     <div

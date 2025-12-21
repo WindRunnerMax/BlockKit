@@ -4,7 +4,7 @@ import { EDITOR_EVENT, EDITOR_STATE } from "@block-kit/x-core";
 import type { FC } from "react";
 import React, { useEffect, useLayoutEffect } from "react";
 
-const PaintEffectView: FC<{ editor: BlockEditor; updateIndex: number }> = props => {
+const PaintEffectView: FC<{ editor: BlockEditor; index: number }> = props => {
   const editor = props.editor;
 
   /**

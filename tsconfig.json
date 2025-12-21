@@ -31,6 +31,7 @@
       "@block-kit/ot-json/dist/es/*": ["./packages/ot-json/src/*"],
       "@block-kit/x-core": ["./blocks/x-core/src"],
       "@block-kit/x-json": ["./blocks/x-json/src"],
+      "@block-kit/x-json/dist/es/*": ["./packages/x-json/src/*"],
       "@block-kit/x-react": ["./blocks/x-react/src"],
       "@block-kit/x-plugin": ["./blocks/x-plugin/src"],
       "@block-kit/variable": ["./examples/variable/src"],

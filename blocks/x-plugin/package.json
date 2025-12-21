@@ -34,8 +34,8 @@
     "url": "https://github.com/WindRunnerMax/BlockKit/issues"
   },
   "peerDependencies": {
-    "react": ">=16",
-    "react-dom": ">=16"
+    "react": ">=17",
+    "react-dom": ">=17"
   },
   "dependencies": {
     "@arco-design/web-react": "2.64.0",
@@ -43,6 +43,9 @@
     "@block-kit/delta": "workspace: *",
     "@block-kit/react": "workspace: *",
     "@block-kit/utils": "workspace: *",
+    "@block-kit/x-core": "workspace: *",
+    "@block-kit/x-json": "workspace: *",
+    "@block-kit/x-react": "workspace: *",
     "@emoji-mart/data": "1.2.1",
     "@emoji-mart/react": "1.1.1",
     "emoji-mart": "5.6.0"

@@ -172,6 +172,15 @@ importers:
       '@block-kit/utils':
         specifier: 'workspace: *'
         version: link:../../packages/utils
+      '@block-kit/x-core':
+        specifier: 'workspace: *'
+        version: link:../x-core
+      '@block-kit/x-json':
+        specifier: 'workspace: *'
+        version: link:../x-json
+      '@block-kit/x-react':
+        specifier: 'workspace: *'
+        version: link:../x-react
       '@emoji-mart/data':
         specifier: 1.2.1
         version: 1.2.1

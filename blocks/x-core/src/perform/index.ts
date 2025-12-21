@@ -12,6 +12,7 @@ import { Point } from "../selection/modules/point";
 import { Range } from "../selection/modules/range";
 import type { RangeEntry, TextPoint } from "../selection/types";
 import { POINT_TYPE } from "../selection/utils/constant";
+import type { BlockState } from "../state/modules/block-state";
 import type { ApplyOptions, BatchApplyChange } from "../state/types";
 import { Atom } from "./modules/atom";
 
@@ -275,7 +276,6 @@ export class Perform {
     if (!block || !block.data.parent || Entry.isBlock(entry)) {
       return this.editor.state.apply(changes, options);
     }
-
     // 文本节点需要拆分当前节点
     const start = entry.start;
     const del = new Delta().retain(start).delete(block.length - start);
@@ -290,6 +290,68 @@ export class Perform {
     changes.push(delChange, newBlockChange, insertBlockChange);
     const newEntry = Entry.create(newBlockChange.id, POINT_TYPE.TEXT, 0, 0);
     options.selection = new Range(newEntry, false);
+    return this.editor.state.apply(changes, options);
+  }
+
+  /**
+   * 增加缩进
+   * @param sel
+   */
+  public indent(sel: Range): ContentChangeEvent | null {
+    if (!sel || sel.isEmpty()) return null;
+    const firstPoint = sel.getFirstPoint()!;
+    const firstState = this.editor.state.getBlock(firstPoint.id);
+    const prevState = firstState && firstState.prev();
+    // 如果没有同级前节点/同级前节点为块节点 则不能缩进
+    if (!prevState || prevState.isBlockType()) return null;
+    const changes: BatchApplyChange = [];
+    const options: ApplyOptions = { autoCaret: false };
+    let startIndex = prevState.children.length;
+    for (const node of sel.nodes) {
+      const state = this.editor.state.getBlock(node.id);
+      // 仅移动与首节点同级的元素
+      if (!state || state.data.parent !== firstState.data.parent) continue;
+      const moveChange = this.atom.move(node.id, prevState.id, startIndex++);
+      changes.push(moveChange);
+    }
+    return this.editor.state.apply(changes, options);
+  }
+
+  /**
+   * 减少缩进
+   * @param sel
+   */
+  public unindent(sel: Range): ContentChangeEvent | null {
+    if (!sel || sel.isEmpty()) return null;
+    const firstPoint = sel.getFirstPoint()!;
+    const firstState = this.editor.state.getBlock(firstPoint.id);
+    if (!firstState) return null;
+    // 仅移动与首节点同级的元素, 多级情况下或许应该分级分组处理
+    const nodes = sel.nodes.map(node => {
+      const state = this.editor.state.getBlock(node.id);
+      if (!state || state.data.parent !== firstState.data.parent) return null;
+      return state;
+    });
+    const states = nodes.filter(Boolean) as BlockState[];
+    const lastState = states[states.length - 1];
+    const parentState = firstState && firstState.parent;
+    const ancestorState = parentState && parentState.parent;
+    if (!parentState || !ancestorState) return null;
+    const changes: BatchApplyChange = [];
+    const options: ApplyOptions = { autoCaret: false };
+    // 将选择的节点移动到祖先节点下
+    let startIndex = parentState.index;
+    for (const state of states) {
+      const moveChange = this.atom.move(state.id, ancestorState.id, ++startIndex);
+      changes.push(moveChange);
+    }
+    // 将同级剩余的节点移动到最后一个节点中
+    startIndex = lastState.children.length;
+    const rests = parentState.children.slice(lastState.index + 1);
+    for (const state of rests) {
+      const moveChange = this.atom.move(state.id, lastState.id, startIndex++);
+      changes.push(moveChange);
+    }
     return this.editor.state.apply(changes, options);
   }
 }

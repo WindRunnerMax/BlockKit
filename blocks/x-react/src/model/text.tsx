@@ -15,15 +15,13 @@ const TextView: FC<{
   state: BlockState;
 }> = props => {
   const { onCreateTextEditor } = useMetaStatic();
-  const onCreateTextEditorRef = useRef(onCreateTextEditor);
-  onCreateTextEditorRef.current = onCreateTextEditor;
 
   const editor = useMemo(() => {
     const ops = props.state.data.delta;
-    const text = onCreateTextEditorRef.current(new Delta(ops));
+    const text = onCreateTextEditor(new Delta(ops));
     props.block.model.setTextEditor(props.state, text);
     return text;
-  }, [props.block.model, props.state]);
+  }, [onCreateTextEditor, props.block.model, props.state]);
 
   const flushing = useRef(false);
   const state = editor.state.block;

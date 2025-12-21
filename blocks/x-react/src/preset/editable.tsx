@@ -36,7 +36,7 @@ export const EditableX: React.FC<{
   const { className, preventDestroy } = props;
   const { editor } = useEditorStatic();
   const { readonly } = useReadonly();
-  const { index: updateIndex, forceUpdate } = useForceUpdate();
+  const { index, forceUpdate } = useForceUpdate();
   const ref = useRef<HTMLDivElement>(null);
   const flushing = useRef<Set<string> | null>(null);
   const root = editor.state.getBlock(editor.state.rootId);
@@ -115,7 +115,7 @@ export const EditableX: React.FC<{
         overflowWrap: "break-word",
       }}
     >
-      <PaintEffectModel editor={editor} updateIndex={updateIndex} />
+      <PaintEffectModel editor={editor} index={index} />
       <Placeholder state={root} editor={editor} placeholder={props.placeholder} />
       <LayoutEffectContext.Provider value={onTreeBlockLayoutEffect}>
         <BlockModel editor={editor} state={root}></BlockModel>
