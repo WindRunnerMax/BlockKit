@@ -89,7 +89,6 @@ export class BlockState {
 
   /**
    * 判断是否为块级类型的节点
-   * @returns
    */
   public isBlockType() {
     return !this.data.delta;

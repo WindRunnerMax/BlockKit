@@ -1,6 +1,6 @@
-import "./index.scss";
+import "./styles/index.scss";
 
-import type { BlockModule } from "@block-kit/x-json";
+import type { BlockDataType } from "@block-kit/x-json";
 import type { ReactBlockContext } from "@block-kit/x-react";
 import { BlockPlugin } from "@block-kit/x-react";
 
@@ -12,7 +12,7 @@ export class HeadingXPlugin extends BlockPlugin {
   public destroy(): void {}
 
   public renderBlock(context: ReactBlockContext): React.ReactNode {
-    const data = context.blockState.data as BlockModule[typeof HEADING_KEY];
+    const data = context.blockState.data as BlockDataType<typeof HEADING_KEY>;
     context.classList.push(`block-kit-x-heading-${data.level}`);
     return context.children;
   }

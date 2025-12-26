@@ -1,12 +1,12 @@
 import { Format } from "./format";
 import { isObject, isString } from "./is";
-import type { O, P } from "./types";
-import { Object } from "./types";
+import type { P } from "./types";
+import type { O } from "./types";
 
 export const INTL_SYMBOL = "__INTL_SYMBOL__";
 export const hasOwnProperty = Object.prototype.hasOwnProperty;
-export type IntlPreset = Object.Nested;
-export type IntlTypes<T extends IntlPreset> = Record<Object.Flatten<T>, string>;
+export type IntlPreset = O.Nested;
+export type IntlTypes<T extends IntlPreset> = Record<O.Flatten<T>, string>;
 
 export class Intl<T extends IntlPreset> {
   /** 当前语言 */
@@ -113,10 +113,10 @@ export class Intl<T extends IntlPreset> {
    */
   private getValue(key: keyof IntlTypes<T>, config: T): string | null {
     const keys = key.split(".");
-    let current = config as Object.Nested;
+    let current = config as O.Nested;
     for (const item of keys) {
       if (!current || !current[item]) break;
-      current = current[item] as Object.Nested;
+      current = current[item] as O.Nested;
     }
     if (current && isString(current)) {
       this._cache[key] = current;
@@ -186,8 +186,8 @@ export class Intl<T extends IntlPreset> {
    * @param {R} target
    * @returns {R}
    */
-  public proxy<R extends Object.Mixed>(target: R): R {
-    const copied: Object.Mixed = {};
+  public proxy<R extends O.Mixed>(target: R): R {
+    const copied: O.Mixed = {};
     for (const key of Object.keys(target)) {
       const value = target[key];
       const prototype = isObject(value) && Object.getPrototypeOf(value);

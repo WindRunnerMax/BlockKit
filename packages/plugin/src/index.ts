@@ -1,3 +1,5 @@
+import "@arco-design/web-react/es/style/index.less";
+
 export { AlignPlugin } from "./align";
 export { ALIGN_KEY } from "./align/types";
 export { BackgroundPlugin } from "./background";

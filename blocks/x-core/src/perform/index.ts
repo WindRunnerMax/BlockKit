@@ -336,7 +336,7 @@ export class Perform {
     const lastState = states[states.length - 1];
     const parentState = firstState && firstState.parent;
     const ancestorState = parentState && parentState.parent;
-    if (!parentState || !ancestorState) return null;
+    if (!parentState || parentState.isBlockType() || !ancestorState) return null;
     const changes: BatchApplyChange = [];
     const options: ApplyOptions = { autoCaret: false };
     // 将选择的节点移动到祖先节点下

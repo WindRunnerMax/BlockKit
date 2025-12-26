@@ -88,7 +88,7 @@ export class DateTime extends Date {
   }
 
   /**
-   * 调整时间
+   * 调整时间 [mutate]
    * @param years 年
    * @param months 月
    * @param days 日
@@ -102,8 +102,8 @@ export class DateTime extends Date {
 
   /**
    * 精确的时间差 取绝对值
-   * - years / months / days 累计计算
-   * - hours / minutes / seconds 独立计算
+   * - years / months / days 累计所有时间差计算
+   * - hours / minutes / seconds 独立按天时间差计算
    * @param newDate
    */
   public diff(newDate: DateTime) {
@@ -119,7 +119,7 @@ export class DateTime extends Date {
   }
 
   /**
-   * 延后到第 N 个月的 1 号
+   * 延后到第 N 个月的 1 号 [mutate]
    * @param n
    */
   public nextMonth(n: number = 1) {
@@ -130,7 +130,7 @@ export class DateTime extends Date {
   }
 
   /**
-   * 延后到第 N 天的 0 点
+   * 延后到第 N 天的 0 点 [mutate]
    * @param n
    */
   public nextDay(n: number = 1) {
@@ -140,7 +140,7 @@ export class DateTime extends Date {
   }
 
   /**
-   * 延后到第 N 小时的 0 分钟
+   * 延后到第 N 小时的 0 分钟 [mutate]
    * @param n
    */
   public nextHour(n: number = 1) {
@@ -150,7 +150,7 @@ export class DateTime extends Date {
   }
 
   /**
-   * 延后到第 N 分钟的 0 秒
+   * 延后到第 N 分钟的 0 秒 [mutate]
    * @param n
    */
   public nextMinute(n: number = 1) {
@@ -160,7 +160,7 @@ export class DateTime extends Date {
   }
 
   /**
-   * 延后 N 个月
+   * 延后 N 个月 [mutate]
    * @param n
    */
   public deferMonth(n: number = 1) {
@@ -169,7 +169,7 @@ export class DateTime extends Date {
   }
 
   /**
-   * 延后 N 天
+   * 延后 N 天 [mutate]
    * @param n
    */
   public deferDay(n: number = 1) {
@@ -178,7 +178,7 @@ export class DateTime extends Date {
   }
 
   /**
-   * 延后 N 小时
+   * 延后 N 小时 [mutate]
    * @param n
    */
   public deferHour(n: number = 1) {
@@ -187,7 +187,7 @@ export class DateTime extends Date {
   }
 
   /**
-   * 延后 N 分钟
+   * 延后 N 分钟 [mutate]
    * @param n
    */
   public deferMinute(n: number = 1) {

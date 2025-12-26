@@ -14,7 +14,7 @@ import {
   UnderlinePlugin,
 } from "@block-kit/plugin";
 import { BlockEditor } from "@block-kit/x-core";
-import { AlignXPlugin, HeadingXPlugin } from "@block-kit/x-plugin";
+import { AlignXPlugin, HeadingXPlugin, QuoteXPlugin } from "@block-kit/x-plugin";
 import { BlockKitX, EditableX } from "@block-kit/x-react";
 import type { FC } from "react";
 import { useEffect, useMemo } from "react";
@@ -26,7 +26,7 @@ import { INIT } from "./config/blocks";
 const App: FC = () => {
   const block = useMemo(() => {
     const instance = new BlockEditor({ initial: INIT, logLevel: LOG_LEVEL.DEBUG });
-    instance.plugin.register([new HeadingXPlugin(), new AlignXPlugin()]);
+    instance.plugin.register([new HeadingXPlugin(), new AlignXPlugin(), new QuoteXPlugin()]);
     return instance;
   }, []);
 

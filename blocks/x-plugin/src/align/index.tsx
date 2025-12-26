@@ -1,4 +1,4 @@
-import "./index.scss";
+import "./styles/index.scss";
 
 import { hasOwnProperty } from "@block-kit/utils";
 import type { ReactBlockContext } from "@block-kit/x-react";
