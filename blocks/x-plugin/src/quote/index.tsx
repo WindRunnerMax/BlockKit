@@ -10,12 +10,14 @@ export class QuoteXPlugin extends BlockPlugin {
   public destroy(): void {}
 
   public renderBlock(context: ReactBlockContext): React.ReactNode {
+    const state = context.state;
     if (process.env.NODE_ENV === "development") {
-      if ("delta" in context.blockState.data) {
+      if ("delta" in state.data) {
         console.warn("Quote Block should not have delta field.");
       }
     }
-    const state = this.editor.state.getBlock(context.blockState.id)!;
+    console.log("object :>> ", context);
+    context.classList = [];
     return <QuoteView key={state.id} editor={this.editor} state={state} />;
   }
 }

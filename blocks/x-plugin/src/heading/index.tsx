@@ -12,7 +12,7 @@ export class HeadingXPlugin extends BlockPlugin {
   public destroy(): void {}
 
   public renderBlock(context: ReactBlockContext): React.ReactNode {
-    const data = context.blockState.data as BlockDataType<typeof HEADING_KEY>;
+    const data = context.state.data as BlockDataType<typeof HEADING_KEY>;
     context.classList.push(`block-kit-x-heading-${data.level}`);
     return context.children;
   }

@@ -7,8 +7,8 @@ import type { BlockState } from "../../state/modules/block-state";
  * 块包裹状态
  */
 export type WrapContext = {
+  state: BlockState;
   classList: string[];
-  blockState: BlockState;
   style: Properties<string | number>;
   children?: P.Any;
 };
@@ -18,7 +18,7 @@ export type WrapContext = {
  */
 export type BlockContext = {
   key?: string;
+  state: BlockState;
   classList: string[];
-  blockState: BlockState;
   style: Properties<string | number>;
 };

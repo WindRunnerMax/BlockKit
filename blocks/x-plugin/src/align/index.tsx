@@ -12,7 +12,7 @@ export class AlignXPlugin extends BlockPlugin {
   public destroy(): void {}
 
   public renderWrap(context: ReactBlockContext): React.ReactNode {
-    const data = context.blockState.data;
+    const data = context.state.data;
     if (hasOwnProperty(data, "align")) {
       context.classList.push(`block-kit-x-align-${data.align}`);
     }

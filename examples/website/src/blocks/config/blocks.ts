@@ -31,7 +31,7 @@ export const INIT: Blocks = {
       delta: [
         {
           insert:
-            "基于 BlockKit 实现的文档编辑器，以 Block 的形式组织核心架构，支持复杂的块级结构，以及更高的扩展性。",
+            "基于 BlockKit 实现的文档编辑器，以 Blocks 的形式组织核心架构，支持复杂的块级结构，以及更高的扩展性。",
         },
       ],
       children: [],

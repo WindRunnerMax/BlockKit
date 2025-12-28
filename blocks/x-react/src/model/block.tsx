@@ -1,4 +1,5 @@
 import { rewriteRemoveChild } from "@block-kit/react";
+import { cs } from "@block-kit/utils";
 import { useForceUpdate, useIsMounted, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { Listener } from "@block-kit/x-core";
 import type { BlockEditor } from "@block-kit/x-core";
@@ -12,16 +13,18 @@ import {
   X_BLOCK_TYPE_KEY,
 } from "@block-kit/x-core";
 import type { FC } from "react";
-import React, { Fragment, useLayoutEffect, useMemo, useRef } from "react";
+import React, { createElement, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useLayoutEffectContext } from "../hooks/use-layout-context";
 import type { ReactBlockContext, ReactWrapContext } from "../plugin/types";
+import { BLOCK_CHILD_CLASS } from "../utils/constant";
 import { TextModel } from "./text";
 
 const BlockView: FC<{
   editor: BlockEditor;
   state: BlockState;
   className?: string;
+  childClassName?: string;
   style?: React.CSSProperties;
 }> = props => {
   const { editor, state } = props;
@@ -71,47 +74,50 @@ const BlockView: FC<{
   }, [forceLayoutEffect, forceUpdate, state, index]);
 
   /**
-   * 处理子节点块结构
+   * 处理文本子节点块结构
+   */
+  const text = useMemo(() => {
+    return state.data.delta && <TextModel block={editor} key={state.id} state={state}></TextModel>;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.version, editor, state, editor.plugin]);
+
+  /**
+   * 处理块级子节点块结构
    */
   const children = useMemo(() => {
-    const els = (
-      <Fragment>
-        {state.data.delta && <TextModel block={editor} key={state.id} state={state}></TextModel>}
-        {state.children.map(child => {
-          const blockContext: ReactBlockContext = {
-            key: child.id,
-            classList: ["block-kit-x-children"],
-            blockState: child,
-            style: {},
-          };
-          const plugin = editor.plugin.map[child.data.type];
-          if (plugin) {
-            blockContext.children = plugin.renderBlock(blockContext);
-          }
-          const wrapBlockContext: ReactWrapContext = {
-            classList: blockContext.classList,
-            blockState: child,
-            style: blockContext.style,
-            children: blockContext.children,
-          };
-          const plugins = editor.plugin.getPriorityPlugins(PLUGIN_FUNC.RENDER_WRAP);
-          for (const wrapPlugin of plugins) {
-            wrapBlockContext.children = wrapPlugin.renderWrap(wrapBlockContext);
-          }
-          if (!wrapBlockContext.children) {
-            wrapBlockContext.children = React.createElement(BlockModel, {
-              className: blockContext.classList.join(" "),
-              key: blockContext.key,
-              editor: editor,
-              state: child,
-              style: blockContext.style,
-            });
-          }
-          return wrapBlockContext.children;
-        })}
-      </Fragment>
-    );
-    return els;
+    return state.children.map(child => {
+      const blockContext: ReactBlockContext = {
+        key: child.id,
+        state: child,
+        classList: [],
+        style: {},
+      };
+      const plugin = editor.plugin.map[child.data.type];
+      if (plugin) {
+        blockContext.children = plugin.renderBlock(blockContext);
+      }
+      const wrapBlockContext: ReactWrapContext = {
+        state: child,
+        classList: blockContext.classList,
+        style: blockContext.style,
+        children: blockContext.children,
+      };
+      const plugins = editor.plugin.getPriorityPlugins(PLUGIN_FUNC.RENDER_WRAP);
+      for (const wrapPlugin of plugins) {
+        wrapBlockContext.children = wrapPlugin.renderWrap(wrapBlockContext);
+      }
+      if (!wrapBlockContext.children) {
+        wrapBlockContext.children = createElement(BlockModel, {
+          className: blockContext.classList.join(" "),
+          key: blockContext.key,
+          editor: editor,
+          state: child,
+          style: blockContext.style,
+        });
+      }
+      return wrapBlockContext.children;
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.version, editor, state, editor.plugin]);
 
@@ -127,7 +133,13 @@ const BlockView: FC<{
       ref={setModel}
       style={props.style}
     >
-      {children}
+      {text}
+      {/* 存在文本组件, 则需要渲染包装节点, 否则直接渲染子块结构即可 */}
+      {text && children.length ? (
+        <div className={cs(BLOCK_CHILD_CLASS, props.childClassName)}>{children}</div>
+      ) : (
+        children
+      )}
     </div>
   );
 };
