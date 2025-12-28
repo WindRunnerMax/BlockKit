@@ -35,6 +35,7 @@ export class Selection {
    * @param editor
    */
   public constructor(protected editor: BlockEditor) {
+    this.editor.event.on(EDITOR_EVENT.MOUSE_UP_GLOBAL, this.onForceUpdateDOMSelection);
     this.editor.event.on(EDITOR_EVENT.SELECTION_CHANGE_NATIVE, this.onNativeSelectionChange);
   }
 
@@ -42,6 +43,7 @@ export class Selection {
    * 销毁模块
    */
   public destroy() {
+    this.editor.event.off(EDITOR_EVENT.MOUSE_UP_GLOBAL, this.onForceUpdateDOMSelection);
     this.editor.event.off(EDITOR_EVENT.SELECTION_CHANGE_NATIVE, this.onNativeSelectionChange);
   }
 
@@ -166,6 +168,17 @@ export class Selection {
       return true;
     }
     return false;
+  }
+
+  /**
+   * 强制刷新浏览器选区
+   */
+  @Bind
+  protected onForceUpdateDOMSelection() {
+    if (!this.editor.state.get(EDITOR_STATE.FOCUS)) {
+      return void 0;
+    }
+    this.updateDOMSelection(true);
   }
 
   /**

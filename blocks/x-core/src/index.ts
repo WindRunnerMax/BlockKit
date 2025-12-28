@@ -10,6 +10,7 @@ export {
   X_TEXT_BLOCK_KEY,
   X_ZERO_KEY,
 } from "./model/types";
+export { getBlockEndTextNode, getBlockStartTextNode } from "./model/utils/dom";
 export { STATE_TO_RENDER } from "./model/utils/weak-map";
 export { CorePlugin } from "./plugin/modules/implement";
 export type { PluginRequiredKeyFunc } from "./plugin/types";

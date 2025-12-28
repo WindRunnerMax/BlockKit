@@ -49,3 +49,6 @@ export const NOOP = () => null;
 
 /** NIL STRING */
 export const NIL = "";
+
+/** SPACE STRING */
+export const SPACE = " ";

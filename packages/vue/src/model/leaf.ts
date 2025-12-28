@@ -1,5 +1,6 @@
 import type { Editor, LeafState } from "@block-kit/core";
 import { LEAF_KEY, PLUGIN_FUNC } from "@block-kit/core";
+import { SPACE } from "@block-kit/utils";
 import type { P } from "@block-kit/utils/dist/es/types";
 import { computed, defineComponent, h } from "vue";
 
@@ -54,8 +55,8 @@ export const LeafModel = /*#__PURE__*/ defineComponent<LeafModelProps>({
         {
           [LEAF_KEY]: true,
           ref: setModel,
-          class: runtime.value.classList.join(" "),
           style: runtime.value.style,
+          class: runtime.value.classList.join(SPACE) || void 0,
         },
         runtime.value.children
       );

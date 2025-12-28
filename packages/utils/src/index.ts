@@ -9,6 +9,7 @@ export {
   NIL,
   NOOP,
   ROOT_BLOCK,
+  SPACE,
   TRULY,
 } from "./constant";
 export { DateTime } from "./date-time";

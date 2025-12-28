@@ -1,3 +1,4 @@
+import { SPACE } from "./constant";
 import { isNil, isObject, isPlainNumber, isString } from "./is";
 import type { Primitive } from "./types";
 
@@ -61,7 +62,7 @@ export class Facade {
    * @returns {string}
    */
   public static classes(...values: Array<unknown>): string {
-    return values.filter(r => isString(r)).join(" ");
+    return values.filter(r => isString(r)).join(SPACE);
   }
 
   /**
@@ -85,7 +86,7 @@ export class Facade {
         continue;
       }
     }
-    return res.join(" ");
+    return res.join(SPACE);
   }
 
   /**

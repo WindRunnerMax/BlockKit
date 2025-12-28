@@ -16,8 +16,6 @@ export class QuoteXPlugin extends BlockPlugin {
         console.warn("Quote Block should not have delta field.");
       }
     }
-    console.log("object :>> ", context);
-    context.classList = [];
     return <QuoteView key={state.id} editor={this.editor} state={state} />;
   }
 }

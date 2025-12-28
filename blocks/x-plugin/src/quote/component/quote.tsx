@@ -8,9 +8,5 @@ export const QuoteView: FC<{
   editor: BlockEditor;
   state: BlockState;
 }> = props => {
-  return (
-    <div className="block-kit-x-quote">
-      <BlockModel editor={props.editor} state={props.state} />
-    </div>
-  );
+  return <BlockModel className="block-kit-x-quote" editor={props.editor} state={props.state} />;
 };

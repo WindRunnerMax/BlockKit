@@ -1,5 +1,6 @@
 import type { Editor, LeafState } from "@block-kit/core";
 import { LEAF_KEY, PLUGIN_FUNC } from "@block-kit/core";
+import { SPACE } from "@block-kit/utils";
 import { useForceUpdate, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { FC } from "react";
 import React, { useMemo } from "react";
@@ -56,8 +57,8 @@ const LeafView: FC<{
       key={renderKey}
       {...{ [LEAF_KEY]: true }}
       ref={setModel}
-      className={runtime.classList.join(" ")}
       style={runtime.style}
+      className={runtime.classList.join(SPACE) || void 0}
     >
       {runtime.children}
     </span>

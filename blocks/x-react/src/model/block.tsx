@@ -17,16 +17,19 @@ import React, { createElement, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useLayoutEffectContext } from "../hooks/use-layout-context";
 import type { ReactBlockContext, ReactWrapContext } from "../plugin/types";
-import { BLOCK_CHILD_CLASS } from "../utils/constant";
+import { BLOCK_CH_CLASS } from "../utils/constant";
 import { TextModel } from "./text";
 
-const BlockView: FC<{
+export type BlockViewProps = {
   editor: BlockEditor;
   state: BlockState;
   className?: string;
-  childClassName?: string;
+  childClsName?: string;
   style?: React.CSSProperties;
-}> = props => {
+  children?: React.ReactNode;
+};
+
+const BlockView: FC<BlockViewProps> = props => {
   const { editor, state } = props;
   const flushing = useRef(false);
   const { mounted } = useIsMounted();
@@ -79,7 +82,7 @@ const BlockView: FC<{
   const text = useMemo(() => {
     return state.data.delta && <TextModel block={editor} key={state.id} state={state}></TextModel>;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.version, editor, state, editor.plugin]);
+  }, [state.version, editor, state]);
 
   /**
    * 处理块级子节点块结构
@@ -89,14 +92,14 @@ const BlockView: FC<{
       const blockContext: ReactBlockContext = {
         key: child.id,
         state: child,
-        classList: [],
         style: {},
+        classList: [],
       };
       const plugin = editor.plugin.map[child.data.type];
       if (plugin) {
         blockContext.children = plugin.renderBlock(blockContext);
       }
-      const wrapBlockContext: ReactWrapContext = {
+      const wrapContext: ReactWrapContext = {
         state: child,
         classList: blockContext.classList,
         style: blockContext.style,
@@ -104,22 +107,22 @@ const BlockView: FC<{
       };
       const plugins = editor.plugin.getPriorityPlugins(PLUGIN_FUNC.RENDER_WRAP);
       for (const wrapPlugin of plugins) {
-        wrapBlockContext.children = wrapPlugin.renderWrap(wrapBlockContext);
+        wrapContext.children = wrapPlugin.renderWrap(wrapContext);
       }
-      if (!wrapBlockContext.children) {
-        wrapBlockContext.children = createElement(BlockModel, {
-          className: blockContext.classList.join(" "),
+      if (!wrapContext.children) {
+        wrapContext.children = createElement(BlockModel, {
+          className: wrapContext.classList.join(" ") || void 0,
           key: blockContext.key,
           editor: editor,
           state: child,
           style: blockContext.style,
         });
       }
-      return wrapBlockContext.children;
+      return wrapContext.children;
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.version, editor, state, editor.plugin]);
+  }, [state.version, editor, state]);
 
   return (
     <div
@@ -136,7 +139,7 @@ const BlockView: FC<{
       {text}
       {/* 存在文本组件, 则需要渲染包装节点, 否则直接渲染子块结构即可 */}
       {text && children.length ? (
-        <div className={cs(BLOCK_CHILD_CLASS, props.childClassName)}>{children}</div>
+        <div className={cs(BLOCK_CH_CLASS, props.childClsName)}>{children}</div>
       ) : (
         children
       )}

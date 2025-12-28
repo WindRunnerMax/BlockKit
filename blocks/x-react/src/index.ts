@@ -5,3 +5,4 @@ export { BlockPlugin } from "./plugin/index";
 export type { ReactBlockContext, ReactWrapContext } from "./plugin/types/index";
 export { BlockKitX } from "./preset/block-kit";
 export { EditableX } from "./preset/editable";
+export { BLOCK_CH_CLASS } from "./utils/constant";

@@ -35,20 +35,20 @@ export class Selection {
    * @param editor
    */
   constructor(protected editor: Editor) {
-    this.editor.event.on(EDITOR_EVENT.MOUSE_DOWN, this.onTripleClick);
     this.editor.event.on(EDITOR_EVENT.KEY_DOWN, this.onArrowKeyDown);
-    this.editor.event.on(EDITOR_EVENT.SELECTION_CHANGE_NATIVE, this.onNativeSelectionChange);
+    this.editor.event.on(EDITOR_EVENT.MOUSE_DOWN, this.onTripleClick);
     this.editor.event.on(EDITOR_EVENT.MOUSE_UP_GLOBAL, this.onForceUpdateDOMSelection);
+    this.editor.event.on(EDITOR_EVENT.SELECTION_CHANGE_NATIVE, this.onNativeSelectionChange);
   }
 
   /**
    * 销毁模块
    */
   public destroy() {
-    this.editor.event.off(EDITOR_EVENT.MOUSE_DOWN, this.onTripleClick);
     this.editor.event.off(EDITOR_EVENT.KEY_DOWN, this.onArrowKeyDown);
-    this.editor.event.off(EDITOR_EVENT.SELECTION_CHANGE_NATIVE, this.onNativeSelectionChange);
+    this.editor.event.off(EDITOR_EVENT.MOUSE_DOWN, this.onTripleClick);
     this.editor.event.off(EDITOR_EVENT.MOUSE_UP_GLOBAL, this.onForceUpdateDOMSelection);
+    this.editor.event.off(EDITOR_EVENT.SELECTION_CHANGE_NATIVE, this.onNativeSelectionChange);
   }
 
   /**

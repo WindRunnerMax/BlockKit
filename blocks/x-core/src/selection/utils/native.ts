@@ -6,7 +6,7 @@ import { isDOMElement } from "@block-kit/utils";
 
 import type { BlockEditor } from "../../editor";
 import { X_SELECTION_KEY } from "../../model/types";
-import { getBlockEndZeroNode, getBlockStartZeroNode } from "../../model/types/dom";
+import { getBlockEndTextNode, getBlockStartTextNode } from "../../model/utils/dom";
 import { Entry } from "../modules/entry";
 import { Point } from "../modules/point";
 import type { Range } from "../modules/range";
@@ -36,10 +36,10 @@ export const toDOMPoint = (
   context: NormalizePointContext
 ): DOMPoint => {
   if (point.type === POINT_TYPE.BLOCK) {
-    const node = context.isEndNode
-      ? getBlockEndZeroNode(editor, point.id)
-      : getBlockStartZeroNode(editor, point.id);
-    return { node: node, offset: 0 };
+    const domPoint = context.isEndNode
+      ? getBlockEndTextNode(editor, point.id)
+      : getBlockStartTextNode(editor, point.id);
+    return domPoint || { node: null, offset: 0 };
   }
   if (point.type === POINT_TYPE.TEXT) {
     const blockState = editor.state.getBlock(point.id);
@@ -104,7 +104,7 @@ export const toDOMRange = (editor: BlockEditor, range: Range): DOMRange | null =
   const endTextNode = getTextNode(endNode);
   if (startTextNode && endTextNode) {
     domRange.setStart(startTextNode, Math.min(startOffset, startTextNode.length));
-    domRange.setEnd(endTextNode, Math.min(endOffset, startTextNode.length));
+    domRange.setEnd(endTextNode, Math.min(endOffset, endTextNode.length));
     return domRange;
   }
   return null;
