@@ -1,23 +1,17 @@
 import { rewriteRemoveChild } from "@block-kit/react";
-import { cs } from "@block-kit/utils";
+import { cs, SPACE } from "@block-kit/utils";
 import { useForceUpdate, useIsMounted, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { Listener } from "@block-kit/x-core";
 import type { BlockEditor } from "@block-kit/x-core";
 import type { BlockState } from "@block-kit/x-core";
-import {
-  EDITOR_EVENT,
-  PLUGIN_FUNC,
-  STATE_TO_RENDER,
-  X_BLOCK_ID_KEY,
-  X_BLOCK_KEY,
-  X_BLOCK_TYPE_KEY,
-} from "@block-kit/x-core";
+import { EDITOR_EVENT, PLUGIN_FUNC, STATE_TO_RENDER } from "@block-kit/x-core";
 import type { FC } from "react";
-import React, { createElement, useLayoutEffect, useMemo, useRef } from "react";
+import React, { createElement, Fragment, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useLayoutEffectContext } from "../hooks/use-layout-context";
 import type { ReactBlockContext, ReactWrapContext } from "../plugin/types";
 import { BLOCK_CH_CLASS } from "../utils/constant";
+import { InnerBlockXModel } from "./inner";
 import { TextModel } from "./text";
 
 export type BlockViewProps = {
@@ -27,9 +21,10 @@ export type BlockViewProps = {
   childClsName?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
+  withinInnerBlock?: boolean;
 };
 
-const BlockView: FC<BlockViewProps> = props => {
+const BlockXView: FC<BlockViewProps> = props => {
   const { editor, state } = props;
   const flushing = useRef(false);
   const { mounted } = useIsMounted();
@@ -99,6 +94,15 @@ const BlockView: FC<BlockViewProps> = props => {
       if (plugin) {
         blockContext.children = plugin.renderBlock(blockContext);
       }
+      if (!blockContext.children) {
+        blockContext.children = createElement(BlockXModel, {
+          editor: editor,
+          state: child,
+          withinInnerBlock: true,
+          style: blockContext.style,
+          className: blockContext.classList.join(" ") || void 0,
+        });
+      }
       const wrapContext: ReactWrapContext = {
         state: child,
         classList: blockContext.classList,
@@ -109,31 +113,40 @@ const BlockView: FC<BlockViewProps> = props => {
       for (const wrapPlugin of plugins) {
         wrapContext.children = wrapPlugin.renderWrap(wrapContext);
       }
-      if (!wrapContext.children) {
-        wrapContext.children = createElement(BlockModel, {
-          className: wrapContext.classList.join(" ") || void 0,
+      return createElement(
+        InnerBlockXModel,
+        {
           key: blockContext.key,
-          editor: editor,
           state: child,
-          style: blockContext.style,
-        });
-      }
-      return wrapContext.children;
+          style: wrapContext.style,
+          className: wrapContext.classList.join(SPACE) || void 0,
+        },
+        wrapContext.children
+      );
     });
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.version, editor, state]);
 
+  if (props.withinInnerBlock) {
+    return createElement(
+      Fragment,
+      {},
+      text,
+      // 存在文本组件, 则需要渲染包装节点, 否则直接渲染子块结构即可
+      text && children.length ? (
+        <div className={cs(BLOCK_CH_CLASS, props.childClsName)}>{children}</div>
+      ) : (
+        children
+      )
+    );
+  }
+
   return (
-    <div
+    <InnerBlockXModel
       key={state.id}
-      {...{
-        [X_BLOCK_KEY]: true,
-        [X_BLOCK_TYPE_KEY]: state.data.type,
-        [X_BLOCK_ID_KEY]: state.id,
-      }}
+      state={state}
       className={props.className}
-      ref={setModel}
+      onRef={setModel}
       style={props.style}
     >
       {text}
@@ -143,9 +156,9 @@ const BlockView: FC<BlockViewProps> = props => {
       ) : (
         children
       )}
-    </div>
+    </InnerBlockXModel>
   );
 };
 
 /** Block Model */
-export const BlockModel = React.memo(BlockView);
+export const BlockXModel = React.memo(BlockXView);

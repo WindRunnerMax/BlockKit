@@ -1,7 +1,8 @@
+import "./styles/index.scss";
+
 import type { ReactBlockContext } from "@block-kit/x-react";
 import { BlockPlugin } from "@block-kit/x-react";
 
-import { QuoteView } from "./component/quote";
 import { QUOTE_KEY } from "./types/index";
 
 export class QuoteXPlugin extends BlockPlugin {
@@ -16,6 +17,7 @@ export class QuoteXPlugin extends BlockPlugin {
         console.warn("Quote Block should not have delta field.");
       }
     }
-    return <QuoteView key={state.id} editor={this.editor} state={state} />;
+    context.classList.push("block-kit-x-quote");
+    return context.children;
   }
 }

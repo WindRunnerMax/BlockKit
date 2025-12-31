@@ -23,6 +23,7 @@ export const Placeholder: FC<{
     !isComposing &&
     state.children.length === 1 &&
     state.children[0]!.data.delta &&
+    state.children[0]!.data.type === "text" &&
     !state.children[0]!.length
   ) {
     placeholder = props.placeholder as JSX.Element;

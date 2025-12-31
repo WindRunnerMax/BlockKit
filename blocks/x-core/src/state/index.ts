@@ -41,7 +41,15 @@ export class EditorState {
         this.rootId = block.id;
       }
       this.blocks[block.id] = new BlockState(block, this);
-      block.data.children.forEach(id => usedIds.add(id));
+      for (const id of block.data.children) {
+        usedIds.add(id);
+        // 开发环境下验证子节点存在性/正确性
+        if (process.env.NODE_ENV === "development") {
+          if (!initial[id] || initial[id].data.parent !== block.id) {
+            this.editor.logger.error(`Block "${block.id}" missing child "${id}"`);
+          }
+        }
+      }
     }
     // 建立树集合后更新元信息, 并构建树结构
     for (const state of Object.values(this.blocks)) {

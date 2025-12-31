@@ -1,4 +1,4 @@
-export { BlockModel } from "./model/block";
+export { BlockXModel } from "./model/block";
 export { PortalModel } from "./model/portal";
 export { TextModel } from "./model/text";
 export { BlockPlugin } from "./plugin/index";

@@ -77,11 +77,7 @@ export const INIT: Blocks = {
       parent: "root",
     },
   },
-  child2: {
-    id: "child2",
-    version: 1,
-    data: { type: "text", children: [], delta: [{ insert: "child2" }], parent: "root" },
-  },
+
   grandchild1: {
     id: "grandchild1",
     version: 1,
@@ -95,6 +91,16 @@ export const INIT: Blocks = {
   grandgrandchild1: {
     id: "grandgrandchild1",
     version: 1,
-    data: { type: "text", children: [], delta: [{ insert: "grandgrandchild1" }], parent: "child1" },
+    data: {
+      type: "text",
+      children: [],
+      delta: [{ insert: "grandgrandchild1" }],
+      parent: "grandchild1",
+    },
+  },
+  child2: {
+    id: "child2",
+    version: 1,
+    data: { type: "text", children: [], delta: [{ insert: "child2" }], parent: "root" },
   },
 };

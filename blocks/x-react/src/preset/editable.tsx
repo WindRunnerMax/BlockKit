@@ -11,7 +11,7 @@ import React, { useLayoutEffect, useRef } from "react";
 import { useEditorStatic } from "../hooks/use-editor";
 import { LayoutEffectContext } from "../hooks/use-layout-context";
 import { useReadonly } from "../hooks/use-readonly";
-import { BlockModel } from "../model/block";
+import { BlockXModel } from "../model/block";
 import { PaintEffectModel } from "../model/effect";
 import { Placeholder } from "../model/ph";
 
@@ -118,7 +118,7 @@ export const EditableX: React.FC<{
       <PaintEffectModel editor={editor} index={index} />
       <Placeholder state={root} editor={editor} placeholder={props.placeholder} />
       <LayoutEffectContext.Provider value={onTreeBlockLayoutEffect}>
-        <BlockModel editor={editor} state={root}></BlockModel>
+        <BlockXModel editor={editor} state={root}></BlockXModel>
       </LayoutEffectContext.Provider>
     </div>
   );
