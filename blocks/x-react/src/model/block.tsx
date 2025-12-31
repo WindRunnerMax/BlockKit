@@ -1,4 +1,3 @@
-import { rewriteRemoveChild } from "@block-kit/react";
 import { cs, SPACE } from "@block-kit/utils";
 import { useForceUpdate, useIsMounted, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { Listener } from "@block-kit/x-core";
@@ -11,17 +10,13 @@ import React, { createElement, Fragment, useLayoutEffect, useMemo, useRef } from
 import { useLayoutEffectContext } from "../hooks/use-layout-context";
 import type { ReactBlockContext, ReactWrapContext } from "../plugin/types";
 import { BLOCK_CH_CLASS } from "../utils/constant";
-import { InnerBlockXModel } from "./inner";
 import { TextModel } from "./text";
+import { BlockXWrapModel } from "./wrap";
 
 export type BlockViewProps = {
   editor: BlockEditor;
   state: BlockState;
-  className?: string;
   childClsName?: string;
-  style?: React.CSSProperties;
-  children?: React.ReactNode;
-  withinInnerBlock?: boolean;
 };
 
 const BlockXView: FC<BlockViewProps> = props => {
@@ -30,16 +25,6 @@ const BlockXView: FC<BlockViewProps> = props => {
   const { mounted } = useIsMounted();
   const { index, forceUpdate } = useForceUpdate();
   const { forceLayoutEffect } = useLayoutEffectContext();
-
-  /**
-   * 设置行 DOM 节点
-   */
-  const setModel = useMemoFn((ref: HTMLDivElement | null) => {
-    if (ref) {
-      editor.model.setBlockModel(ref, state);
-      rewriteRemoveChild(ref);
-    }
-  });
 
   /**
    * 数据同步变更, 异步批量绘制变更
@@ -100,7 +85,7 @@ const BlockXView: FC<BlockViewProps> = props => {
           state: child,
           withinInnerBlock: true,
           style: blockContext.style,
-          className: blockContext.classList.join(" ") || void 0,
+          className: blockContext.classList.join(SPACE) || void 0,
         });
       }
       const wrapContext: ReactWrapContext = {
@@ -114,9 +99,10 @@ const BlockXView: FC<BlockViewProps> = props => {
         wrapContext.children = wrapPlugin.renderWrap(wrapContext);
       }
       return createElement(
-        InnerBlockXModel,
+        BlockXWrapModel,
         {
           key: blockContext.key,
+          editor: editor,
           state: child,
           style: wrapContext.style,
           className: wrapContext.classList.join(SPACE) || void 0,
@@ -127,28 +113,8 @@ const BlockXView: FC<BlockViewProps> = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.version, editor, state]);
 
-  if (props.withinInnerBlock) {
-    return createElement(
-      Fragment,
-      {},
-      text,
-      // 存在文本组件, 则需要渲染包装节点, 否则直接渲染子块结构即可
-      text && children.length ? (
-        <div className={cs(BLOCK_CH_CLASS, props.childClsName)}>{children}</div>
-      ) : (
-        children
-      )
-    );
-  }
-
   return (
-    <InnerBlockXModel
-      key={state.id}
-      state={state}
-      className={props.className}
-      onRef={setModel}
-      style={props.style}
-    >
+    <Fragment>
       {text}
       {/* 存在文本组件, 则需要渲染包装节点, 否则直接渲染子块结构即可 */}
       {text && children.length ? (
@@ -156,7 +122,7 @@ const BlockXView: FC<BlockViewProps> = props => {
       ) : (
         children
       )}
-    </InnerBlockXModel>
+    </Fragment>
   );
 };
 

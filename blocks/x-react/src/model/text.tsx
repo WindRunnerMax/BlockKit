@@ -1,6 +1,6 @@
 import { EDITOR_EVENT, EDITOR_STATE } from "@block-kit/core";
 import { Delta } from "@block-kit/delta";
-import { BlockKit, LineModel, rewriteRemoveChild } from "@block-kit/react";
+import { BlockKitContext, LineModel, rewriteRemoveChild } from "@block-kit/react";
 import { useMemoFn, useSafeState } from "@block-kit/utils/dist/es/hooks";
 import type { BlockEditor, BlockState, Listener } from "@block-kit/x-core";
 import { X_TEXT_BLOCK_KEY } from "@block-kit/x-core";
@@ -82,11 +82,11 @@ const TextView: FC<{
   }, [editor, lines]);
 
   return (
-    <BlockKit editor={editor}>
+    <BlockKitContext.Provider value={editor}>
       <div {...{ [X_TEXT_BLOCK_KEY]: true }} ref={setModel}>
         {elements}
       </div>
-    </BlockKit>
+    </BlockKitContext.Provider>
   );
 };
 

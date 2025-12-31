@@ -1,3 +1,5 @@
+import type { O } from "@block-kit/utils/dist/es/types";
+
 import type { BlockEditor } from "../../editor";
 import type { RangeEntry, RangePoint, TextEntry } from "../types";
 import { normalizeModelRange } from "../utils/normalize";
@@ -7,6 +9,8 @@ import { Point } from "./point";
 export class Range {
   /** 内建节点 */
   public readonly nodes: RangeEntry[];
+  /** 选区 Entries 长度 */
+  public readonly length: number;
   /** 选区方向反选 */
   public readonly isBackward: boolean;
   /**
@@ -16,12 +20,15 @@ export class Range {
    * - 只有单个 Text Entry 且选区长度为 0 时为折叠
    */
   public readonly isCollapsed: boolean;
-  /** 选区 Entries 长度 */
-  public readonly length: number;
+  /** 选区 Map 索引 */
+  public readonly map: O.Map<RangeEntry> = {};
 
   /** 构造函数 */
   public constructor(nodes: RangeEntry | RangeEntry[], isBackward?: boolean) {
     const entries = Array.isArray(nodes) ? nodes : [nodes];
+    for (const entry of entries) {
+      this.map[entry.id] = entry;
+    }
     this.nodes = entries;
     this.length = entries.length;
     this.isBackward = !!isBackward;

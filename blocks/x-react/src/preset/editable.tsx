@@ -14,6 +14,7 @@ import { useReadonly } from "../hooks/use-readonly";
 import { BlockXModel } from "../model/block";
 import { PaintEffectModel } from "../model/effect";
 import { Placeholder } from "../model/ph";
+import { BlockXWrapModel } from "../model/wrap";
 
 /**
  * Editable 编辑节点
@@ -118,7 +119,9 @@ export const EditableX: React.FC<{
       <PaintEffectModel editor={editor} index={index} />
       <Placeholder state={root} editor={editor} placeholder={props.placeholder} />
       <LayoutEffectContext.Provider value={onTreeBlockLayoutEffect}>
-        <BlockXModel editor={editor} state={root}></BlockXModel>
+        <BlockXWrapModel editor={editor} state={root}>
+          <BlockXModel editor={editor} state={root}></BlockXModel>
+        </BlockXWrapModel>
       </LayoutEffectContext.Provider>
     </div>
   );

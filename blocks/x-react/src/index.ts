@@ -1,6 +1,7 @@
 export { BlockXModel } from "./model/block";
 export { PortalModel } from "./model/portal";
 export { TextModel } from "./model/text";
+export { BlockXWrapModel } from "./model/wrap";
 export { BlockPlugin } from "./plugin/index";
 export type { ReactBlockContext, ReactWrapContext } from "./plugin/types/index";
 export { BlockKitX } from "./preset/block-kit";
