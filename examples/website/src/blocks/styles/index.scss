@@ -34,19 +34,19 @@ body[arco-theme='dark'] {
     top: 0;
   }
 
-  .block-kit-editable {
+  .block-kit-x-editable {
     background-color: var(--color-bg-2);
     color: var(--color-text-1);
     padding: 10px 20px;
   }
 
   div[data-node],
-  div.block-kit-editable > div[data-placeholder] {
+  div.block-kit-x-editable > div[data-placeholder] {
     line-height: 1.8;
   }
 
   div[data-text-block],
-  div.block-kit-editable > div[data-placeholder] {
+  div.block-kit-x-editable > div[data-placeholder] {
     margin: 6px 0;
   }
 }

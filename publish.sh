@@ -1,5 +1,5 @@
 #!/bin/bash
-# Usage: bash publish.sh --build-only --emit
+# Usage: bash publish.sh --build-only --emit --skip-login
 
 set -e # -x
 dir=$(pwd)
@@ -29,6 +29,10 @@ echo_notice "Version: $version"
 
 if ! check_argument "--emit" || check_argument "--build-only"; then
   echo_notice "Notice: Current Version Will Not Publish To NPM"
+fi 
+
+if check_argument "--emit" && ! check_argument "--skip-login"; then
+  npm login --registry https://registry.npmjs.org/
 fi
 
 for item in "${packages[@]}"; do

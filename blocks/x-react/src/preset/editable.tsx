@@ -104,7 +104,7 @@ export const EditableX: React.FC<{
   return (
     <div
       ref={ref}
-      className={cs(className, "notranslate")}
+      className={cs(className, "block-kit-x-editable", "notranslate")}
       {...{ [EDITOR_KEY]: true }}
       contentEditable={!readonly}
       suppressContentEditableWarning

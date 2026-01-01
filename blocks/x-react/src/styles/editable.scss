@@ -1,6 +1,6 @@
 /* stylelint-disable selector-no-qualifying-type */
 
-div[data-block][data-placeholder]::before {
+.block-kit-x-editable div[data-block][data-placeholder]::before {
   color: #bbbfc4;
   content: attr(data-placeholder);
   height: 0;
@@ -8,6 +8,24 @@ div[data-block][data-placeholder]::before {
   position: absolute;
 }
 
-.block-kit-x-children {
+.block-kit-x-editable .block-kit-x-children {
   margin-left: 10px;
+}
+
+.block-kit-x-editable div[data-block] {
+  border-radius: 4px;
+}
+
+.block-kit-x-editable {
+  ::selection {
+    background: rgba(20, 86, 240, 0.18);
+  }
+}
+
+.block-kit-x-editable div[data-block].block-kit-x-selected {
+  background-color: rgba(20, 86, 240, 0.18);
+
+  ::selection {
+    background: transparent;
+  }
 }

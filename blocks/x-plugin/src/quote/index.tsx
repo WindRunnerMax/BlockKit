@@ -1,7 +1,7 @@
 import "./styles/index.scss";
 
 import type { ReactBlockContext } from "@block-kit/x-react";
-import { BlockPlugin } from "@block-kit/x-react";
+import { BlockPlugin, BlockXModel } from "@block-kit/x-react";
 
 import { QUOTE_KEY } from "./types/index";
 
@@ -17,7 +17,10 @@ export class QuoteXPlugin extends BlockPlugin {
         console.warn("Quote Block should not have delta field.");
       }
     }
-    context.classList.push("block-kit-x-quote");
-    return context.children;
+    return (
+      <div className="block-kit-x-quote">
+        <BlockXModel editor={this.editor} state={state}></BlockXModel>
+      </div>
+    );
   }
 }

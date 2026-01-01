@@ -1,7 +1,7 @@
 {
   "name": "blocks-kit",
   "description": "WYSIWYG Editor Widget",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "scripts": {
     "bootstrap": "pnpm install --frozen-lockfile",
     "dev": "pnpm run --filter ./examples/website dev",

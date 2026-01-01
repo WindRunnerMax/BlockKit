@@ -83,9 +83,6 @@ const BlockXView: FC<BlockViewProps> = props => {
         blockContext.children = createElement(BlockXModel, {
           editor: editor,
           state: child,
-          withinInnerBlock: true,
-          style: blockContext.style,
-          className: blockContext.classList.join(SPACE) || void 0,
         });
       }
       const wrapContext: ReactWrapContext = {

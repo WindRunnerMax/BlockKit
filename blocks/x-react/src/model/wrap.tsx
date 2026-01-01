@@ -1,9 +1,16 @@
 import { rewriteRemoveChild } from "@block-kit/react";
-import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
-import type { BlockEditor, BlockState } from "@block-kit/x-core";
-import { X_BLOCK_ID_KEY, X_BLOCK_KEY, X_BLOCK_TYPE_KEY } from "@block-kit/x-core";
+import { cs } from "@block-kit/utils";
+import { useMemoFn, useSafeState } from "@block-kit/utils/dist/es/hooks";
+import type { BlockEditor, BlockState, SelectionChangeEvent } from "@block-kit/x-core";
+import {
+  EDITOR_EVENT,
+  POINT_TYPE,
+  X_BLOCK_ID_KEY,
+  X_BLOCK_KEY,
+  X_BLOCK_TYPE_KEY,
+} from "@block-kit/x-core";
 import type { FC } from "react";
-import React from "react";
+import React, { useEffect } from "react";
 
 export type BlockXWrapViewProps = {
   editor: BlockEditor;
@@ -16,6 +23,21 @@ export type BlockXWrapViewProps = {
 
 const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
   const { editor, state } = props;
+  const [selected, setSelected] = useSafeState(false);
+
+  const onSelectionChange = useMemoFn((e: SelectionChangeEvent) => {
+    const { current } = e;
+    const entry = current && current.map[state.id];
+    const isSelected = entry && entry.type === POINT_TYPE.BLOCK;
+    setSelected(!!isSelected);
+  });
+
+  useEffect(() => {
+    editor.event.on(EDITOR_EVENT.SELECTION_CHANGE, onSelectionChange);
+    return () => {
+      editor.event.off(EDITOR_EVENT.SELECTION_CHANGE, onSelectionChange);
+    };
+  }, [editor.event, onSelectionChange]);
 
   /**
    * 设置行 DOM 节点
@@ -36,7 +58,7 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
         [X_BLOCK_TYPE_KEY]: state.data.type,
         [X_BLOCK_ID_KEY]: state.id,
       }}
-      className={props.className}
+      className={cs(props.className, selected && "block-kit-x-selected")}
       ref={setModel}
       style={props.style}
     >

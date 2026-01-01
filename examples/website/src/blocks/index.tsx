@@ -56,7 +56,7 @@ const App: FC = () => {
       <div className="block-kit-editor-container">
         <div className="block-kit-editable-container">
           <div className="block-kit-mount-dom"></div>
-          <EditableX placeholder="Input Placeholder..." className="block-kit-editable"></EditableX>
+          <EditableX placeholder="Input Placeholder..."></EditableX>
         </div>
       </div>
     </BlockKitX>

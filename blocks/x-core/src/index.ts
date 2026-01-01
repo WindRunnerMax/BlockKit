@@ -1,5 +1,11 @@
 export { BlockEditor } from "./editor/index";
 export type { EditorOptions } from "./editor/types";
+export type {
+  ContentChangeEvent,
+  ContentWillChangeEvent,
+  EventMap,
+  SelectionChangeEvent,
+} from "./event/bus";
 export { EDITOR_EVENT } from "./event/bus";
 export type { InternalEvent, Listener } from "./event/bus/types";
 export {
@@ -19,6 +25,7 @@ export type { BlockContext, WrapContext } from "./plugin/types/context";
 export { Entry } from "./selection/modules/entry";
 export { Point } from "./selection/modules/point";
 export { Range } from "./selection/modules/range";
+export { POINT_TYPE } from "./selection/utils/constant";
 export { toModelPoint, toModelRange } from "./selection/utils/model";
 export { normalizeModelRange } from "./selection/utils/normalize";
 export { BlockState } from "./state/modules/block-state";
