@@ -25,6 +25,17 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
   const { editor, state } = props;
   const [selected, setSelected] = useSafeState(false);
 
+  /**
+   * 设置行 DOM 节点
+   */
+  const setModel = useMemoFn((ref: HTMLDivElement | null) => {
+    if (ref) {
+      editor.model.setBlockModel(ref, state);
+      rewriteRemoveChild(ref);
+    }
+    props.onRef && props.onRef(ref);
+  });
+
   const onSelectionChange = useMemoFn((e: SelectionChangeEvent) => {
     const { current } = e;
     const entry = current && current.map[state.id];
@@ -39,17 +50,6 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
     };
   }, [editor.event, onSelectionChange]);
 
-  /**
-   * 设置行 DOM 节点
-   */
-  const setModel = useMemoFn((ref: HTMLDivElement | null) => {
-    if (ref) {
-      editor.model.setBlockModel(ref, state);
-      rewriteRemoveChild(ref);
-    }
-    props.onRef && props.onRef(ref);
-  });
-
   return (
     <div
       key={state.id}
@@ -58,9 +58,9 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
         [X_BLOCK_TYPE_KEY]: state.data.type,
         [X_BLOCK_ID_KEY]: state.id,
       }}
-      className={cs(props.className, selected && "block-kit-x-selected")}
       ref={setModel}
       style={props.style}
+      className={cs(props.className, selected && "block-kit-x-selected")}
     >
       {props.children}
     </div>

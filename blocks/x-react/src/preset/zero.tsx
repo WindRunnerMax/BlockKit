@@ -1,14 +1,18 @@
 import { ZERO_SPACE_KEY, ZERO_SYMBOL } from "@block-kit/core";
 import { NO_CURSOR } from "@block-kit/react";
 import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
+import type { BlockState } from "@block-kit/x-core";
+import type { BlockEditor } from "@block-kit/x-core";
 import { X_ZERO_KEY } from "@block-kit/x-core";
 import type { FC } from "react";
 
 export type ZeroSpaceProps = {
-  /** 隐藏光标 */
-  hide?: boolean;
-  /** 块占位节点 */
-  block?: boolean;
+  /** Block 状态 */
+  state: BlockState;
+  /** 编辑器实例 */
+  editor: BlockEditor;
+  /** 展示光标 */
+  cursor?: boolean;
   /** 获取 DOM 引用 */
   onRef?: (ref: HTMLSpanElement | null) => void;
 };
@@ -25,6 +29,7 @@ export const ZeroSpace: FC<ZeroSpaceProps> = props => {
    */
   const onRef = useMemoFn((dom: HTMLSpanElement | null) => {
     props.onRef && props.onRef(dom);
+    dom && props.editor.model.setZeroNode(props.state, dom);
   });
 
   return (
@@ -32,9 +37,9 @@ export const ZeroSpace: FC<ZeroSpaceProps> = props => {
       ref={onRef}
       {...{
         [ZERO_SPACE_KEY]: true,
-        [X_ZERO_KEY]: props.block,
+        [X_ZERO_KEY]: true,
       }}
-      style={props.hide ? NO_CURSOR : void 0}
+      style={props.cursor ? void 0 : NO_CURSOR}
     >
       {ZERO_SYMBOL}
     </span>

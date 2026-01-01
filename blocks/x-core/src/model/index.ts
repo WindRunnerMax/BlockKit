@@ -9,6 +9,8 @@ export class Model {
   protected MODEL_DOM: WeakMap<BlockState, HTMLElement>;
   /** State To Text Editor */
   protected MODEL_EDITOR: WeakMap<BlockState, Editor>;
+  /** State To Zero Element */
+  protected MODEL_ZERO: WeakMap<BlockState, HTMLSpanElement>;
 
   /**
    * 构造函数
@@ -16,6 +18,7 @@ export class Model {
   constructor() {
     this.DOM_MODEL = new WeakMap();
     this.MODEL_DOM = new WeakMap();
+    this.MODEL_ZERO = new WeakMap();
     this.MODEL_EDITOR = new WeakMap();
   }
 
@@ -25,6 +28,7 @@ export class Model {
   public destroy() {
     this.DOM_MODEL = new WeakMap();
     this.MODEL_DOM = new WeakMap();
+    this.MODEL_ZERO = new WeakMap();
     this.MODEL_EDITOR = new WeakMap();
   }
 
@@ -72,5 +76,23 @@ export class Model {
   public getTextEditor(state: BlockState | null): Editor | null {
     if (!state) return null;
     return this.MODEL_EDITOR.get(state) || null;
+  }
+
+  /**
+   * 映射 BlockState - Zero Element
+   * @param state
+   * @param zero
+   */
+  public setZeroNode(state: BlockState, zero: HTMLSpanElement) {
+    this.MODEL_ZERO.set(state, zero);
+  }
+
+  /**
+   * 获取 Block Zero Element
+   * @param state
+   */
+  public getZeroNode(state: BlockState | null): HTMLSpanElement | null {
+    if (!state) return null;
+    return this.MODEL_ZERO.get(state) || null;
   }
 }

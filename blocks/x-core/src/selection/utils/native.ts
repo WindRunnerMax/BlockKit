@@ -35,20 +35,28 @@ export const toDOMPoint = (
   point: RangePoint,
   context: NormalizePointContext
 ): DOMPoint => {
+  const def: DOMPoint = { node: null, offset: 0 };
   if (point.type === POINT_TYPE.BLOCK) {
+    const state = editor.state.getBlock(point.id);
+    // 如果不存在子节点, 则为块级节点, 如图片等
+    if (state && !state.children.length) {
+      const zero = editor.model.getZeroNode(state);
+      return { node: zero, offset: 0 };
+    }
+    // 从块节点上查找文本编辑器的文本节点
     const domPoint = context.isEndNode
       ? getBlockEndTextNode(editor, point.id)
       : getBlockStartTextNode(editor, point.id);
-    return domPoint || { node: null, offset: 0 };
+    return domPoint || def;
   }
   if (point.type === POINT_TYPE.TEXT) {
     const blockState = editor.state.getBlock(point.id);
     const text = blockState && editor.model.getTextEditor(blockState);
     const textPoint = text && TextPoint.fromRaw(text, new RawPoint(point.offset));
     const domPoint = text && textPoint && toTextDOMPoint(text, textPoint);
-    if (domPoint) return domPoint;
+    return domPoint || def;
   }
-  return { node: null, offset: 0 };
+  return def;
 };
 
 /**

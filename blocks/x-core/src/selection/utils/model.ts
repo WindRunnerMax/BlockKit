@@ -40,7 +40,7 @@ export const toModelPoint = (
     const pointContext = { ...context, nodeContainer: node, nodeOffset: offset };
     const startRangePoint = toTextModelPoint(text, startDOMPoint, pointContext);
     const raw = RawPoint.fromPoint(text, startRangePoint);
-    if (raw) return Point.create(id, TEXT, raw.offset);
+    return raw ? Point.create(id, TEXT, raw.offset) : Point.create(id, BLOCK);
   }
   // 否则作为块节点处理
   return Point.create(id, BLOCK);
