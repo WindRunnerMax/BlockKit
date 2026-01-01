@@ -1,6 +1,6 @@
-import type { Object } from "@block-kit/utils";
+import type { O } from "@block-kit/utils/dist/es/types";
 
-export const NODE_TO_KEY = new WeakMap<Object.Any, Key>();
+export const NODE_TO_KEY = new WeakMap<O.Any, Key>();
 
 export class Key {
   /** 当前节点 id */
@@ -19,7 +19,7 @@ export class Key {
    * 根据节点获取 id
    * @param node
    */
-  public static getId(node: Object.Any): string {
+  public static getId(node: O.Any): string {
     let key = NODE_TO_KEY.get(node);
     if (!key) {
       key = new Key();
@@ -32,7 +32,7 @@ export class Key {
    * 根据节点刷新 id
    * @param node
    */
-  public static refresh(node: Object.Any): string {
+  public static refresh(node: O.Any): string {
     const key = new Key();
     NODE_TO_KEY.set(node, key);
     return key.id;
@@ -43,7 +43,7 @@ export class Key {
    * @param node
    * @param id
    */
-  public static update(node: Object.Any, id: string): string {
+  public static update(node: O.Any, id: string): string {
     const key = NODE_TO_KEY.get(node) || new Key(id);
     key.id = id;
     NODE_TO_KEY.set(node, key);

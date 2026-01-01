@@ -1,4 +1,4 @@
-import type { Object } from "@block-kit/utils";
+import type { O } from "@block-kit/utils/dist/es/types";
 
 export const NATIVE_EVENTS = {
   COMPOSITION_START: "compositionstart",
@@ -49,7 +49,7 @@ export type NativeEventMap = {
 };
 
 export type NativeEventMapType = typeof NATIVE_EVENTS;
-export type NativeEventMapKeys = Object.Values<NativeEventMapType>;
+export type NativeEventMapKeys = O.Values<NativeEventMapType>;
 export type NativeEventHandler = (e: Event) => void;
 export type Listener<T extends NativeEventMapKeys> = (value: NativeEventMap[T]) => void;
 export type Listeners = { [T in NativeEventMapKeys]?: Listener<T> };

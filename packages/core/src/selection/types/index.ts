@@ -1,4 +1,4 @@
-import type { Object } from "@block-kit/utils";
+import type { O } from "@block-kit/utils/dist/es/types";
 
 /** 方向 */
 export const DIRECTION = {
@@ -49,7 +49,7 @@ export type ModelPointContext = {
 export type DOMRange = globalThis.Range;
 export type DOMSelection = globalThis.Selection;
 export type DOMStaticRange = globalThis.StaticRange;
-export type Direction = Object.Values<typeof DIRECTION>;
+export type Direction = O.Values<typeof DIRECTION>;
 export type DOMComment = globalThis.Comment;
 export type DOMNode = globalThis.Node;
 export type DOMText = globalThis.Text;

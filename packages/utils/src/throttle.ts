@@ -3,13 +3,6 @@
 import { isNil, isNumber } from "./is";
 import type { Array, Func, Primitive } from "./types";
 
-type ThrottledFn<T extends Func.Any> = T & {
-  /** 立即执行 */
-  flush: () => void;
-  /** 清除定时器 */
-  cancel: () => void;
-};
-
 type Options = {
   /** 等待时间 */
   wait: number;
@@ -23,6 +16,13 @@ const DEFAULT_OPTIONS: Required<Options> = {
   wait: 100,
   leading: true,
   trailing: true,
+};
+
+export type ThrottledFn<T extends Func.Any> = T & {
+  /** 立即执行 */
+  flush: () => void;
+  /** 清除定时器 */
+  cancel: () => void;
 };
 
 /**

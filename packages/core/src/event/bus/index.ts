@@ -1,7 +1,7 @@
 import type { Delta } from "@block-kit/delta";
 import type { InsertOp } from "@block-kit/delta";
-import type { Object } from "@block-kit/utils";
 import type { Reflex } from "@block-kit/utils";
+import type { O } from "@block-kit/utils/dist/es/types";
 
 import type { Range } from "../../selection/modules/range";
 import type { ApplyOptions } from "../../state/types";
@@ -47,7 +47,7 @@ export type EventMap = {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type PaintEvent = {};
 export type EventMapType = typeof EDITOR_EVENT;
-export type EventMapKeys = Object.Values<EventMapType>;
+export type EventMapKeys = O.Values<EventMapType>;
 export type EditorEvent = Reflex.Tuple<EventMap>;
 export type EditorEventArgs = Reflex.Array<EventMap>;
 export type AssertEventMap<T extends EventMapKeys> = EventMap[T];

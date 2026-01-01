@@ -1,5 +1,5 @@
-import type { Object } from "@block-kit/utils";
 import type { Reflex } from "@block-kit/utils";
+import type { O } from "@block-kit/utils/dist/es/types";
 import type { Blocks, BlocksChange } from "@block-kit/x-json";
 
 import type { Range } from "../../selection/modules/range";
@@ -45,7 +45,7 @@ export type EventMap = {
 
 export type PaintEvent = { id: string };
 export type EventMapType = typeof EDITOR_EVENT;
-export type EventMapKeys = Object.Values<EventMapType>;
+export type EventMapKeys = O.Values<EventMapType>;
 export type EditorEvent = Reflex.Tuple<EventMap>;
 export type EditorEventArgs = Reflex.Array<EventMap>;
 export type AssertEventMap<T extends EventMapKeys> = EventMap[T];

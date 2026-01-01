@@ -13,6 +13,7 @@ export {
   TRULY,
 } from "./constant";
 export { DateTime } from "./date-time";
+export type { DebouncedFn } from "./debounce";
 export { debounce } from "./debounce";
 export { Bind } from "./decorator";
 export {
@@ -78,8 +79,9 @@ export { Schedule } from "./schedule";
 export { Scroll } from "./scroll";
 export { Storage } from "./storage";
 export { cs, Facade } from "./styles";
+export type { ThrottledFn } from "./throttle";
 export { throttle } from "./throttle";
 export type { Func, Primitive, Reflex } from "./types";
-export { Array, Object, String } from "./types";
+export type { Array as ArrayType, Object as ObjectType, String as StringType } from "./types";
 export { URI } from "./uri";
 export { getId, getUniqueId } from "./uuid";
