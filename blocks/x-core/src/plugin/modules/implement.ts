@@ -32,12 +32,21 @@ export abstract class CorePlugin {
 
   /**
    * 渲染块级包裹节点
+   * - 渲染范围在 Block 节点之上, Wrap 节点之下
    * - 调度优先级值越大 DOM 结构在越外层
    */
   public renderWrap?(state: WrapContext): P.Any;
 
   /**
+   * 渲染块级文本包装节点
+   * - 渲染范围在 Text 节点之上, Wrap 节点之下
+   * - 调度优先级值越大 DOM 结构在越外层
+   */
+  public renderTextWrap?(state: WrapContext): P.Any;
+
+  /**
    * 渲染块级节点 Block
+   * - 渲染范围为 Block 节点, Wrap 节点之下
    * - 调度优先级值越大 DOM 结构在越外层
    */
   public renderBlock?(state: BlockContext): P.Any;

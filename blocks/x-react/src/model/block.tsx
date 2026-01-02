@@ -60,7 +60,19 @@ const BlockXView: FC<BlockViewProps> = props => {
    * 处理文本子节点块结构
    */
   const text = useMemo(() => {
-    return state.data.delta && <TextModel block={editor} key={state.id} state={state}></TextModel>;
+    if (!state.data.delta) return null;
+    const el = <TextModel block={editor} key={state.id} state={state}></TextModel>;
+    const wrapContext: ReactWrapContext = {
+      state: state,
+      classList: [],
+      style: {},
+      children: el,
+    };
+    const plugins = editor.plugin.getPriorityPlugins(PLUGIN_FUNC.RENDER_TEXT_WRAP);
+    for (const wrapPlugin of plugins) {
+      wrapContext.children = wrapPlugin.renderTextWrap(wrapContext);
+    }
+    return wrapContext.children;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.version, editor, state]);
 
@@ -74,6 +86,7 @@ const BlockXView: FC<BlockViewProps> = props => {
         state: child,
         style: {},
         classList: [],
+        childClsList: [],
       };
       const plugin = editor.plugin.map[child.data.type];
       if (plugin) {
@@ -83,6 +96,7 @@ const BlockXView: FC<BlockViewProps> = props => {
         blockContext.children = createElement(BlockXModel, {
           editor: editor,
           state: child,
+          childClsName: blockContext.childClsList.join(SPACE) || void 0,
         });
       }
       const wrapContext: ReactWrapContext = {

@@ -6,18 +6,22 @@ import { getPluginPriority } from "./modules/priority";
 import type { CallerMap, CallerType, PluginFuncKeys, PluginRequiredKeyFunc } from "./types";
 
 export class Plugin {
-  /** key 块渲染映射 */
-  public map: Record<string, PluginRequiredKeyFunc<"renderBlock">> = {};
   /** 当前注册的插件 */
-  public current: CorePlugin[] = [];
+  public current: CorePlugin[];
   /** 插件缓存 */
-  protected cache: Record<string, CorePlugin[]> = {};
+  protected cache: Record<string, CorePlugin[]>;
+  /** key 块渲染映射 */
+  public map: Record<string, PluginRequiredKeyFunc<"renderBlock">>;
 
   /**
    * 构造函数
    * @param editor
    */
-  constructor(protected editor: BlockEditor) {}
+  constructor(protected editor: BlockEditor) {
+    this.map = {};
+    this.cache = {};
+    this.current = [];
+  }
 
   /**
    * 销毁插件

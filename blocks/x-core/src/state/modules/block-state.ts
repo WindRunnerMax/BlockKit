@@ -10,6 +10,8 @@ import { clearTreeCache, getNextSiblingNode, getPrevSiblingNode } from "../utils
 export class BlockState {
   /** Block ID */
   public readonly id: string;
+  /** Block 类型 */
+  public readonly type: string;
   /** Block 可变数据 */
   public readonly data: BlockDataField;
   /** Block 版本 */
@@ -20,6 +22,8 @@ export class BlockState {
   public index: number;
   /** 块结构深度 */
   public depth: number;
+  /** 最近块结构深度(线性深度) */
+  public linear: number;
   /** 标记更新节点 */
   public isDirty: boolean;
   /** delta 文本长度 */
@@ -38,6 +42,7 @@ export class BlockState {
     this.index = -1;
     this.depth = -1;
     this.length = -1;
+    this.linear = -1;
     this._nodes = null;
     this.children = [];
     this.id = block.id;
@@ -45,6 +50,7 @@ export class BlockState {
     this._nodesIndex = {};
     this.isDirty = true;
     this.removed = false;
+    this.type = block.data.type;
     this.version = block.version;
     this.data = { ...block.data };
   }
@@ -89,6 +95,7 @@ export class BlockState {
 
   /**
    * 判断是否为块级类型的节点
+   * - 块级类型的节点不存在 delta 文本内容
    */
   public isBlockType() {
     return !this.data.delta;
@@ -201,6 +208,8 @@ export class BlockState {
     // 数据结构通常是宽而浅的树形结构, 性能消耗通常可接受
     {
       let depth = 0;
+      let linear = 0;
+      let hasBlockType = false;
       const visited = new Set<BlockState>();
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       let current: BlockState | null = this;
@@ -210,9 +219,14 @@ export class BlockState {
         }
         visited.add(current);
         depth++;
+        if (current.isBlockType()) {
+          hasBlockType = true;
+        }
+        !hasBlockType && linear++;
         current = current.parent;
       }
       this.depth = depth;
+      this.linear = linear;
     }
     // ============ Update Length ============
     // 更新文本块 Delta 长度

@@ -1,0 +1,32 @@
+/* stylelint-disable selector-no-qualifying-type */
+.block-kit-x-bullet {
+  display: flex;
+
+  >div[data-text-block] {
+    flex: 1 0;
+  }
+
+  >.block-kit-x-bullet-marker {
+    align-items: center;
+    color: rgb(var(--arcoblue-6));
+    display: flex;
+    flex-shrink: 0;
+    font-size: 12px;
+    margin-right: 1px;
+    padding: 0 5px;
+    transform: scale(0.5);
+    user-select: none;
+  }
+
+  // ["●", "◯", "■"] => disc, circle, square
+  @each $index, $type in 0 disc, 1 circle, 2 square {
+    &.block-kit-x-li-level-#{$index} {
+      list-style-type: $type;
+      margin-left: 20px;
+    }
+  }
+}
+
+.block-kit-x-editable .block-kit-x-bullet-children {
+  margin-left: 20px;
+}

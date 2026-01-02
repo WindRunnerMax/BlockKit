@@ -21,6 +21,7 @@ export const PLUGIN_FUNC = {
   ...CALLER_TYPE,
   RENDER_WRAP: "renderWrap",
   RENDER_BLOCK: "renderBlock",
+  RENDER_TEXT_WRAP: "renderTextWrap",
 } as const;
 
 export type CallerMap = {

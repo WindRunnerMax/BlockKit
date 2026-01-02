@@ -6,7 +6,7 @@ export const INIT: Blocks = {
     version: 1,
     data: {
       type: "ROOT",
-      children: ["h1", "desc", "h2_quote", "quote_container", "child1", "child2"],
+      children: ["h1", "desc", "h2_quote", "quote_container", "h2_bullet", "bullet_l1", "child2"],
       parent: "",
     },
   },
@@ -54,7 +54,7 @@ export const INIT: Blocks = {
     data: {
       type: "quote",
       parent: "root",
-      children: ["quote_text"],
+      children: ["quote_text", "quote_bullet_l1"],
     },
   },
   quote_text: {
@@ -67,35 +67,55 @@ export const INIT: Blocks = {
       delta: [{ insert: "引用内容" }],
     },
   },
-  child1: {
-    id: "child1",
+  quote_bullet_l1: {
+    id: "quote_bullet_l1",
     version: 1,
     data: {
-      type: "text",
-      children: ["grandchild1"],
-      delta: [{ insert: "child1" }],
+      type: "bullet",
+      children: [],
+      delta: [{ insert: "可嵌套列表结构" }],
+      parent: "quote_container",
+    },
+  },
+  h2_bullet: {
+    id: "h2_bullet",
+    version: 1,
+    data: {
+      type: "heading",
+      level: "h2",
+      children: [],
+      delta: [{ insert: "无序列表" }],
       parent: "root",
     },
   },
-
-  grandchild1: {
-    id: "grandchild1",
+  bullet_l1: {
+    id: "bullet_l1",
     version: 1,
     data: {
-      type: "text",
-      children: ["grandgrandchild1"],
-      delta: [{ insert: "grandchild1" }],
-      parent: "child1",
+      type: "bullet",
+      children: ["bullet_l2"],
+      delta: [{ insert: "一级无序列表" }],
+      parent: "root",
     },
   },
-  grandgrandchild1: {
-    id: "grandgrandchild1",
+  bullet_l2: {
+    id: "bullet_l2",
     version: 1,
     data: {
-      type: "text",
+      type: "bullet",
+      children: ["bullet_l3"],
+      delta: [{ insert: "二级无序列表" }],
+      parent: "bullet_l1",
+    },
+  },
+  bullet_l3: {
+    id: "bullet_l3",
+    version: 1,
+    data: {
+      type: "bullet",
       children: [],
-      delta: [{ insert: "grandgrandchild1" }],
-      parent: "grandchild1",
+      delta: [{ insert: "三级无序列表" }],
+      parent: "bullet_l2",
     },
   },
   child2: {
