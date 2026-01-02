@@ -1,16 +1,16 @@
 import "./styles/index.scss";
 
-import type { ReactBlockContext, ReactWrapContext } from "@block-kit/x-react";
-import { BlockPlugin } from "@block-kit/x-react";
+import type { ReactBlockContext, ReactBlockWrapContext } from "@block-kit/x-react";
+import { BlockXPlugin } from "@block-kit/x-react";
 
 import { BULLET_KEY } from "./types/index";
 
-export class BulletXPlugin extends BlockPlugin {
+export class BulletXPlugin extends BlockXPlugin {
   public key: string = BULLET_KEY;
 
   public destroy(): void {}
 
-  public renderTextWrap(context: ReactWrapContext): React.ReactNode {
+  public renderTextWrap(context: ReactBlockWrapContext): React.ReactNode {
     const state = context.state;
     if (state.type !== BULLET_KEY) return context.children;
     const level = state.linear;

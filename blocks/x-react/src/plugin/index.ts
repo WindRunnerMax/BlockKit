@@ -1,17 +1,9 @@
 import { CorePlugin } from "@block-kit/x-core";
 
-import type { ReactBlockContext, ReactWrapContext } from "./types";
+import type { ReactBlockContext, ReactBlockWrapContext } from "./types";
 
-export abstract class BlockPlugin extends CorePlugin {
-  /**
-   * 渲染块包装节点
-   * - 调度优先级值越大 DOM 结构在越外层
-   */
-  public renderWrap?(context: ReactWrapContext): React.ReactNode;
-
-  /**
-   * 渲染块级节点
-   * - 调度优先级值越大 DOM 结构在越外层
-   */
+export abstract class BlockXPlugin extends CorePlugin {
   public renderBlock?(context: ReactBlockContext): React.ReactNode;
+  public renderTextWrap?(context: ReactBlockWrapContext): React.ReactNode;
+  public renderBlockWrap?(context: ReactBlockWrapContext): React.ReactNode;
 }

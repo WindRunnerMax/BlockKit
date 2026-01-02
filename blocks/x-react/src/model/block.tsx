@@ -8,7 +8,7 @@ import type { FC } from "react";
 import React, { createElement, Fragment, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useLayoutEffectContext } from "../hooks/use-layout-context";
-import type { ReactBlockContext, ReactWrapContext } from "../plugin/types";
+import type { ReactBlockContext, ReactBlockWrapContext } from "../plugin/types";
 import { BLOCK_CH_CLASS } from "../utils/constant";
 import { TextModel } from "./text";
 import { BlockXWrapModel } from "./wrap";
@@ -62,7 +62,7 @@ const BlockXView: FC<BlockViewProps> = props => {
   const text = useMemo(() => {
     if (!state.data.delta) return null;
     const el = <TextModel block={editor} key={state.id} state={state}></TextModel>;
-    const wrapContext: ReactWrapContext = {
+    const wrapContext: ReactBlockWrapContext = {
       state: state,
       classList: [],
       style: {},
@@ -99,15 +99,15 @@ const BlockXView: FC<BlockViewProps> = props => {
           childClsName: blockContext.childClsList.join(SPACE) || void 0,
         });
       }
-      const wrapContext: ReactWrapContext = {
+      const wrapContext: ReactBlockWrapContext = {
         state: child,
         classList: blockContext.classList,
         style: blockContext.style,
         children: blockContext.children,
       };
-      const plugins = editor.plugin.getPriorityPlugins(PLUGIN_FUNC.RENDER_WRAP);
+      const plugins = editor.plugin.getPriorityPlugins(PLUGIN_FUNC.RENDER_BLOCK_WRAP);
       for (const wrapPlugin of plugins) {
-        wrapContext.children = wrapPlugin.renderWrap(wrapContext);
+        wrapContext.children = wrapPlugin.renderBlockWrap(wrapContext);
       }
       return createElement(
         BlockXWrapModel,

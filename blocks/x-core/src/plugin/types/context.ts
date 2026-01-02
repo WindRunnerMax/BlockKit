@@ -6,7 +6,7 @@ import type { BlockState } from "../../state/modules/block-state";
 /**
  * 块包裹状态
  */
-export type WrapContext = {
+export type BlockWrapContext = {
   /** 状态对象 */
   state: BlockState;
   /**

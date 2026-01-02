@@ -1,11 +1,11 @@
 import "./styles/index.scss";
 
 import type { ReactBlockContext } from "@block-kit/x-react";
-import { BlockPlugin, BlockXModel } from "@block-kit/x-react";
+import { BlockXModel, BlockXPlugin } from "@block-kit/x-react";
 
 import { QUOTE_KEY } from "./types/index";
 
-export class QuoteXPlugin extends BlockPlugin {
+export class QuoteXPlugin extends BlockXPlugin {
   public key: string = QUOTE_KEY;
 
   public destroy(): void {}
