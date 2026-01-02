@@ -11,10 +11,10 @@ import React, { useLayoutEffect, useRef } from "react";
 import { useEditorStatic } from "../hooks/use-editor";
 import { LayoutEffectContext } from "../hooks/use-layout-context";
 import { useReadonly } from "../hooks/use-readonly";
-import { BlockXModel } from "../model/block";
 import { PaintEffectModel } from "../model/effect";
 import { Placeholder } from "../model/ph";
-import { BlockXWrapModel } from "../model/wrap";
+import { BlockXModel } from "./block";
+import { BlockXWrapModel } from "./block-wrap";
 
 /**
  * Editable 编辑节点

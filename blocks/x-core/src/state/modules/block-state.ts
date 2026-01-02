@@ -1,5 +1,6 @@
 import { getOpLength } from "@block-kit/delta";
 import { isString, isUndef } from "@block-kit/utils";
+import type { F } from "@block-kit/utils/dist/es/types";
 import type { Block, BlockDataField, JSONOp } from "@block-kit/x-json";
 import { cloneSnapshot, json } from "@block-kit/x-json";
 
@@ -32,6 +33,8 @@ export class BlockState {
   public parent: BlockState | null;
   /** 子节点 */
   public children: BlockState[];
+  /** 状态 Meta 更新回调 */
+  public onMetaUpdated: F.Plain | null;
   /** @internal 子树节点 */
   public _nodes: BlockState[] | null;
   /** @internal 子树节点索引映射 */
@@ -50,6 +53,7 @@ export class BlockState {
     this._nodesIndex = {};
     this.isDirty = true;
     this.removed = false;
+    this.onMetaUpdated = null;
     this.type = block.data.type;
     this.version = block.version;
     this.data = { ...block.data };
@@ -182,9 +186,10 @@ export class BlockState {
   /**
    * 更新块结构元信息
    * @internal 仅编辑器内部使用
+   * @param force [?=false] 是否强制更新
    */
-  public _updateMeta(): void {
-    if (!this.isDirty) return void 0;
+  public _updateMeta(force = false): void {
+    if (!this.isDirty && !force) return void 0;
     this.isDirty = false;
     // ============ Update Index ============
     // 更新子节点 index, 直接根据父节点的子节点重新计算
@@ -239,6 +244,8 @@ export class BlockState {
         this.length = len;
       }
     }
+    // ============ Callback ============
+    this.onMetaUpdated && this.onMetaUpdated();
   }
 
   /**
@@ -265,7 +272,7 @@ export class BlockState {
           inserts.add(liBlock.id);
           break LI_OP;
         }
-        // 块级节点需要护理处理本身及其子树节点
+        // 块级节点需要处理本身及其子树节点
         const nodes = liBlock.getTreeNodes();
         for (const child of nodes) {
           child.restore();
@@ -282,7 +289,7 @@ export class BlockState {
           deletes.add(ldBlock.id);
           break LD_OP;
         }
-        // 块级节点需要护理处理本身及其子树节点
+        // 块级节点需要处理本身及其子树节点
         const nodes = ldBlock.getTreeNodes();
         for (const child of nodes) {
           child.remove();

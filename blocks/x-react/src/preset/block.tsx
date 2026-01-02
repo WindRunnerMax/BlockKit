@@ -8,10 +8,14 @@ import type { FC } from "react";
 import React, { createElement, Fragment, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useLayoutEffectContext } from "../hooks/use-layout-context";
-import type { ReactBlockContext, ReactBlockWrapContext } from "../plugin/types";
+import { TextModel } from "../model/text";
+import type {
+  ReactBlockContext,
+  ReactBlockWrapContext,
+  ReactTextWrapContext,
+} from "../plugin/types";
 import { BLOCK_CH_CLASS } from "../utils/constant";
-import { TextModel } from "./text";
-import { BlockXWrapModel } from "./wrap";
+import { BlockXWrapModel } from "./block-wrap";
 
 export type BlockViewProps = {
   editor: BlockEditor;
@@ -62,10 +66,8 @@ const BlockXView: FC<BlockViewProps> = props => {
   const text = useMemo(() => {
     if (!state.data.delta) return null;
     const el = <TextModel block={editor} key={state.id} state={state}></TextModel>;
-    const wrapContext: ReactBlockWrapContext = {
+    const wrapContext: ReactTextWrapContext = {
       state: state,
-      classList: [],
-      style: {},
       children: el,
     };
     const plugins = editor.plugin.getPriorityPlugins(PLUGIN_FUNC.RENDER_TEXT_WRAP);

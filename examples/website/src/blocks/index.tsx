@@ -14,7 +14,13 @@ import {
   UnderlinePlugin,
 } from "@block-kit/plugin";
 import { BlockEditor } from "@block-kit/x-core";
-import { AlignXPlugin, BulletXPlugin, HeadingXPlugin, QuoteXPlugin } from "@block-kit/x-plugin";
+import {
+  AlignXPlugin,
+  BulletXPlugin,
+  HeadingXPlugin,
+  IndentXPlugin,
+  QuoteXPlugin,
+} from "@block-kit/x-plugin";
 import { BlockKitX, EditableX } from "@block-kit/x-react";
 import type { FC } from "react";
 import { useEffect, useMemo } from "react";
@@ -31,6 +37,7 @@ const App: FC = () => {
       new AlignXPlugin(),
       new QuoteXPlugin(),
       new BulletXPlugin(),
+      new IndentXPlugin(),
     ]);
     return instance;
   }, []);

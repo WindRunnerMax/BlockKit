@@ -13,6 +13,7 @@ import { useMetaStatic } from "../hooks/use-meta";
 const TextView: FC<{
   block: BlockEditor;
   state: BlockState;
+  className?: string;
 }> = props => {
   const { onCreateTextEditor } = useMetaStatic();
 
@@ -83,7 +84,7 @@ const TextView: FC<{
 
   return (
     <BlockKitContext.Provider value={editor}>
-      <div {...{ [X_TEXT_BLOCK_KEY]: true }} ref={setModel}>
+      <div {...{ [X_TEXT_BLOCK_KEY]: true }} ref={setModel} className={props.className}>
         {elements}
       </div>
     </BlockKitContext.Provider>

@@ -1,7 +1,7 @@
 import "./styles/index.scss";
 
 import type { BlockDataType } from "@block-kit/x-json";
-import type { ReactBlockContext } from "@block-kit/x-react";
+import type { ReactTextWrapContext } from "@block-kit/x-react";
 import { BlockXPlugin } from "@block-kit/x-react";
 
 import { HEADING_KEY } from "./types/index";
@@ -11,9 +11,8 @@ export class HeadingXPlugin extends BlockXPlugin {
 
   public destroy(): void {}
 
-  public renderBlock(context: ReactBlockContext): React.ReactNode {
+  public renderTextWrap(context: ReactTextWrapContext): React.ReactNode {
     const data = context.state.data as BlockDataType<typeof HEADING_KEY>;
-    context.classList.push(`block-kit-x-heading-${data.level}`);
-    return context.children;
+    return <div className={`block-kit-x-heading-${data.level}`}>{context.children}</div>;
   }
 }
