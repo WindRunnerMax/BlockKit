@@ -134,7 +134,7 @@ describe("perform insert break", () => {
         },
       },
     };
-    const editor = new BlockEditor({ initial: blocks });
+    const editor = new BlockEditor({ initial: blocks, logLevel: 1 });
     const range = normalizeModelRange(
       editor,
       Point.create("child1", "T", 3),
@@ -145,6 +145,7 @@ describe("perform insert break", () => {
     const newId = Object.entries(changes).find(([, it]) => it[0].p.length === 0)?.[0];
     expect(Object.keys(blockSet)).toEqual(["root", "child1", "child2", "grandgrandchild1", newId]);
     expect(blockSet.child1.data.delta).toEqual([{ insert: "chi" }]);
+    // 这里还测试了是否正常能够正常插入最新的文本节点
     expect(blockSet[newId!].data.delta).toEqual([{ insert: "child1" }]);
     expect(blockSet.child1.data.children).toEqual([newId, "grandgrandchild1"]);
     expect(blockSet.root.data.children).toEqual(["child1", "child2"]);

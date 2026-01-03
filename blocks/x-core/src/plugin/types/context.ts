@@ -1,7 +1,7 @@
 import type { P } from "@block-kit/utils/dist/es/types";
 import type { Properties } from "csstype";
 
-import type { BlockState } from "../../state/modules/block-state";
+import type { BlockState } from "../../state/modules/state";
 
 /**
  * 块渲染状态

@@ -68,4 +68,44 @@ describe("perform indent", () => {
     expect(blockSet.g2.data.parent).toEqual("root");
     expect(editor.state.getBlock("g2")?.depth).toEqual(1);
   });
+
+  it("indent block depth", () => {
+    const blocks: Blocks = {
+      root: {
+        id: "root",
+        version: 1,
+        data: { type: "ROOT", children: ["child0", "child1"], parent: "" },
+      },
+      child0: {
+        id: "child0",
+        version: 1,
+        data: { type: "text", children: [], delta: [], parent: "root" },
+      },
+      child1: {
+        id: "child1",
+        version: 1,
+        data: { type: "text", children: ["child2"], delta: [], parent: "root" },
+      },
+      child2: {
+        id: "child2",
+        version: 1,
+        data: { type: "text", children: [], delta: [], parent: "child1" },
+      },
+    };
+    const editor = new BlockEditor({ initial: blocks, logLevel: 0 });
+    // root
+    // ├── child0
+    // └── child1
+    //     └── child2
+    expect(editor.state.getBlock("child1")?.depth).toEqual(1);
+    expect(editor.state.getBlock("child2")?.depth).toEqual(2);
+    const entry = Entry.create("child1", "T", 0, 0);
+    editor.perform.indent(new Range(entry));
+    // root
+    // └── child0
+    //     └── child1
+    //         └── child2
+    expect(editor.state.getBlock("child1")?.depth).toEqual(2);
+    expect(editor.state.getBlock("child2")?.depth).toEqual(3);
+  });
 });

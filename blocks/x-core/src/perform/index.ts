@@ -12,7 +12,7 @@ import { Point } from "../selection/modules/point";
 import { Range } from "../selection/modules/range";
 import type { RangeEntry, TextPoint } from "../selection/types";
 import { POINT_TYPE } from "../selection/utils/constant";
-import type { BlockState } from "../state/modules/block-state";
+import type { BlockState } from "../state/modules/state";
 import type { ApplyOptions, BatchApplyChange } from "../state/types";
 import { Atom } from "./modules/atom";
 

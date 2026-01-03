@@ -7,8 +7,8 @@ import type { BlockEditor } from "../editor";
 import type { ContentChangeEvent } from "../event/bus";
 import { EDITOR_EVENT } from "../event/bus";
 import type { Range } from "../selection/modules/range";
-import { BlockState } from "./modules/block-state";
-import { Mutate } from "./mutate";
+import { Mutate } from "./modules/mutate";
+import { BlockState } from "./modules/state";
 import type { ApplyOptions, BatchApplyChange } from "./types";
 import { APPLY_SOURCE, EDITOR_STATE } from "./types";
 import { normalizeBlocksChange, transformPosition } from "./utils/normalize";
@@ -53,7 +53,7 @@ export class EditorState {
     }
     // 建立树集合后更新元信息, 并构建树结构
     for (const state of Object.values(this.blocks)) {
-      usedIds.has(state.id) ? state._updateMeta() : state.remove();
+      usedIds.has(state.id) ? state.restore() : state.remove();
     }
   }
 

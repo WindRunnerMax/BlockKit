@@ -1,12 +1,12 @@
 import { getOpLength } from "@block-kit/delta";
-import { isString, isUndef } from "@block-kit/utils";
+import { isUndef } from "@block-kit/utils";
 import type { F } from "@block-kit/utils/dist/es/types";
-import type { Block, BlockDataField, JSONOp } from "@block-kit/x-json";
-import { cloneSnapshot, json } from "@block-kit/x-json";
+import type { Block, BlockDataField } from "@block-kit/x-json";
+import { cloneSnapshot } from "@block-kit/x-json";
 
 import { STATE_TO_RENDER } from "../../model/utils/weak-map";
 import type { EditorState } from "../index";
-import { clearTreeCache, getNextSiblingNode, getPrevSiblingNode } from "../utils/tree";
+import { getNextSiblingNode, getPrevSiblingNode } from "../utils/tree";
 
 export class BlockState {
   /** Block ID */
@@ -52,7 +52,7 @@ export class BlockState {
     this.parent = null;
     this._nodesIndex = {};
     this.isDirty = true;
-    this.removed = false;
+    this.removed = true;
     this.onMetaUpdated = null;
     this.type = block.data.type;
     this.version = block.version;
@@ -125,6 +125,7 @@ export class BlockState {
    * 标记块重新挂载
    */
   public restore() {
+    if (!this.removed) return void 0;
     this.removed = false;
     this._updateMeta();
   }
@@ -139,7 +140,7 @@ export class BlockState {
 
   /**
    * 获取树结构子节点的数据 [DFS BlockState]
-   * - 当前树节点所有子节点, 含自身节点
+   * - 当前树节点所有子节点, 含自身节点(首个节点为当前节点)
    */
   public getTreeNodes(): BlockState[] {
     if (this._nodes) return this._nodes;
@@ -246,59 +247,5 @@ export class BlockState {
     }
     // ============ Callback ============
     this.onMetaUpdated && this.onMetaUpdated();
-  }
-
-  /**
-   * 应用数据变更
-   * @internal 仅编辑器内部使用
-   */
-  public _apply(ops: JSONOp[]) {
-    this.isDirty = true;
-    this.version++;
-    // 空路径情况应该由父级状态管理调度 Insert 处理
-    const changes = ops.filter(op => op && op.p.length);
-    json.apply(this.data, changes);
-    let isChildrenChanged = false;
-    const inserts: Set<string> = new Set();
-    const deletes: Set<string> = new Set();
-    for (const op of changes) {
-      // 若是 children 的新增变更, 则需要同步相关的 Block 状态
-      LI_OP: if (op.p[0] === "children" && isString(op.li)) {
-        isChildrenChanged = true;
-        const liBlock = this.state.getOrCreateBlock(op.li);
-        // 文本类型的节点仅需要处理本身
-        if (!liBlock.isBlockType()) {
-          liBlock.restore();
-          inserts.add(liBlock.id);
-          break LI_OP;
-        }
-        // 块级节点需要处理本身及其子树节点
-        const nodes = liBlock.getTreeNodes();
-        for (const child of nodes) {
-          child.restore();
-          inserts.add(child.id);
-        }
-      }
-      // 若是 children 的删除变更, 则需要同步相关的 Block 状态
-      LD_OP: if (op.p[0] === "children" && isString(op.ld)) {
-        isChildrenChanged = true;
-        const ldBlock = this.state.getOrCreateBlock(op.ld);
-        // 文本类型的节点仅需要处理本身的删除状态, 子节点需要选区状态来维护
-        if (!ldBlock.isBlockType()) {
-          ldBlock.remove();
-          deletes.add(ldBlock.id);
-          break LD_OP;
-        }
-        // 块级节点需要处理本身及其子树节点
-        const nodes = ldBlock.getTreeNodes();
-        for (const child of nodes) {
-          child.remove();
-          deletes.add(child.id);
-        }
-      }
-    }
-    isChildrenChanged && clearTreeCache(this);
-    this._updateMeta();
-    return { inserts, deletes };
   }
 }

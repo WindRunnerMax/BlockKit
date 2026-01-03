@@ -1,6 +1,6 @@
 import { isNil } from "@block-kit/utils";
 
-import type { BlockState } from "../modules/block-state";
+import type { BlockState } from "../modules/state";
 
 /**
  * 获取指定深度级的祖先节点

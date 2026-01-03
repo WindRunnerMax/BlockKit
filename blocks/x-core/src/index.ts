@@ -28,5 +28,5 @@ export { Range } from "./selection/modules/range";
 export { POINT_TYPE } from "./selection/utils/constant";
 export { toModelPoint, toModelRange } from "./selection/utils/model";
 export { normalizeModelRange } from "./selection/utils/normalize";
-export { BlockState } from "./state/modules/block-state";
+export { BlockState } from "./state/modules/state";
 export { EDITOR_STATE } from "./state/types";

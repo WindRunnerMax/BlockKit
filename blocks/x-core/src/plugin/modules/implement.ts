@@ -1,7 +1,7 @@
 import type { P } from "@block-kit/utils/dist/es/types";
 
 import type { BlockEditor } from "../../editor";
-import type { BlockState } from "../../state/modules/block-state";
+import type { BlockState } from "../../state/modules/state";
 import type { BlockContext, BlockWrapContext, TextWrapContext } from "../types/context";
 
 export abstract class CorePlugin {

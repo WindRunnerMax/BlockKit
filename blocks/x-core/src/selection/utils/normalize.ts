@@ -1,5 +1,5 @@
 import type { BlockEditor } from "../../editor";
-import type { BlockState } from "../../state/modules/block-state";
+import type { BlockState } from "../../state/modules/state";
 import { getLCAWithChildren } from "../../state/utils/tree";
 import { Entry } from "../modules/entry";
 import type { RangeEntry, RangePoint } from "../types";

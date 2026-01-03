@@ -1,6 +1,6 @@
 import type { Editor } from "@block-kit/core";
 
-import type { BlockState } from "../state/modules/block-state";
+import type { BlockState } from "../state/modules/state";
 
 export class Model {
   /** DOM To State */

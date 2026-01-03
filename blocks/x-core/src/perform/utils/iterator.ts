@@ -4,7 +4,7 @@ import { isTextDeltaOp } from "@block-kit/x-json";
 import type { BlockEditor } from "../../editor";
 import type { Range } from "../../selection/modules/range";
 import type { RangeEntry } from "../../selection/types";
-import type { BlockState } from "../../state/modules/block-state";
+import type { BlockState } from "../../state/modules/state";
 import type { BatchApplyChange } from "../../state/types";
 
 /**
