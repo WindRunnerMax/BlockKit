@@ -2,7 +2,6 @@ import "../styles/index.scss";
 
 import type { ReactBlockWrapContext } from "@block-kit/x-react";
 import type { FC } from "react";
-import { useEffect, useState } from "react";
 
 export const BulletText: FC<{
   context: ReactBlockWrapContext;
@@ -10,18 +9,7 @@ export const BulletText: FC<{
 }> = props => {
   const context = props.context;
   const state = context.state;
-  const [linear, setLinear] = useState(state.linear);
-  const dot = ["●", "◯", "■"][(linear - 1) % 3];
-
-  useEffect(() => {
-    const onMetaUpdated = () => {
-      setLinear(state.linear);
-    };
-    state.onMetaUpdated = onMetaUpdated;
-    return () => {
-      state.onMetaUpdated = null;
-    };
-  }, [state]);
+  const dot = ["●", "◯", "■"][(state.linear - 1) % 3];
 
   return (
     <div className="block-kit-x-bullet">

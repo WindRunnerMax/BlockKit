@@ -1,3 +1,4 @@
+import { Delta } from "@block-kit/delta";
 import type { Blocks } from "@block-kit/x-json";
 
 import { BlockEditor } from "../../src/editor";
@@ -52,5 +53,41 @@ describe("state mutate", () => {
     // 因此, 这里的文本节点仍然存在, 在真正删除的情况下应该是挂在起始的父节点上
     expect(newBlocks.grandchild1).toBeTruthy();
     expect(editor.state.blocks.child2.index).toBe(0);
+  });
+
+  it("children reference keep", () => {
+    const editor = new BlockEditor({ initial: getBlocks() });
+    const atom = editor.perform.atom;
+    const change = atom.updateText("child1", new Delta().insert("hello"));
+    const children1 = editor.state.blocks.child1.data.children;
+    editor.state.apply([change]);
+    expect(editor.state.blocks.child1.data.children).toBe(children1);
+  });
+
+  it("children reference change", () => {
+    const editor = new BlockEditor({ initial: getBlocks() });
+    const atom = editor.perform.atom;
+    const change = atom.remove("root", 0);
+    const children1 = editor.state.blocks.root.data.children;
+    editor.state.apply([change]);
+    expect(editor.state.blocks.root.data.children).not.toBe(children1);
+  });
+
+  it("text delta reference keep", () => {
+    const editor = new BlockEditor({ initial: getBlocks() });
+    const atom = editor.perform.atom;
+    const change = atom.remove("root", 0);
+    const delta1 = editor.state.blocks.root.data.delta;
+    editor.state.apply([change]);
+    expect(editor.state.blocks.root.data.delta).toBe(delta1);
+  });
+
+  it("text delta reference change", () => {
+    const editor = new BlockEditor({ initial: getBlocks() });
+    const atom = editor.perform.atom;
+    const change = atom.updateText("child1", new Delta().insert("hello"));
+    const delta1 = editor.state.blocks.child1.data.delta;
+    editor.state.apply([change]);
+    expect(editor.state.blocks.child1.data.delta).not.toBe(delta1);
   });
 });

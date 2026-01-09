@@ -1,4 +1,4 @@
-import { isString, List } from "@block-kit/utils";
+import { isString } from "@block-kit/utils";
 import type { Block, BlocksChange, JSONOp } from "@block-kit/x-json";
 import { json } from "@block-kit/x-json";
 
@@ -29,39 +29,10 @@ export class Mutate {
   }
 
   /**
-   * 应用数据变更到指定 Block
-   * @param block 目标 Block 状态
-   * @param ops 变更操作
-   */
-  protected applyToBlock(block: BlockState, ops: JSONOp[]) {
-    block.isDirty = true;
-    block.version++;
-    // 空路径情况应该由父级状态管理调度 Insert 处理
-    const changes = ops.filter(op => op && op.p.length);
-    json.apply(block.data, changes);
-    const inserts: Set<string> = new Set();
-    const deletes: Set<string> = new Set();
-    for (const op of changes) {
-      // 若是 children 的新增变更, 则需要同步相关的 Block 状态
-      if (op.p[0] === "children" && isString(op.li)) {
-        inserts.add(op.li);
-      }
-      // 若是 children 的删除变更, 则需要同步相关的 Block 状态
-      if (op.p[0] === "children" && isString(op.ld)) {
-        deletes.add(op.ld);
-      }
-    }
-    if (inserts.size || deletes.size) {
-      clearTreeCache(block);
-    }
-    return { inserts, deletes };
-  }
-
-  /**
    * 应用编辑器更新
    * @param changes
    */
-  public apply(changes: BlocksChange) {
+  public compose(changes: BlocksChange) {
     // 优先处理新建的 Block 节点操作变更
     for (const [blockId, ops] of Object.entries(changes)) {
       const block = this.state.getBlock(blockId);
@@ -75,7 +46,6 @@ export class Mutate {
           data: insert.oi as unknown as Block["data"],
         };
         const newBlockState = new BlockState(data, this.state);
-        newBlockState.restore();
         this.state.blocks[blockId] = newBlockState;
       }
     }
@@ -84,30 +54,82 @@ export class Mutate {
       const block = this.state.getBlock(blockId);
       if (!block) continue;
       this.updates.add(blockId);
-      const result = this.applyToBlock(block, ops);
-      this.inserts = List.union(this.inserts, result.inserts);
-      this.deletes = List.union(this.deletes, result.deletes);
+      this.applyToBlock(block, ops);
     }
-    // 变更的状态更新需要统一处理, 否则会因为树形副作用导致计算差异
+    // 统一更新变更的 Block 元信息
+    this.updateBlockMeta();
+    // 如果节点同时被删除和插入, 则认为是更新操作, 需要恢复节点挂载状态
+    // 否则可能会造成移动的情况下, 节点被认为是删除的情况(顺序问题)
+    // 虽然存在误判的可能, 但通常应该不会出现刚创建就删除的批量执行场景
+    for (const id of this.inserts) {
+      if (!this.deletes.has(id)) continue;
+      this.inserts.delete(id);
+      this.deletes.delete(id);
+      this.updates.add(id);
+      const state = this.state.getBlock(id);
+      state && state.restore();
+    }
+  }
+
+  /**
+   * 应用数据变更到指定 Block
+   * @param block 目标 Block 状态
+   * @param ops 变更操作
+   */
+  protected applyToBlock(block: BlockState, ops: JSONOp[]) {
+    block.isDirty = true;
+    block.version++;
+    // 空路径情况应该由父级状态管理调度 Insert 处理
+    const changes = ops.filter(op => op && op.p.length);
+    json.apply(block.data, changes);
+    let isNestedNodeStateChanged = false;
+    for (const op of changes) {
+      // 若是 children 的新增变更, 则需要同步相关的 Block 状态
+      if (op.p[0] === "children" && isString(op.li)) {
+        this.inserts.add(op.li);
+        isNestedNodeStateChanged = true;
+      }
+      // 若是 children 的删除变更, 则需要同步相关的 Block 状态
+      if (op.p[0] === "children" && isString(op.ld)) {
+        this.deletes.add(op.ld);
+        isNestedNodeStateChanged = true;
+      }
+    }
+    // 存在嵌套子节点的变更情况, 需要处理相关的 Block 状态
+    if (isNestedNodeStateChanged) {
+      // 清空树结构缓存, 触发重新计算
+      clearTreeCache(block);
+      // 浅拷贝 children 数组, 变更其引用
+      block.data.children = block.data.children.slice();
+    }
+  }
+
+  /**
+   * 统一更新 Block 元信息
+   * - 变更的状态更新需要统一处理, 否则会因为树形副作用导致计算差异
+   */
+  protected updateBlockMeta() {
     /** 已经更新过 Meta 的节点 */
     const updatedMeta = new Set<string>();
     // 处理更新节点的情况
     for (const id of this.updates) {
-      const block = this.state.getBlock(id);
-      block && !updatedMeta.has(id) && block._updateMeta();
+      if (this.inserts.has(id)) continue;
       updatedMeta.add(id);
+      const block = this.state.getBlock(id);
+      block && block._updateMeta();
     }
     // 处理删除节点的情况
     for (const id of this.deletes) {
       const ldBlock = this.state.getOrCreateBlock(id);
       const isBlockType = ldBlock.isBlockType();
       const nodes = ldBlock.getTreeNodes();
-      // 文本类型的节点仅需要处理本身
       ldBlock.remove();
+      // 文本节点仅需要处理本身
+      if (!isBlockType) continue;
+      // 块级节点需要处理本身及其子树节点
       for (let i = 1; i < nodes.length; i++) {
         const child = nodes[i];
-        // 块级节点需要处理本身及其子树节点
-        isBlockType && child.remove();
+        child && child.remove();
       }
     }
     // 处理新增节点的情况
@@ -115,7 +137,6 @@ export class Mutate {
       const liBlock = this.state.getOrCreateBlock(id);
       const nodes = liBlock.getTreeNodes();
       const isBlockType = liBlock.isBlockType();
-      // 文本类型的节点仅需要处理本身
       liBlock.restore();
       updatedMeta.add(id);
       for (let i = 1; i < nodes.length; i++) {
@@ -128,24 +149,7 @@ export class Mutate {
         } else {
           child.restore();
         }
-        updatedMeta.add(child.id);
       }
     }
-    // 如果节点同时被删除和插入, 则认为是更新操作, 需要恢复节点挂载状态
-    // 否则可能会造成移动的情况下, 节点被认为是删除的情况(顺序问题)
-    // 虽然存在误判的可能, 但通常应该不会出现刚创建就删除的批量执行场景
-    for (const id of this.inserts) {
-      if (!this.deletes.has(id)) continue;
-      this.inserts.delete(id);
-      this.deletes.delete(id);
-      this.updates.add(id);
-      const state = this.state.getBlock(id);
-      state && state.restore();
-    }
-    return {
-      inserts: this.inserts,
-      updates: this.updates,
-      deletes: this.deletes,
-    };
   }
 }

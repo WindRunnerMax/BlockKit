@@ -1,8 +1,6 @@
 import { cs, SPACE } from "@block-kit/utils";
 import { useForceUpdate, useIsMounted, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { Listener } from "@block-kit/x-core";
-import type { BlockEditor } from "@block-kit/x-core";
-import type { BlockState } from "@block-kit/x-core";
 import { EDITOR_EVENT, PLUGIN_FUNC, STATE_TO_RENDER } from "@block-kit/x-core";
 import type { FC } from "react";
 import React, { createElement, Fragment, useLayoutEffect, useMemo, useRef } from "react";
@@ -14,14 +12,10 @@ import type {
   ReactBlockWrapContext,
   ReactTextWrapContext,
 } from "../plugin/types";
+import type { BlockViewProps } from "../utils/block-state";
+import { blockPropsAreEqual } from "../utils/block-state";
 import { BLOCK_CH_CLASS } from "../utils/constant";
 import { BlockXWrapModel } from "./block-wrap";
-
-export type BlockViewProps = {
-  editor: BlockEditor;
-  state: BlockState;
-  childClsName?: string;
-};
 
 const BlockXView: FC<BlockViewProps> = props => {
   const { editor, state } = props;
@@ -76,7 +70,7 @@ const BlockXView: FC<BlockViewProps> = props => {
     }
     return wrapContext.children;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.version, editor, state]);
+  }, [state.data.delta, editor, state]);
 
   /**
    * 处理块级子节点块结构
@@ -124,7 +118,7 @@ const BlockXView: FC<BlockViewProps> = props => {
       );
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.version, editor, state]);
+  }, [state.data.children, editor, state]);
 
   return (
     <Fragment>
@@ -140,4 +134,4 @@ const BlockXView: FC<BlockViewProps> = props => {
 };
 
 /** Block Model */
-export const BlockXModel = React.memo(BlockXView);
+export const BlockXModel = React.memo(BlockXView, blockPropsAreEqual);

@@ -1,6 +1,5 @@
 import { getOpLength } from "@block-kit/delta";
 import { isUndef } from "@block-kit/utils";
-import type { F } from "@block-kit/utils/dist/es/types";
 import type { Block, BlockDataField } from "@block-kit/x-json";
 import { cloneSnapshot } from "@block-kit/x-json";
 
@@ -11,10 +10,10 @@ import { getNextSiblingNode, getPrevSiblingNode } from "../utils/tree";
 export class BlockState {
   /** Block ID */
   public readonly id: string;
-  /** Block 类型 */
-  public readonly type: string;
   /** Block 可变数据 */
   public readonly data: BlockDataField;
+  /** Block 类型 */
+  public type: string;
   /** Block 版本 */
   public version: number;
   /** 标记是否删除 */
@@ -33,8 +32,6 @@ export class BlockState {
   public parent: BlockState | null;
   /** 子节点 */
   public children: BlockState[];
-  /** 状态 Meta 更新回调 */
-  public onMetaUpdated: F.Plain | null;
   /** @internal 子树节点 */
   public _nodes: BlockState[] | null;
   /** @internal 子树节点索引映射 */
@@ -50,10 +47,9 @@ export class BlockState {
     this.children = [];
     this.id = block.id;
     this.parent = null;
-    this._nodesIndex = {};
     this.isDirty = true;
     this.removed = true;
-    this.onMetaUpdated = null;
+    this._nodesIndex = {};
     this.type = block.data.type;
     this.version = block.version;
     this.data = { ...block.data };
@@ -196,6 +192,7 @@ export class BlockState {
     // 更新子节点 index, 直接根据父节点的子节点重新计算
     // 注意这是更新该节点的子节点索引值, 而不是更新本身的索引值
     {
+      this.type = this.data.type;
       const parent = this.state.getBlock(this.data.parent);
       this.parent = parent || null;
       const len = this.data.children.length;
@@ -215,21 +212,21 @@ export class BlockState {
     {
       let depth = 0;
       let linear = 0;
-      let hasBlockType = false;
+      let prevent = false;
       const visited = new Set<BlockState>();
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       let current: BlockState | null = this;
       while (current) {
-        if (!current.parent || visited.has(current)) {
+        // 从数据中取父节点, 避免元数据更新时节点树结构状态未更新问题
+        const parent = this.state.getBlock(current.data.parent);
+        if (!parent || visited.has(current)) {
           break;
         }
         visited.add(current);
         depth++;
-        if (current.isBlockType()) {
-          hasBlockType = true;
-        }
-        !hasBlockType && linear++;
-        current = current.parent;
+        if (current.isBlockType()) prevent = true;
+        !prevent && linear++;
+        current = parent;
       }
       this.depth = depth;
       this.linear = linear;
@@ -245,7 +242,5 @@ export class BlockState {
         this.length = len;
       }
     }
-    // ============ Callback ============
-    this.onMetaUpdated && this.onMetaUpdated();
   }
 }

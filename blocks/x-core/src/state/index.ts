@@ -171,7 +171,7 @@ export class EditorState {
     });
 
     const mutate = new Mutate(this);
-    const { inserts, updates, deletes } = mutate.apply(normalized);
+    mutate.compose(normalized);
 
     const id = getId(6);
     const current = this.toBlockSet();
@@ -182,9 +182,9 @@ export class EditorState {
       current: current,
       source: source,
       changes: normalized,
-      inserts: inserts,
-      updates: updates,
-      deletes: deletes,
+      inserts: mutate.inserts,
+      updates: mutate.updates,
+      deletes: mutate.deletes,
       extra: options.extra,
     };
 

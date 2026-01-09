@@ -68,4 +68,4 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
 };
 
 /** Wrap Block Model */
-export const BlockXWrapModel = BlockXWrapView;
+export const BlockXWrapModel = React.memo(BlockXWrapView);
