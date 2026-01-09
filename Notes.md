@@ -1595,7 +1595,14 @@ ReactDOM.render(<App />, document.getElementById("root"));
 </div>
 ```
 
-那么除了通过零宽字符或者`<br>`标签来放置光标外，自然也可以通过自绘选区来实现，因为此时不再需要`ContentEditable`属性，那么自然就不会存在这些奇怪的行为。因此如果借助原生的选区实现，然后在此基础上实现控制器层，就可以实现完全受控的编辑器。
+那么除了通过零宽字符或者`<br>`标签来放置光标外，自然也可以通过自绘选区来实现，因为此时不再需要`ContentEditable`属性，那么自然就不会存在这些奇怪的行为。因此如果借助原生的选区实现，然后在此基础上实现控制器层，就可以实现完全受控的编辑器，可以用下面的代码观察选区。
+
+```js
+document.onselectionchange = () => {
+  const sel = document.getSelection();
+  console.table(">", sel.anchorNode, sel.anchorOffset, sel.focusNode, sel.focusOffset);
+};
+```
 
 但是这里存在一个很大的问题，就是内容的输入，因为不启用`ContentEditable`的话是无法出现光标的，自然也无法输入内容。而如果我们想唤醒内容输入，特别是需要唤醒`IME`输入法的话，浏览器给予的常规`API`就是借助`<input>`来完成，因此我们就必须要实现隐藏的`<input>`来实现输入，实际上很多代码编辑器例如 [CodeMirror](https://github.com/codemirror/codemirror5) 就是类似实现。
 
