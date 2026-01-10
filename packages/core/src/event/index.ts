@@ -1,15 +1,14 @@
 import { EventBus } from "@block-kit/utils";
 
 import type { Editor } from "../editor";
-import type { EventMap } from "./bus";
-import type { EventMapExtension } from "./bus/types";
+import type { InternalEvent } from "./bus";
 import { NativeEvent } from "./native";
 
 export class Event {
   /** 原生事件绑定 */
   protected nativeEvent: NativeEvent;
   /** 事件总线 */
-  protected bus: EventBus<EventMap & EventMapExtension>;
+  protected bus: EventBus<InternalEvent>;
 
   /**
    * 构造函数

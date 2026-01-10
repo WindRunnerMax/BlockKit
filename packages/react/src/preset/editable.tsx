@@ -1,5 +1,6 @@
 import { EDITOR_KEY, Point, Range } from "@block-kit/core";
 import { cs } from "@block-kit/utils";
+import { useUpdateEffect } from "@block-kit/utils/dist/es/hooks";
 import React, { useEffect, useLayoutEffect, useRef } from "react";
 
 import { useEditorStatic } from "../hooks/use-editor";
@@ -42,6 +43,11 @@ export const Editable: React.FC<{
       !preventDestroy && editor.destroy();
     };
   }, [editor, preventDestroy]);
+
+  useUpdateEffect(() => {
+    // 需要保证 editor 实例稳定, 重渲染并不会触发 ref 执行, 导致 DOM 映射关系失效
+    editor.logger.warning("Confirm the uniqueness of the editor instance.", editor);
+  }, [editor]);
 
   useEffect(() => {
     // COMPAT: 这里有个奇怪的表现

@@ -117,13 +117,13 @@ export const EditableX: React.FC<{
         overflowWrap: "break-word",
       }}
     >
-      <PaintEffectModel editor={editor} index={index} />
       <Placeholder state={root} editor={editor} placeholder={props.placeholder} />
       <LayoutEffectContext.Provider value={onTreeBlockLayoutEffect}>
         <BlockXWrapModel editor={editor} state={root}>
           <BlockXModel editor={editor} state={root}></BlockXModel>
         </BlockXWrapModel>
       </LayoutEffectContext.Provider>
+      <PaintEffectModel editor={editor} index={index} />
     </div>
   );
 };

@@ -17,8 +17,15 @@ export type { CMDFunc, CMDPayload } from "./command/types";
 export { Editor } from "./editor";
 export type { EditorOptions } from "./editor/types";
 export { Event } from "./event";
-export type { ContentChangeEvent, SelectionChangeEvent } from "./event/bus/";
-export type { EventMapKeys } from "./event/bus/";
+export type {
+  ContentChangeEvent,
+  EditorEvent,
+  EditorEventArgs,
+  EventMap,
+  EventMapKeys,
+  InternalEvent,
+  SelectionChangeEvent,
+} from "./event/bus/";
 export { EDITOR_EVENT } from "./event/bus/";
 export { History } from "./history";
 export { Input } from "./input";

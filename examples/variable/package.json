@@ -1,6 +1,6 @@
 {
   "name": "@block-kit/variable",
-  "version": "1.0.18",
+  "version": "1.0.20",
   "description": "",
   "main": "./dist/lib/index.js",
   "types": "./dist/es/index.d.ts",

@@ -4,6 +4,7 @@
 set -e # -x
 dir=$(pwd)
 bash_args="$@"
+prefix="@block-kit"
 # npm version patch --no-git-tag-version
 version=$(echo "console.log(require(\"../../package.json\").version)" | node)
 vars_version=$(echo "console.log(require(\"./package.json\").version)" | node)
@@ -41,7 +42,7 @@ echo "const fs = require('fs');
   const json = require('./package.json');
   const dep = json.dependencies || {};
   for(const [key, value] of Object.entries(dep)) {
-    if(key.startsWith('$prefix')) dep[key] = '$version';
+    if(key.startsWith('$prefix')) dep[key] = '^$version';
   }
   fs.writeFileSync('./package.json', JSON.stringify(json, null, 2));
 " | node

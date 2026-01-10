@@ -39,5 +39,6 @@ const PaintEffectView: FC<{ editor: Editor; lines: LineState[] }> = props => {
  * - 父组件渲染会引发子组件渲染问题, memo 并未严格控制对比, 例如 ph 变更会导致重渲染
  * - 避免 memo 的渲染穿透问题, 参考 packages/react/test/render/effect.test.tsx
  * - 同样也可以直接将依赖即 [lines] 作为以来放置于 effect 中, 但抽离出独立组件能够更清晰
+ * - 不过其实抽离出 Hook 更清晰, 组件实现方式需要保证组件渲染顺序, 否则会导致选区刷新问题
  */
 export const PaintEffectModel = React.memo(PaintEffectView);

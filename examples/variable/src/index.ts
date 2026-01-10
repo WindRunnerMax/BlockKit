@@ -13,9 +13,45 @@ export {
   VARS_VALUE_KEY,
 } from "./utils/constant";
 export type { EditablePluginOptions } from "./utils/types";
-export type { EditorSchema } from "@block-kit/core";
-export { Editor, EDITOR_EVENT, LOG_LEVEL } from "@block-kit/core";
-export { Delta } from "@block-kit/delta";
-export { Isolate } from "@block-kit/react";
-export { BlockKit, Editable, EditorPlugin, useEditorStatic, useReadonly } from "@block-kit/react";
-export { cs, preventNativeEvent } from "@block-kit/utils";
+export type { EditorSchema, LeafState } from "@block-kit/core";
+export {
+  Editor,
+  EDITOR_EVENT,
+  isArrowDown,
+  isArrowLeft,
+  isArrowRight,
+  isArrowUp,
+  LEAF_KEY,
+  LEAF_STRING,
+  LOG_LEVEL,
+  Point,
+  Range,
+  ZERO_SPACE_KEY,
+} from "@block-kit/core";
+export type { AttributeMap, Op } from "@block-kit/delta";
+export { Delta, OP_TYPES, OpIterator } from "@block-kit/delta";
+export type { ReactLeafContext, ReactLineContext } from "@block-kit/react";
+export {
+  BlockKit,
+  Editable,
+  EditorPlugin,
+  Embed,
+  Isolate,
+  MountNode,
+  preventReactEvent,
+  useEditorStatic,
+  useReadonly,
+  Void,
+} from "@block-kit/react";
+export {
+  Bind,
+  cs,
+  isDOMElement,
+  isDOMText,
+  isKeyCode,
+  isNil,
+  KEY_CODE,
+  NOOP,
+  preventNativeEvent,
+  TEXT_PLAIN,
+} from "@block-kit/utils";

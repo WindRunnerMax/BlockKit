@@ -7,6 +7,7 @@ import type { Range } from "../../selection/modules/range";
 import type { ApplyOptions } from "../../state/types";
 import type { NativeEventMap } from "../native/types";
 import { NATIVE_EVENTS } from "../native/types";
+import type { EventMapExtension } from "./types";
 
 export const EDITOR_EVENT = {
   PAINT: "PAINT",
@@ -50,4 +51,5 @@ export type EventMapType = typeof EDITOR_EVENT;
 export type EventMapKeys = O.Values<EventMapType>;
 export type EditorEvent = Reflex.Tuple<EventMap>;
 export type EditorEventArgs = Reflex.Array<EventMap>;
+export type InternalEvent = EventMap & EventMapExtension;
 export type AssertEventMap<T extends EventMapKeys> = EventMap[T];

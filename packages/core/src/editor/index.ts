@@ -60,7 +60,7 @@ export class Editor {
   public constructor(options: EditorOptions = {}) {
     const {
       delta = new Delta(BLOCK_LIKE),
-      logLevel = LOG_LEVEL.ERROR,
+      logLevel = LOG_LEVEL.WARNING,
       schema = {},
       modules = {},
     } = options;
