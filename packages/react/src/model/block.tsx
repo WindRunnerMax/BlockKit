@@ -2,12 +2,11 @@ import type { BlockState, Editor } from "@block-kit/core";
 import { BLOCK_ID_KEY, BLOCK_KEY, EDITOR_EVENT, EDITOR_STATE } from "@block-kit/core";
 import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { FC } from "react";
-import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { withWrapLineNodes } from "../plugin/modules/wrap";
 import { rewriteRemoveChild } from "../utils/dirty-dom";
 import { JSX_TO_STATE } from "../utils/weak-map";
-import { PaintEffectModel } from "./effect";
 import { LineModel } from "./line";
 import { Placeholder } from "./ph";
 
@@ -58,6 +57,31 @@ const BlockView: FC<{
   }, [editor.event, onContentChange]);
 
   /**
+   * 视图更新需要重新设置选区, 依赖于行状态变更
+   */
+  useLayoutEffect(() => {
+    const selection = editor.selection.get();
+    // 同步计算完成后更新浏览器选区, 等待 Paint
+    if (editor.state.isFocused() && selection) {
+      editor.logger.debug("UpdateDOMSelection");
+      editor.selection.updateDOMSelection(true);
+    }
+  }, [editor, lines]);
+
+  /**
+   * 视图更新需要触发视图绘制完成事件, 依赖于行状态变更
+   */
+  useEffect(() => {
+    // state  -> parent -> node -> child ->|
+    // effect <- parent <- node <- child <-|
+    editor.logger.debug("OnPaint");
+    editor.state.set(EDITOR_STATE.PAINTING, false);
+    Promise.resolve().then(() => {
+      editor.event.trigger(EDITOR_EVENT.PAINT, {});
+    });
+  }, [editor, lines]);
+
+  /**
    * 处理行节点
    */
   const elements = useMemo(() => {
@@ -89,7 +113,6 @@ const BlockView: FC<{
     <div {...{ [BLOCK_KEY]: true, [BLOCK_ID_KEY]: state.key }} ref={setModel}>
       <Placeholder editor={editor} lines={lines} placeholder={props.placeholder} />
       {children}
-      <PaintEffectModel editor={editor} lines={lines} />
     </div>
   );
 };

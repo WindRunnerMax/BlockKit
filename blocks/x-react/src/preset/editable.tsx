@@ -1,17 +1,16 @@
 import "../styles/editable.scss";
 
 import { EDITOR_EVENT, EDITOR_KEY } from "@block-kit/core";
-import { cs } from "@block-kit/utils";
+import { cs, ROOT_BLOCK } from "@block-kit/utils";
 import { useForceUpdate, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { Listener } from "@block-kit/x-core";
 import { EDITOR_STATE, X_SELECTION_KEY } from "@block-kit/x-core";
 import type { ReactNode } from "react";
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 
 import { useEditorStatic } from "../hooks/use-editor";
 import { LayoutEffectContext } from "../hooks/use-layout-context";
 import { useReadonly } from "../hooks/use-readonly";
-import { PaintEffectModel } from "../model/effect";
 import { Placeholder } from "../model/ph";
 import { BlockXModel } from "./block";
 import { BlockXWrapModel } from "./block-wrap";
@@ -96,6 +95,31 @@ export const EditableX: React.FC<{
     };
   }, [editor, preventDestroy]);
 
+  /**
+   * 视图更新需要重新设置选区 依赖渲染序列
+   */
+  useLayoutEffect(() => {
+    const selection = editor.selection.get();
+    // 同步计算完成后更新浏览器选区, 等待 Paint
+    if (editor.state.isFocused() && selection) {
+      editor.logger.debug("UpdateDOMSelection");
+      editor.selection.updateDOMSelection(true);
+    }
+  }, [editor, index]);
+
+  /**
+   * 视图更新需要触发视图绘制完成事件 依赖渲染序列
+   */
+  useEffect(() => {
+    // state  -> parent -> node -> child ->|
+    // effect <- parent <- node <- child <-|
+    editor.logger.debug("OnPaint");
+    editor.state.set(EDITOR_STATE.PAINTING, false);
+    Promise.resolve().then(() => {
+      editor.event.trigger(EDITOR_EVENT.PAINT, { id: ROOT_BLOCK });
+    });
+  }, [editor, index]);
+
   if (!root) {
     editor.logger.error("Missing Root Block");
     return null;
@@ -123,7 +147,6 @@ export const EditableX: React.FC<{
           <BlockXModel editor={editor} state={root}></BlockXModel>
         </BlockXWrapModel>
       </LayoutEffectContext.Provider>
-      <PaintEffectModel editor={editor} index={index} />
     </div>
   );
 };

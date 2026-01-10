@@ -9,6 +9,11 @@ import { act } from "react-dom/test-utils";
 
 import { BlockKit, Editable } from "../../src";
 
+// UpdateDOMSelection/OnPaint
+// 父组件渲染会引发子组件渲染问题, memo 并未严格控制对比, 例如 ph 变更会导致重渲染
+// 避免 memo 的渲染穿透问题, 参考 packages/react/test/render/effect.test.tsx
+// 相关事件节点将依赖即 [lines] 作为以来放置于 effect 中, 能够避免父组件的重渲染问题
+// 此外独立出 Hook 更合理, 独立组件实现方式需要保证组件渲染顺序, 否则会导致选区刷新问题
 describe("render effect", () => {
   it("paint effect render placeholder penetrate memo", async () => {
     const delta = new Delta().insertEOL();
@@ -29,6 +34,29 @@ describe("render effect", () => {
     await act(() => {
       forceUpdate();
       editor.event.on("PAINT", spy);
+      return sleep(20) as P.Any;
+    });
+    expect(spy).toBeCalledTimes(0);
+  });
+
+  it("paint effect render placeholder composing state", async () => {
+    const delta = new Delta().insertEOL();
+    const editor = new Editor({ delta });
+    const App = () => {
+      return (
+        <BlockKit editor={editor}>
+          <Editable placeholder={<div></div>}></Editable>
+        </BlockKit>
+      );
+    };
+    render(<App />);
+    const spy = jest.fn();
+    await sleep(20);
+    await act(() => {
+      editor.event.on("PAINT", spy);
+      // Placeholder 作为子组件重新渲染, 不会触发父节点的 PAINT(effect) 事件
+      editor.event.trigger("compositionstart", new Event("compositionstart") as CompositionEvent);
+      editor.event.trigger("compositionend", new Event("compositionend") as CompositionEvent);
       return sleep(20) as P.Any;
     });
     expect(spy).toBeCalledTimes(0);

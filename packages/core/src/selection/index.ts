@@ -239,7 +239,7 @@ export class Selection {
       newFocus = new Point(nextLine.index, 0);
     }
     // 右键且在嵌入节点时 将光标放在嵌入节点后
-    if (rightArrow && sel && sel.isCollapsed) {
+    if (rightArrow && sel && sel.isCollapsed && !newFocus) {
       const leaf = this.editor.lookup.getLeafAtPoint(focus);
       const nextLeaf = leaf && leaf.next();
       // 右侧节点是 Embed 节点时, 需要右移光标位置

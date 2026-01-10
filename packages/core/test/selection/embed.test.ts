@@ -110,4 +110,28 @@ describe("selection embed", () => {
     document.dispatchEvent(new Event("selectionchange"));
     expect(editor1.selection.get()).toEqual(Range.fromTuple([0, 1], [0, 1]));
   });
+
+  it("embed selection end right arrow", () => {
+    const delta1 = new Delta({
+      ops: [
+        { insert: "text" },
+        { insert: " ", attributes: { mention: " ", text: "789" } },
+        { insert: "\n" },
+        { insert: "text" },
+        { insert: "\n" },
+      ],
+    });
+    const editor1 = new Editor({
+      delta: delta1,
+      schema: { mention: { inline: true, void: true } },
+    });
+    editor1.state.set("FOCUS", true);
+    mountEditorViewModel(editor1);
+    editor1.selection.set(Range.fromTuple([0, 5], [0, 5]), true);
+    const container = editor1.getContainer();
+    const event = new KeyboardEvent("keydown", { keyCode: KEY_CODE.RIGHT });
+    container.dispatchEvent(event);
+    document.dispatchEvent(new Event("selectionchange"));
+    expect(editor1.selection.get()).toEqual(Range.fromTuple([1, 0], [1, 0]));
+  });
 });
