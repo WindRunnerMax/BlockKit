@@ -114,6 +114,9 @@ export class BlockState {
    */
   public forceRender() {
     const update = STATE_TO_RENDER.get(this);
+    if (!update) {
+      this.state.editor.logger.info(`Cannot Force Render Block ${this.id}`);
+    }
     update && update();
   }
 

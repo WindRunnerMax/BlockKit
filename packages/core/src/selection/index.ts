@@ -157,8 +157,8 @@ export class Selection {
     }
     const sel = toDOMRange(this.editor, range);
     if (!sel || !sel.startContainer || !sel.endContainer) {
+      // 选区 DOM 范围无效, 理论上应该移除选区, 但为了易用性则不做处理
       this.editor.logger.warning("Invalid DOM Range", sel, range);
-      selection.removeAllRanges();
       return false;
     }
     const currentStaticSel = getStaticSelection(selection);

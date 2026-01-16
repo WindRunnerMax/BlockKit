@@ -9,9 +9,9 @@ import { act } from "react-dom/test-utils";
 
 import { BlockKit, Editable } from "../../src";
 
-// UpdateDOMSelection/OnPaint
+// UpdateDOMSelection/OnPaint [假设 ph 的状态管理在父组件上]
 // 父组件渲染会引发子组件渲染问题, memo 并未严格控制对比, 例如 ph 变更会导致重渲染
-// 避免 memo 的渲染穿透问题, 参考 packages/react/test/render/effect.test.tsx
+// 没有严格控制对比, 而 ph 组件每次更新都是会创建新对象, 需要避免 memo 的渲染穿透问题
 // 相关事件节点将依赖即 [lines] 作为以来放置于 effect 中, 能够避免父组件的重渲染问题
 // 此外独立出 Hook 更合理, 独立组件实现方式需要保证组件渲染顺序, 否则会导致选区刷新问题
 describe("render effect", () => {

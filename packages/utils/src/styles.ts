@@ -8,8 +8,7 @@ import type { Primitive } from "./types";
 export class Facade {
   /**
    * 转换为像素值
-   * @param {string | number | Primitive.Nil} value
-   * @returns {string | null}
+   * @param value
    */
   public static pixelate(value: Primitive.Nil): null;
   public static pixelate(value: string | number): string;
@@ -21,8 +20,7 @@ export class Facade {
 
   /**
    * 转换为数字值
-   * @param {string | number | Primitive.Nil} value
-   * @returns {number | null}
+   * @param value
    */
   public static digitize(value: string | number | Primitive.Nil): number | null {
     if (!value) return null;
@@ -43,9 +41,8 @@ export class Facade {
 
   /**
    * 设置样式到 DOM
-   * @param {HTMLElement} dom
-   * @param {Record<T, CSSStyleDeclaration[T]>} styles
-   * @returns {void}
+   * @param dom
+   * @param styles
    */
   public static setToDOM<T extends keyof CSSStyleDeclaration>(
     dom: HTMLElement,
@@ -58,8 +55,7 @@ export class Facade {
 
   /**
    * 组合计算 class-name plain
-   * @param {Array<unknown>} values
-   * @returns {string}
+   * @param values
    */
   public static classes(...values: Array<unknown>): string {
     return values.filter(r => isString(r)).join(SPACE);
@@ -67,8 +63,7 @@ export class Facade {
 
   /**
    * 组合计算 class-name complex
-   * @param {Array<unknown>} values
-   * @returns {string}
+   * @param values
    */
   public static cx(...values: Array<unknown>): string {
     const res: string[] = [];
@@ -91,10 +86,9 @@ export class Facade {
 
   /**
    * 为 DOM 创建动画效果
-   * @param {Element | Primitive.Nil} dom
-   * @param {Keyframe[] | PropertyIndexedKeyframes} keyframes
-   * @param {number | KeyframeAnimationOptions} options
-   * @returns {Primitive.Nil | Animation}
+   * @param dom
+   * @param keyframes
+   * @param options
    */
   public static animation(
     dom: Element | Primitive.Nil,
@@ -107,14 +101,14 @@ export class Facade {
 
 /**
  * 组合计算 class-name plain
- * @param {Array<unknown>} values
- * @returns {string}
+ * @param values
+ * @example cs(true && "a", false && "b", "c") // "a c"
  */
 export const cs = Facade.classes;
 
 /**
  * 组合计算 class-name complex
- * @param {Array<unknown>} values
- * @returns {string}
+ * @param values
+ * @example cx(true && "a", { b: true, c: false }) // "a b"
  */
 export const cx = Facade.cx;

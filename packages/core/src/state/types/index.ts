@@ -29,7 +29,7 @@ export const APPLY_SOURCE = {
 export type ApplyOptions = {
   /** 操作源 */
   source?: O.Values<typeof APPLY_SOURCE>;
-  /** 当前 Raw Range Modal */
+  /** 初始 Raw Range Modal */
   range?: RawRange;
   /** 自动变换光标 */
   autoCaret?: boolean;

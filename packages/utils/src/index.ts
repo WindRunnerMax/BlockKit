@@ -2,6 +2,7 @@ export type { ClipboardTransfer } from "./clipboard";
 export { Clipboard, TEXT_HTML, TEXT_PLAIN } from "./clipboard";
 export { Collection, Collection as List } from "./collection";
 export {
+  BMP_PRIVATE,
   CTRL_KEY,
   DEFAULT_PRIORITY,
   FALSY,

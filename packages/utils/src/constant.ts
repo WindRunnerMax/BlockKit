@@ -52,3 +52,9 @@ export const NIL = "";
 
 /** SPACE STRING */
 export const SPACE = " ";
+
+/**
+ * BMP 基本多文种平面私有使用区
+ * - 范围 0xE000 - 0xF8FF, 共 6400 个码位
+ */
+export const BMP_PRIVATE = 0xe000;
