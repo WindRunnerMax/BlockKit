@@ -54,6 +54,7 @@ describe("perform block", () => {
       .insertEOL();
     const editor = new Editor({
       delta,
+      logLevel: 2,
       schema: {
         image: { block: true, void: true },
       },
@@ -77,6 +78,7 @@ describe("perform block", () => {
       .insertEOL();
     const editor = new Editor({
       delta,
+      logLevel: 2,
       schema: {
         image: { block: true, void: true },
       },
@@ -100,6 +102,7 @@ describe("perform block", () => {
       .insertEOL();
     const editor = new Editor({
       delta,
+      logLevel: 2,
       schema: {
         image: { block: true, void: true },
       },

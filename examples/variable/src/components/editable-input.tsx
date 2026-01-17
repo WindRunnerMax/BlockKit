@@ -12,7 +12,7 @@ import {
 import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { O } from "@block-kit/utils/dist/es/types";
 import type { FC } from "react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { DATA_EDITABLE_KEY } from "../utils/constant";
 import { onLeftArrowKey, onRightArrowKey, onTabKey } from "../utils/event";
@@ -22,7 +22,7 @@ export const EditableTextInput: FC<{
   placeholder?: string;
   className?: string;
   style?: React.CSSProperties;
-  onKeydown?: React.KeyboardEventHandler<HTMLDivElement>;
+  onKeydown?: (e: KeyboardEvent) => void;
   onRef?: (ref: HTMLDivElement | null) => void;
   onChange?: (value: string, event: InputEvent) => void;
   onBeforeInput?: (event: InputEvent) => void;
@@ -33,10 +33,10 @@ export const EditableTextInput: FC<{
   const [isComposing, setIsComposing] = useState(false);
   const [editNode, setEditNode] = useState<HTMLDivElement | null>(null);
 
-  const onEditableRef = (ref: HTMLDivElement | null) => {
+  const onEditableRef = useMemoFn((ref: HTMLDivElement | null) => {
     props.onRef && props.onRef(ref);
     ref && setEditNode(ref);
-  };
+  });
 
   useEffect(() => {
     if (!editNode) return void 0;
@@ -54,12 +54,25 @@ export const EditableTextInput: FC<{
     }
   }, [props.value, editNode]);
 
+  const onBeforeInput = useMemoFn((e: InputEvent) => {
+    props.onBeforeInput && props.onBeforeInput(e);
+  });
+
   const onInput = useMemoFn((e: Event) => {
     if ((e as O.Any).isComposing || isNil(editNode)) {
       return void 0;
     }
     const newValue = editNode.textContent || "";
     newValue !== value && onChange(newValue, e as InputEvent);
+  });
+
+  const onCompositionStart = useMemoFn(() => {
+    setIsComposing(true);
+  });
+
+  const onCompositionEnd = useMemoFn((e: CompositionEvent) => {
+    setIsComposing(false);
+    onInput(e);
   });
 
   const onMouseDown = useMemoFn((e: MouseEvent) => {
@@ -69,6 +82,7 @@ export const EditableTextInput: FC<{
   });
 
   const onKeyDown = useMemoFn((e: KeyboardEvent) => {
+    props.onKeydown && props.onKeydown(e);
     if (isKeyCode(e, KEY_CODE.ENTER)) {
       preventNativeEvent(e);
       return void 0;
@@ -81,15 +95,6 @@ export const EditableTextInput: FC<{
     }
   });
 
-  const onCompositionStart = useMemoFn(() => {
-    setIsComposing(true);
-  });
-
-  const onCompositionEnd = useMemoFn((e: CompositionEvent) => {
-    setIsComposing(false);
-    onInput(e);
-  });
-
   const onPaste = useMemoFn((e: ClipboardEvent) => {
     preventNativeEvent(e);
     const clipboardData = e.clipboardData;
@@ -98,12 +103,9 @@ export const EditableTextInput: FC<{
     document.execCommand("insertText", false, text.replace(/\n/g, " "));
   });
 
-  const onBeforeInputRef = useRef(props.onBeforeInput);
-
   useEffect(() => {
     const el = editNode;
     if (!el) return void 0;
-    const onBeforeInput = onBeforeInputRef.current;
     const { INPUT, COMPOSITION_END, PASTE, KEY_DOWN, MOUSE_DOWN, COMPOSITION_START, BEFORE_INPUT } =
       EDITOR_EVENT;
     el.addEventListener(INPUT, onInput);
@@ -112,7 +114,7 @@ export const EditableTextInput: FC<{
     el.addEventListener(MOUSE_DOWN, onMouseDown);
     el.addEventListener(COMPOSITION_START, onCompositionStart);
     el.addEventListener(COMPOSITION_END, onCompositionEnd);
-    onBeforeInput && el.addEventListener(BEFORE_INPUT, onBeforeInput);
+    el.addEventListener(BEFORE_INPUT, onBeforeInput);
     return () => {
       el.removeEventListener(INPUT, onInput);
       el.removeEventListener(PASTE, onPaste);
@@ -120,9 +122,10 @@ export const EditableTextInput: FC<{
       el.removeEventListener(MOUSE_DOWN, onMouseDown);
       el.removeEventListener(COMPOSITION_START, onCompositionStart);
       el.removeEventListener(COMPOSITION_END, onCompositionEnd);
-      onBeforeInput && el.removeEventListener(BEFORE_INPUT, onBeforeInput);
+      el.removeEventListener(BEFORE_INPUT, onBeforeInput);
     };
-  }, [onInput, onKeyDown, onMouseDown, editNode, onPaste, onCompositionStart, onCompositionEnd]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editNode]);
 
   const showPlaceholder = !value && placeholder && !isComposing;
 
@@ -130,10 +133,9 @@ export const EditableTextInput: FC<{
     <Isolate className={props.className} style={props.style}>
       <div
         {...{ [DATA_EDITABLE_KEY]: true }}
-        className="block-kit-editable-text"
         ref={onEditableRef}
+        className="block-kit-editable-text"
         data-vars-placeholder={showPlaceholder ? placeholder : void 0}
-        onKeyDown={props.onKeydown}
         contentEditable
         suppressContentEditableWarning
       ></div>

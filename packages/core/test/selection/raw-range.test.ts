@@ -12,7 +12,7 @@ describe("selection raw-range", () => {
     .insert("\n")
     .insert("text2")
     .insert("\n", { align: "center" });
-  const editor = new Editor({ delta });
+  const editor = new Editor({ delta, logLevel: 2 });
 
   it("from-range", () => {
     const range = new Range(new Point(0, 0), new Point(1, 0));

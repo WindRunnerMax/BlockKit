@@ -11,7 +11,7 @@ describe("selection raw-point", () => {
     .insert("\n")
     .insert("text2")
     .insert("\n", { align: "center" });
-  const editor = new Editor({ delta });
+  const editor = new Editor({ delta, logLevel: 2 });
 
   it("from-point", () => {
     const point = new Point(1, 1);

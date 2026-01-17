@@ -1,9 +1,8 @@
 import type { O } from "@block-kit/utils/dist/es/types";
-import type React from "react";
 
 export type EditablePluginOptions = {
   placeholders?: O.Map<string>;
-  onKeydown?: React.KeyboardEventHandler<HTMLDivElement>;
+  onKeydown?: (e: KeyboardEvent) => void;
 };
 
 export type SelectorPluginOptions = {

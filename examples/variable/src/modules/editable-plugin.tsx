@@ -105,6 +105,7 @@ export class EditableInputPlugin extends EditorPlugin {
           value={attrs[VARS_VALUE_KEY] || ""}
           placeholder={placeholders[varKey]}
           onChange={(v, e) => this.onTextChange(context.leafState, v, e)}
+          onKeydown={this.options.onKeydown}
         ></EditableTextInput>
       </Embed>
     );
