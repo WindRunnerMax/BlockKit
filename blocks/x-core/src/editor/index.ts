@@ -8,6 +8,7 @@ import { Lookup } from "../lookup";
 import { Model } from "../model";
 import { Perform } from "../perform";
 import { Plugin } from "../plugin";
+import { Rect } from "../rect";
 import { Selection } from "../selection";
 import { EditorState } from "../state";
 import { EDITOR_STATE } from "../state/types";
@@ -40,6 +41,8 @@ export class BlockEditor {
   public input: Input;
   /** 历史模块 */
   public history: History;
+  /** 位置模块 */
+  public rect: Rect;
 
   /**
    * 构造函数
@@ -60,6 +63,7 @@ export class BlockEditor {
     this.input = new Input(this);
     this.plugin = new Plugin(this);
     this.history = new History(this);
+    this.rect = new Rect(this);
   }
 
   /**

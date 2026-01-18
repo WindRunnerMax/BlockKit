@@ -6,11 +6,12 @@ import { Delta } from "@block-kit/delta";
 import type { ReactLeafContext } from "@block-kit/react";
 import { EditorPlugin, Embed } from "@block-kit/react";
 import type { EventContext } from "@block-kit/utils";
-import { cs } from "@block-kit/utils";
+import { cs, isKeyCode, KEY_CODE } from "@block-kit/utils";
 import { Bind, isDOMText } from "@block-kit/utils";
 
 import { EditableTextInput } from "../components/editable-input";
 import { DATA_EDITABLE_KEY, VARS_CLS_PREFIX, VARS_KEY, VARS_VALUE_KEY } from "../utils/constant";
+import { onLeftArrowKey, onRightArrowKey, onTabKey } from "../utils/event";
 import type { EditablePluginOptions as EditableInputOptions } from "../utils/types";
 
 export class EditableInputPlugin extends EditorPlugin {
@@ -80,6 +81,19 @@ export class EditableInputPlugin extends EditorPlugin {
     }
   }
 
+  @Bind
+  public onEditableKeydown(e: KeyboardEvent, value: string) {
+    this.options.onKeydown && this.options.onKeydown(e);
+    const editor = this.editor;
+    const readonly = this.editor.state.isReadonly();
+    const sel = window.getSelection();
+    if (sel && sel.isCollapsed) {
+      isKeyCode(e, KEY_CODE.TAB) && onTabKey(editor, sel, e);
+      !readonly && isKeyCode(e, KEY_CODE.LEFT) && onLeftArrowKey(sel, e);
+      !readonly && isKeyCode(e, KEY_CODE.RIGHT) && onRightArrowKey(value, sel, e);
+    }
+  }
+
   public onTextChange(leaf: LeafState, value: string, event: InputEvent) {
     const rawRange = leaf.toRawRange();
     if (!rawRange) return void 0;
@@ -97,15 +111,16 @@ export class EditableInputPlugin extends EditorPlugin {
   public renderLeaf(context: ReactLeafContext): React.ReactNode {
     const { attributes: attrs = {} } = context;
     const varKey = attrs[VARS_KEY];
+    const value = attrs[VARS_VALUE_KEY] || "";
     const placeholders = this.options.placeholders || {};
     return (
       <Embed context={context}>
         <EditableTextInput
-          className={cs(VARS_CLS_PREFIX, `${VARS_CLS_PREFIX}-${varKey}`)}
-          value={attrs[VARS_VALUE_KEY] || ""}
+          value={value}
           placeholder={placeholders[varKey]}
+          onKeydown={e => this.onEditableKeydown(e, value)}
           onChange={(v, e) => this.onTextChange(context.leafState, v, e)}
-          onKeydown={this.options.onKeydown}
+          className={cs(VARS_CLS_PREFIX, `${VARS_CLS_PREFIX}-${varKey}`)}
         ></EditableTextInput>
       </Embed>
     );

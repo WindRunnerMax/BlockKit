@@ -71,7 +71,7 @@ export { getPluginPriority } from "./plugin/modules/priority";
 export { CALLER_TYPE, PLUGIN_FUNC } from "./plugin/types";
 export type { LeafContext, LineContext } from "./plugin/types/context";
 export type { Rect } from "./rect/types";
-export { relativeTo } from "./rect/utils/convert";
+export { fromDOMRect, relativeTo } from "./rect/utils/convert";
 export { Schema } from "./schema";
 export type { EditorSchema, SchemaRule } from "./schema/types";
 export { isBlockLine, isEmptyLine } from "./schema/utils/is";

@@ -1,35 +1,31 @@
 import { EDITOR_EVENT } from "@block-kit/core";
-import { Isolate, useEditorStatic, useReadonly } from "@block-kit/react";
+import { Isolate } from "@block-kit/react";
 import {
   isDOMText,
   isKeyCode,
   isNil,
   KEY_CODE,
-  NOOP,
   preventNativeEvent,
   TEXT_PLAIN,
 } from "@block-kit/utils";
 import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { O } from "@block-kit/utils/dist/es/types";
 import type { FC } from "react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 
 import { DATA_EDITABLE_KEY } from "../utils/constant";
-import { onLeftArrowKey, onRightArrowKey, onTabKey } from "../utils/event";
 
 export const EditableTextInput: FC<{
   value: string;
-  placeholder?: string;
   className?: string;
+  placeholder?: string;
   style?: React.CSSProperties;
   onKeydown?: (e: KeyboardEvent) => void;
-  onRef?: (ref: HTMLDivElement | null) => void;
-  onChange?: (value: string, event: InputEvent) => void;
   onBeforeInput?: (event: InputEvent) => void;
+  onRef?: (ref: HTMLDivElement | null) => void;
+  onChange: (value: string, event: InputEvent) => void;
 }> = props => {
-  const { onChange = NOOP, value, placeholder } = props;
-  const { editor } = useEditorStatic();
-  const { readonly } = useReadonly();
+  const { onChange, value, placeholder } = props;
   const [isComposing, setIsComposing] = useState(false);
   const [editNode, setEditNode] = useState<HTMLDivElement | null>(null);
 
@@ -38,7 +34,7 @@ export const EditableTextInput: FC<{
     ref && setEditNode(ref);
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!editNode) return void 0;
     // 如果受控, 选区行为可以考虑从后向前找到差异位置作为选区
     if (isDOMText(editNode.firstChild)) {
@@ -86,12 +82,6 @@ export const EditableTextInput: FC<{
     if (isKeyCode(e, KEY_CODE.ENTER)) {
       preventNativeEvent(e);
       return void 0;
-    }
-    const sel = window.getSelection();
-    if (sel && sel.isCollapsed) {
-      isKeyCode(e, KEY_CODE.TAB) && onTabKey(editor, sel, e);
-      !readonly && isKeyCode(e, KEY_CODE.LEFT) && onLeftArrowKey(sel, e);
-      !readonly && isKeyCode(e, KEY_CODE.RIGHT) && onRightArrowKey(props.value, sel, e);
     }
   });
 
