@@ -24,10 +24,12 @@ export const PLUGIN_FUNC = {
   RENDER_BLOCK_WRAP: "renderBlockWrap",
 } as const;
 
+/** 插件原型方法参数类型 */
 export type CallerMap = {
   [P in CallerType]: PickPluginFunc<P>;
 };
 
+/** 插件原型方法键值 */
 export type PluginFuncKeys = Exclude<
   O.Values<{
     [key in PluginType]: RequiredPlugin[key] extends F.Any ? key : never;
@@ -35,10 +37,12 @@ export type PluginFuncKeys = Exclude<
   "destroy"
 >;
 
+/** 选择插件原型方法参数 */
 export type PickPluginFunc<key extends PluginType> = RequiredPlugin[key] extends F.Any
   ? Parameters<RequiredPlugin[key]>[0]
   : null;
 
+/** 插件原型方法严格必选 */
 export type PluginRequiredKeyFunc<T extends PluginFuncKeys> = CorePlugin &
   Required<{
     [K in T]: RequiredPlugin[K];

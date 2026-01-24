@@ -1,4 +1,5 @@
 import type { AttributeMap, Op } from "../../src";
+import { Delta, isEqualDelta } from "../../src";
 import { isEqualAttributes, isEqualOp } from "../../src";
 
 describe("equal", () => {
@@ -16,6 +17,7 @@ describe("equal", () => {
 
   it("undefined attrs", () => {
     expect(isEqualAttributes(undefined, undefined)).toEqual(true);
+    expect(isEqualAttributes({}, undefined)).toEqual(true);
   });
 
   it("equal attrs", () => {
@@ -36,7 +38,7 @@ describe("equal", () => {
     expect(isEqualOp(origin, target)).toEqual(false);
   });
 
-  it("undefined attrs", () => {
+  it("undefined ops", () => {
     expect(isEqualOp(undefined, undefined)).toEqual(true);
   });
 
@@ -44,5 +46,11 @@ describe("equal", () => {
     const origin: Op = { insert: "1" };
     const target: Op = { insert: "1" };
     expect(isEqualOp(origin, target)).toEqual(true);
+  });
+
+  it("equal delta", () => {
+    const origin: Delta = new Delta().insert("1");
+    const target: Delta = new Delta().insert("1");
+    expect(isEqualDelta(origin, target)).toEqual(true);
   });
 });

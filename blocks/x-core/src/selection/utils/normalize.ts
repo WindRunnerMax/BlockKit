@@ -29,9 +29,9 @@ export const normalizeModelRange = (
   }
   // ============== 不同节点情况 ==============
   // 如果端点存在 Block 类型, 则处理为同级块节点集合
-  const result = getLCAWithChildren(startState, endState);
-  if (!result) return [];
-  const { lca, child1, child2 } = result;
+  const lcaResult = getLCAWithChildren(startState, endState);
+  if (!lcaResult) return [];
+  const { lca, child1, child2 } = lcaResult;
   if (start.type === BLOCK || end.type === BLOCK) {
     return lca.children.slice(child1.index, child2.index + 1).map(it => Entry.create(it.id, BLOCK));
   }
@@ -39,48 +39,58 @@ export const normalizeModelRange = (
   const startEntry = Entry.fromPoint(start, start.offset, startState.length - start.offset);
   const endEntry = Entry.fromPoint(end, 0, end.offset);
   const nodes = lca.getTreeNodes();
-  const between: RangeEntry[] = [];
-  let isInsideNode = false;
-  let maxAccessLevel = Infinity;
-  NODES_ITERATOR: for (const node of nodes) {
+  const stack: BlockState[] = [];
+  const result: RangeEntry[] = [];
+  let startTracking = false;
+  for (let k = 0, n = nodes.length; k < n; k++) {
+    const node = nodes[k];
+    // 如果是首节点块节点, 则不参与迭代, 目前仅容器类型需要跳过
+    if (k === 0 && node.isBlockType()) continue;
+    // 如果节点深度小于最后块节点的深度, 则出栈
+    // 此外栈节点的深度可能会突变, 则需要持续出栈, 直到深度匹配
+    for (let i = stack.length - 1; i >= 0; i--) {
+      const lastStackNode = stack[i];
+      if (lastStackNode && node.depth <= lastStackNode.depth) {
+        stack.pop();
+      }
+    }
+    // 遇到块类型的节点, 则入栈, 先出栈再入栈以避免刚入栈就出栈
+    if (node.isBlockType()) {
+      stack.push(node);
+    }
+    const isInBlockStack = stack.length > 0;
     // 遇到起始节点, 则开始记录
     if (node.id === start.id) {
-      isInsideNode = true;
-      // 向父节点迭代查找块级类型的节点
-      let current: BlockState | null = node.parent;
-      let diff = node.depth - child1.depth;
-      while (diff-- > 0 && current) {
-        if (current.isBlockType()) {
-          maxAccessLevel = current.depth;
-          between.push(Entry.create(child1.id, BLOCK));
-          continue NODES_ITERATOR;
-        }
-        current = current.parent;
+      startTracking = true;
+      // 如果当前不在块节点内, 则直接添加起始节点到结果中
+      // 并且继续遍历下一个节点, 否则会走到后续的统一节点处理逻辑
+      if (!isInBlockStack) {
+        result.push(startEntry);
+        continue;
       }
-      between.push(startEntry);
-      continue;
-    }
-    // 如果小于等于最大访问深度, 则认为已经越过先前的块节点, 恢复最大访问深度
-    if (isInsideNode && maxAccessLevel !== Infinity && node.depth <= maxAccessLevel) {
-      maxAccessLevel = Infinity;
     }
     // 遇到结束节点, 则停止记录
     if (node.id === end.id) {
-      // 如果结束节点深度小于最大访问深度, 则需要将结束节点加入结果中
-      endState.depth < maxAccessLevel && between.push(endEntry);
+      !isInBlockStack && result.push(endEntry);
       break;
     }
-    // 如果不在起始节点和结束节点之间, 或者超过最大访问深度, 则跳过
-    if (!isInsideNode || node.depth > maxAccessLevel) {
-      continue;
-    }
-    // 分别处理块节点和文本节点
-    if (node.isBlockType()) {
-      maxAccessLevel = node.depth;
-      between.push(Entry.create(node.id, BLOCK));
+    if (!startTracking) continue;
+    // 如果栈中存在内容, 则当前处于块节点内, 检查是否已经置于结果中
+    const firstStackNode = stack[0];
+    const lastResultNode = result[result.length - 1];
+    if (isInBlockStack) {
+      // 如果当前未置于结果中, 则添加到结果中
+      if (!lastResultNode || firstStackNode.id !== lastResultNode.id) {
+        result.push(Entry.create(firstStackNode.id, BLOCK));
+      }
     } else {
-      between.push(Entry.create(node.id, TEXT, 0, node.length));
+      // 否则, 则添加当前节点到结果中, 需要分别处理块节点和文本节点
+      if (node.isBlockType()) {
+        result.push(Entry.create(node.id, BLOCK));
+      } else {
+        result.push(Entry.create(node.id, TEXT, 0, node.length));
+      }
     }
   }
-  return between;
+  return result;
 };

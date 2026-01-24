@@ -3,6 +3,7 @@ import type { BlockChange } from "@block-kit/x-json";
 
 import type { Range } from "../../selection/modules/range";
 
+/** 编辑器状态 */
 export const EDITOR_STATE = {
   /** IME 组合状态 */
   COMPOSING: "COMPOSING",
@@ -20,6 +21,7 @@ export const EDITOR_STATE = {
   PAINTING: "PAINTING",
 } as const;
 
+/** 变更来源 */
 export const APPLY_SOURCE = {
   /** 用户触发 默认值 */
   USER: "USER",
@@ -40,6 +42,7 @@ export type ApplyChange = {
 /** 批量 Block 变更 */
 export type BatchApplyChange = Array<ApplyChange | ApplyChange[]>;
 
+/** 变更选项 */
 export type ApplyOptions = {
   /** 操作源 */
   source?: O.Values<typeof APPLY_SOURCE>;
@@ -55,6 +58,7 @@ export type ApplyOptions = {
   extra?: unknown;
 };
 
+/** 变更结果 */
 export type ApplyResult = {
   /** 操作 id */
   id: string;

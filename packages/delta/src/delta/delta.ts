@@ -403,6 +403,7 @@ export class Delta {
               retDelta.retain(opLength, diffAttributes(thisOp.attributes, otherOp.attributes));
             } else {
               // 直接将 op2 置入目标 delta 并删除 op1 (兜底策略)
+              // 当初始文本 diff 和 ops 迭代器文本不一致时, 会执行该兜底逻辑
               retDelta.push(otherOp).delete(opLength);
             }
             break;
