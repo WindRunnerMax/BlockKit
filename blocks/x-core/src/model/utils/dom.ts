@@ -4,6 +4,7 @@ import { Point } from "@block-kit/core";
 import { isDOMElement } from "@block-kit/utils";
 
 import type { BlockEditor } from "../../editor";
+import { isBoxBlockType, isVoidBlockType } from "../../schema/utils/is";
 import { X_ZERO_KEY } from "../types/index";
 
 /**
@@ -16,7 +17,8 @@ export const getBlockStartTextNode = (editor: BlockEditor, blockId: string): DOM
   if (!block) return null;
   const nodes = block.getTreeNodes();
   for (const node of nodes) {
-    if (node.isBlockType()) continue;
+    // 容器节点、空节点不存在文本内容, 跳过
+    if (isBoxBlockType(node) || isVoidBlockType(node)) continue;
     const text = editor.model.getTextEditor(node);
     const textPoint: Point = Point.from(0, 0);
     const textDOM = text && toTextDOMPoint(text, textPoint);
@@ -36,7 +38,8 @@ export const getBlockEndTextNode = (editor: BlockEditor, blockId: string): DOMPo
   const nodes = block.getTreeNodes();
   for (let i = nodes.length - 1; i >= 0; i--) {
     const node = nodes[i];
-    if (!node || node.isBlockType()) continue;
+    // 容器节点、空节点不存在文本内容, 跳过
+    if (!node || isBoxBlockType(node) || isVoidBlockType(node)) continue;
     const text = editor.model.getTextEditor(node);
     const textBlock = text && text.state.block;
     const lines = textBlock && textBlock.getLines();

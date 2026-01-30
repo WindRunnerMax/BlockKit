@@ -3,6 +3,7 @@ import type { Block, BlocksChange, JSONOp } from "@block-kit/x-json";
 import { json } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../../editor";
+import { isBoxBlockType } from "../../schema/utils/is";
 import type { EditorState } from "../index";
 import { clearTreeCache } from "../utils/tree";
 import { BlockState } from "./state";
@@ -121,10 +122,10 @@ export class Mutate {
     // 处理删除节点的情况
     for (const id of this.deletes) {
       const ldBlock = this.state.getOrCreateBlock(id);
-      const isBlockType = ldBlock.isBlockType();
+      const isBlockType = isBoxBlockType(ldBlock);
       const nodes = ldBlock.getTreeNodes();
       ldBlock.remove();
-      // 文本节点仅需要处理本身
+      // 文本/容器文本/空节点仅需要处理本身
       if (!isBlockType) continue;
       // 块级节点需要处理本身及其子树节点
       for (let i = 1; i < nodes.length; i++) {
@@ -136,7 +137,7 @@ export class Mutate {
     for (const id of this.inserts) {
       const liBlock = this.state.getOrCreateBlock(id);
       const nodes = liBlock.getTreeNodes();
-      const isBlockType = liBlock.isBlockType();
+      const isBlockType = isBoxBlockType(liBlock);
       liBlock.restore();
       updatedMeta.add(id);
       for (let i = 1; i < nodes.length; i++) {

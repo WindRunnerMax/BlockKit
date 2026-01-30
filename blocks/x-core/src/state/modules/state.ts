@@ -4,6 +4,7 @@ import type { Block, BlockDataField } from "@block-kit/x-json";
 import { cloneSnapshot } from "@block-kit/x-json";
 
 import { STATE_TO_RENDER } from "../../model/utils/weak-map";
+import { isBoxBlockType } from "../../schema/utils/is";
 import type { EditorState } from "../index";
 import { getNextSiblingNode, getPrevSiblingNode } from "../utils/tree";
 
@@ -38,7 +39,11 @@ export class BlockState {
   public _nodesIndex: Record<string, number>;
 
   /** 构造函数 */
-  public constructor(block: Block, protected state: EditorState) {
+  public constructor(
+    block: Block,
+    /** 编辑器 Block 容器状态 */
+    public container: EditorState
+  ) {
     this.index = -1;
     this.depth = -1;
     this.length = -1;
@@ -62,7 +67,7 @@ export class BlockState {
     const parent = this.parent;
     if (!parent || !parent.data.children) return null;
     const prevId = parent.data.children[this.index - 1];
-    return prevId ? this.state.getBlock(prevId) : null;
+    return prevId ? this.container.getBlock(prevId) : null;
   }
 
   /**
@@ -72,7 +77,7 @@ export class BlockState {
     const parent = this.parent;
     if (!parent || !parent.data.children) return null;
     const nextId = parent.data.children[this.index + 1];
-    return nextId ? this.state.getBlock(nextId) : null;
+    return nextId ? this.container.getBlock(nextId) : null;
   }
 
   /**
@@ -94,18 +99,10 @@ export class BlockState {
   }
 
   /**
-   * 判断是否为块级类型的节点
-   * - 块级类型的节点不存在 delta 文本内容
-   */
-  public isBlockType() {
-    return !this.data.delta;
-  }
-
-  /**
    * 获取 State 对应的 DOM 节点
    */
   public getDOMNode() {
-    return this.state.editor.model.getBlockNode(this);
+    return this.container.editor.model.getBlockNode(this);
   }
 
   /**
@@ -115,7 +112,7 @@ export class BlockState {
   public forceRender() {
     const update = STATE_TO_RENDER.get(this);
     if (!update) {
-      this.state.editor.logger.info(`Cannot Force Render Block ${this.id}`);
+      this.container.editor.logger.info(`Cannot Force Render Block ${this.id}`);
     }
     update && update();
   }
@@ -196,13 +193,13 @@ export class BlockState {
     // 注意这是更新该节点的子节点索引值, 而不是更新本身的索引值
     {
       this.type = this.data.type;
-      const parent = this.state.getBlock(this.data.parent);
+      const parent = this.container.getBlock(this.data.parent);
       this.parent = parent || null;
       const len = this.data.children.length;
       this.children.length = 0;
       for (let i = 0; i < len; i++) {
         const id = this.data.children[i];
-        const child = this.state.getOrCreateBlock(id);
+        const child = this.container.getOrCreateBlock(id);
         child.index = i;
         child.parent = this;
         child.data.parent = this.id;
@@ -221,13 +218,14 @@ export class BlockState {
       let current: BlockState | null = this;
       while (current) {
         // 从数据中取父节点, 避免元数据更新时节点树结构状态未更新问题
-        const parent = this.state.getBlock(current.data.parent);
+        const parent = this.container.getBlock(current.data.parent);
         if (!parent || visited.has(current)) {
           break;
         }
         visited.add(current);
         depth++;
-        if (current.isBlockType()) prevent = true;
+        // 容器节点需要停止 linear 的计算, 隔离作用范围
+        if (isBoxBlockType(current)) prevent = true;
         !prevent && linear++;
         current = parent;
       }

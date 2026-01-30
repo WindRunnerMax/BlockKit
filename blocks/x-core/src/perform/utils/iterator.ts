@@ -2,6 +2,7 @@ import { Delta } from "@block-kit/delta";
 import { isTextDeltaOp } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../../editor";
+import { isBoxBlockType } from "../../schema/utils/is";
 import type { Range } from "../../selection/modules/range";
 import type { RangeEntry } from "../../selection/types";
 import type { BlockState } from "../../state/modules/state";
@@ -21,7 +22,8 @@ export const iterator = (
   for (const entry of range.nodes) {
     const state = editor.state.getBlock(entry.id);
     if (!state) continue;
-    if (state.isBlockType()) {
+    // 仅容器节点需要遍历其子节点
+    if (isBoxBlockType(state)) {
       const treeNodes = state.getTreeNodes();
       for (const node of treeNodes) {
         cb(entry, node);

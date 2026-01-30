@@ -26,4 +26,9 @@ export type SchemaRule = {
   mark?: boolean;
 };
 
+/**
+ * 编辑器 Op 模式规则
+ * - key: Op Attrs 匹配的 Key
+ * - value: Op 匹配的模式规则
+ */
 export type EditorSchema = O.Map<SchemaRule>;

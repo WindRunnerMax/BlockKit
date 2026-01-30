@@ -22,6 +22,8 @@ export { CorePlugin } from "./plugin/modules/implement";
 export type { PluginRequiredKeyFunc } from "./plugin/types";
 export { CALLER_TYPE, PLUGIN_FUNC } from "./plugin/types";
 export type { BlockContext, BlockWrapContext, TextWrapContext } from "./plugin/types/context";
+export { Schema } from "./schema";
+export type { EditorXRules, XSchemaRule } from "./schema/types";
 export { Entry } from "./selection/modules/entry";
 export { Point } from "./selection/modules/point";
 export { Range } from "./selection/modules/range";

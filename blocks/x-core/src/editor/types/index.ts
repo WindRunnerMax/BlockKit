@@ -2,6 +2,8 @@ import type { EditorSchema, LOG_LEVEL } from "@block-kit/core";
 import type { O } from "@block-kit/utils/dist/es/types";
 import type { BlockMap } from "@block-kit/x-json";
 
+import type { EditorXRules } from "../../schema/types";
+
 export type EditorOptions = {
   /** 初始渲染数据 */
   initial?: BlockMap;
@@ -9,4 +11,6 @@ export type EditorOptions = {
   logLevel?: O.Values<typeof LOG_LEVEL>;
   /** 文本编辑器预设渲染规则 */
   schema?: EditorSchema;
+  /** 块编辑器预设渲染规则 */
+  rules?: EditorXRules;
 };

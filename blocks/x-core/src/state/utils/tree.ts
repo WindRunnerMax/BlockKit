@@ -1,5 +1,6 @@
 import { isNil } from "@block-kit/utils";
 
+import { isTextLikeBlockType } from "../../schema/utils/is";
 import type { BlockState } from "../modules/state";
 
 /**
@@ -124,8 +125,8 @@ export const getPrevSiblingNode = (state: BlockState, strict = false): BlockStat
       const node = nodes[i];
       // 非严格模式下直接返回前一个节点
       if (!strict) return node;
-      // 严格模式下需要检查文本节点
-      if (!node.isBlockType()) return node;
+      // 严格模式下需要检查文本节点, 类文本节点即可
+      if (isTextLikeBlockType(node)) return node;
     }
     // 定位到首个节点, 提高下一次查找性能
     currentBlockId = currentParent.id;
@@ -162,8 +163,8 @@ export const getNextSiblingNode = (state: BlockState, strict = false): BlockStat
       const node = nodes[i];
       // 非严格模式下直接返回下一个节点
       if (!strict) return node;
-      // 严格模式下需要检查文本节点
-      if (!node.isBlockType()) return node;
+      // 严格模式下需要检查文本节点, 类文本节点即可
+      if (isTextLikeBlockType(node)) return node;
     }
     // 定位到首个节点, 提高下一次查找性能
     currentBlockId = nodes[nodes.length - 1].id;

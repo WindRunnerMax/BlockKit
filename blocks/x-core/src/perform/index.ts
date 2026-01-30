@@ -7,6 +7,7 @@ import type { BlockDataField } from "@block-kit/x-json";
 import type { BlockEditor } from "../editor";
 import type { ContentChangeEvent } from "../event/bus";
 import { getOpMetaMarks } from "../lookup/utils/marks";
+import { isTextBlockType, isTextLikeBlockType } from "../schema/utils/is";
 import { Entry } from "../selection/modules/entry";
 import { Point } from "../selection/modules/point";
 import { Range } from "../selection/modules/range";
@@ -114,7 +115,7 @@ export class Perform {
       // 块级节点需要删除整个节点, 父节点已经删除的不再处理
       const isParentDeleted = parentId && deleted.has(parentId);
       // 如果父节点是文本节点, 则不会删除所有子节点, 在此处需要继续处理
-      const isTextParentBlock = state.parent && !state.parent.isBlockType();
+      const isTextParentBlock = state.parent && isTextBlockType(state.parent);
       if (!isParentDeleted || isTextParentBlock) {
         const change = this.atom.remove(parentId, state.index);
         changes.push(change);
@@ -123,7 +124,7 @@ export class Perform {
       // 删除的块节点需要将子节点收集, 未删除的需要重新插入到父节点中
       // 由于块节点仅存在直属类型的子节点, 会被直接删除, 因此这里仅文本块需要处理
       const children = state.data.children;
-      !state.isBlockType() && remain.push(...children);
+      isTextBlockType(state) && remain.push(...children);
     }
     // ========== 预设删除后的选区, 需要根据不同的情况处理 ==========
     // 首个节点为文本节点, 直接设置选区到该位置
@@ -139,7 +140,7 @@ export class Perform {
     } else {
       const prevBlock = firstBlock.prev();
       // 存在前节点且前节点是文本块的情况下, 选区设置到前节点的末尾
-      if (prevBlock && !prevBlock.isBlockType()) {
+      if (prevBlock && isTextLikeBlockType(prevBlock)) {
         const offset = prevBlock.length;
         const entry = Entry.create(lastBlock.id, POINT_TYPE.TEXT, offset, 0);
         options.selection = new Range(entry, false);
@@ -189,8 +190,8 @@ export class Perform {
       const prevBlock = block.prevSiblingNode();
       // 如果没有前节点, 或者前节点是 root, 则不能执行删除操作
       if (!prevBlock || prevBlock.data.type === ROOT_BLOCK) return null;
-      // 如果前节点是块节点, 则移动选区到前节点上
-      if (prevBlock.isBlockType()) {
+      // 如果前节点是非文本节点, 则移动选区到前节点上
+      if (!isTextBlockType(prevBlock)) {
         const entry = Entry.create(prevBlock.id, POINT_TYPE.BLOCK);
         options.selection = new Range(entry, false);
         return this.editor.state.apply(changes, options);
@@ -231,8 +232,8 @@ export class Perform {
       const nextBlock = block.nextSiblingNode();
       // 如果没有后节点, 则不能执行删除操作
       if (!nextBlock) return null;
-      // 如果后节点是块节点, 则移动选区到后节点上
-      if (nextBlock.isBlockType()) {
+      // 如果后节点是非文本节点, 则移动选区到后节点上
+      if (!isTextBlockType(nextBlock)) {
         const entry = Entry.create(nextBlock.id, POINT_TYPE.BLOCK);
         options.selection = new Range(entry, false);
         return this.editor.state.apply(changes, options);
@@ -302,8 +303,8 @@ export class Perform {
     const firstPoint = sel.getFirstPoint()!;
     const firstState = this.editor.state.getBlock(firstPoint.id);
     const prevState = firstState && firstState.prev();
-    // 如果没有同级前节点/同级前节点为块节点 则不能缩进
-    if (!prevState || prevState.isBlockType()) return null;
+    // 如果没有同级前节点/同级前节点非文本类型节点 则不能缩进
+    if (!prevState || !isTextBlockType(prevState)) return null;
     const changes: BatchApplyChange = [];
     const options: ApplyOptions = { autoCaret: false };
     let startIndex = prevState.children.length;
@@ -336,7 +337,7 @@ export class Perform {
     const lastState = states[states.length - 1];
     const parentState = firstState && firstState.parent;
     const ancestorState = parentState && parentState.parent;
-    if (!parentState || parentState.isBlockType() || !ancestorState) return null;
+    if (!parentState || !isTextBlockType(parentState) || !ancestorState) return null;
     const changes: BatchApplyChange = [];
     const options: ApplyOptions = { autoCaret: false };
     // 将选择的节点移动到祖先节点下

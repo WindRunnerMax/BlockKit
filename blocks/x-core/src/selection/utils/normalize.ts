@@ -1,4 +1,5 @@
 import type { BlockEditor } from "../../editor";
+import { isBoxLikeBlockType, isTextBlockType } from "../../schema/utils/is";
 import type { BlockState } from "../../state/modules/state";
 import { getLCAWithChildren } from "../../state/utils/tree";
 import { Entry } from "../modules/entry";
@@ -44,30 +45,34 @@ export const normalizeModelRange = (
   let startTracking = false;
   for (let k = 0, n = nodes.length; k < n; k++) {
     const node = nodes[k];
-    // 如果是首节点块节点, 则不参与迭代, 目前仅容器类型需要跳过
-    if (k === 0 && node.isBlockType()) continue;
+    // 在 k 为 0 的情况下, node 实际上即为 lca 节点
+    // 如果首节点为非文本节点, 且不是 lca 的直属子节点, 该情况下不参与迭代
+    if (k === 0 && !isTextBlockType(node) && lca !== child1 && lca !== child2) {
+      continue;
+    }
     // 如果节点深度小于最后块节点的深度, 则出栈
     // 此外栈节点的深度可能会突变, 则需要持续出栈, 直到深度匹配
     for (let i = stack.length - 1; i >= 0; i--) {
       const lastStackNode = stack[i];
       if (lastStackNode && node.depth <= lastStackNode.depth) {
         stack.pop();
+        continue;
       }
+      break;
     }
     // 遇到块类型的节点, 则入栈, 先出栈再入栈以避免刚入栈就出栈
-    if (node.isBlockType()) {
+    if (isBoxLikeBlockType(node)) {
       stack.push(node);
     }
     const isInBlockStack = stack.length > 0;
     // 遇到起始节点, 则开始记录
-    if (node.id === start.id) {
+    START: if (node.id === start.id) {
       startTracking = true;
+      // 在块节点中, 则会走到后续的统一节点处理逻辑
+      if (isInBlockStack) break START;
       // 如果当前不在块节点内, 则直接添加起始节点到结果中
-      // 并且继续遍历下一个节点, 否则会走到后续的统一节点处理逻辑
-      if (!isInBlockStack) {
-        result.push(startEntry);
-        continue;
-      }
+      result.push(startEntry);
+      continue;
     }
     // 遇到结束节点, 则停止记录
     if (node.id === end.id) {
@@ -84,12 +89,8 @@ export const normalizeModelRange = (
         result.push(Entry.create(firstStackNode.id, BLOCK));
       }
     } else {
-      // 否则, 则添加当前节点到结果中, 需要分别处理块节点和文本节点
-      if (node.isBlockType()) {
-        result.push(Entry.create(node.id, BLOCK));
-      } else {
-        result.push(Entry.create(node.id, TEXT, 0, node.length));
-      }
+      // 否则, 则添加当前节点到结果中
+      result.push(Entry.create(node.id, TEXT, 0, node.length));
     }
   }
   return result;

@@ -1,7 +1,7 @@
 import type { P } from "@block-kit/utils/dist/es/types";
 import type { Blocks } from "@block-kit/x-json";
 
-import { BlockEditor, normalizeModelRange, Point } from "../../src";
+import { BlockEditor, normalizeModelRange } from "../../src";
 
 /*
 Text1
@@ -209,62 +209,15 @@ describe("selection model", () => {
   });
 
   it("common text block parent", () => {
-    const blocks: Blocks = {
-      root: {
-        id: "root",
-        version: 1,
-        data: { type: "ROOT", children: ["child1", "child2"], parent: "" },
-      },
-      child1: {
-        id: "child1",
-        version: 1,
-        data: {
-          type: "text",
-          children: ["grandchild1"],
-          delta: [{ insert: "child1" }],
-          parent: "root",
-        },
-      },
-      child2: {
-        id: "child2",
-        version: 1,
-        data: { type: "text", children: [], delta: [{ insert: "child2" }], parent: "root" },
-      },
-      grandchild1: {
-        id: "grandchild1",
-        version: 1,
-        data: {
-          type: "text",
-          children: ["grandgrandchild1"],
-          delta: [{ insert: "grandchild1" }],
-          parent: "child1",
-        },
-      },
-      grandgrandchild1: {
-        id: "grandgrandchild1",
-        version: 1,
-        data: {
-          type: "text",
-          children: [],
-          delta: [{ insert: "grandgrandchild1" }],
-          parent: "child1",
-        },
-      },
-    };
-    const editor = new BlockEditor({ initial: blocks, logLevel: 1 });
-    // ├── root
-    // │   ├── child1
-    // │   │   └── grandchild1
-    // │   │       └── grandgrandchild1
-    // │   └── child2
-    const range = normalizeModelRange(
+    const editor = new BlockEditor({ initial: getBlocks() });
+    const ranges = normalizeModelRange(
       editor,
-      Point.create("child1", "T", 3),
-      Point.create("grandchild1", "T", 5)
+      { id: "Text1", type: "T", offset: 2 },
+      { id: "GrandText1", type: "T", offset: 3 }
     );
-    expect(range).toEqual([
-      { id: "child1", type: "T", start: 3, len: 3 },
-      { id: "grandchild1", type: "T", start: 0, len: 5 },
+    expect(ranges).toEqual([
+      { id: "Text1", type: "T", start: 2, len: 3 },
+      { id: "GrandText1", type: "T", start: 0, len: 3 },
     ]);
   });
 });
