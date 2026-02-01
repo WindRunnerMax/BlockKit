@@ -29,7 +29,7 @@ describe("lookup marks", () => {
   it("collect inline mark", () => {
     const editor = new BlockEditor({
       initial: getBlocks(),
-      schema: {
+      textSchema: {
         bold: { mark: true },
         inline: { mark: true, inline: true },
       },

@@ -11,7 +11,7 @@ export class Plugin {
   /** 插件缓存 */
   protected cache: Record<string, CorePlugin[]>;
   /** key 块渲染映射 */
-  public map: Record<string, PluginRequiredKeyFunc<"renderBlock">>;
+  public map: Record<string, CorePlugin>;
 
   /**
    * 构造函数
@@ -60,11 +60,11 @@ export class Plugin {
       this.reset();
       const map: Record<string, CorePlugin> = {};
       for (const plugin of plugins) {
-        if (plugin.renderBlock) {
-          this.map[plugin.key] = plugin as PluginRequiredKeyFunc<"renderBlock">;
-        }
+        // 如果已经注册过重名 key 的插件, 则需要先销毁
+        if (map[plugin.key]) map[plugin.key].destroy();
         map[plugin.key] = plugin;
       }
+      this.map = map;
       this.current = Object.values(map);
       CorePlugin.editor = null;
     }

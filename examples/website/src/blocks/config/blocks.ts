@@ -6,7 +6,17 @@ export const INIT: Blocks = {
     version: 1,
     data: {
       type: "ROOT",
-      children: ["h1", "desc", "h2_quote", "quote_container", "h2_bullet", "bullet_l1", "child2"],
+      children: [
+        "h1",
+        "desc",
+        "h2_quote",
+        "quote_container",
+        "h2_bullet",
+        "bullet_l1",
+        "h2_code",
+        "code_block",
+        "child2",
+      ],
       parent: "",
     },
   },
@@ -30,9 +40,20 @@ export const INIT: Blocks = {
       parent: "root",
       delta: [
         {
-          insert:
-            "基于 BlockKit 实现的文档编辑器，以 Blocks 的形式组织核心架构，支持复杂的块级结构，以及更高的扩展性。",
+          insert: "基于",
         },
+        {
+          attributes: { "inline-code": "true" },
+          insert: "BlockKit",
+        },
+        {
+          insert: "实现的文档编辑器，以",
+        },
+        {
+          attributes: { "inline-code": "true" },
+          insert: "Blocks",
+        },
+        { insert: "的形式组织核心架构，支持复杂的块级结构，以及更高的扩展性。" },
       ],
       children: [],
     },
@@ -116,6 +137,28 @@ export const INIT: Blocks = {
       children: [],
       delta: [{ insert: "三级无序列表" }],
       parent: "bullet_l2",
+    },
+  },
+  h2_code: {
+    id: "h2_code",
+    version: 1,
+    data: {
+      type: "heading",
+      level: "h2",
+      children: [],
+      delta: [{ insert: "代码块" }],
+      parent: "root",
+    },
+  },
+  code_block: {
+    id: "code_block",
+    version: 1,
+    data: {
+      type: "code",
+      parent: "root",
+      children: [],
+      language: "javascript",
+      delta: [{ insert: "const a = 1;\nconst b = 2;" }],
     },
   },
   child2: {

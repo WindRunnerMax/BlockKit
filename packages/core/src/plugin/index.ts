@@ -56,6 +56,8 @@ export class Plugin {
       this.reset();
       const map: Record<string, CorePlugin> = {};
       for (const plugin of plugins) {
+        // 如果已经注册过重名 key 的插件, 则需要先销毁
+        if (map[plugin.key]) map[plugin.key].destroy();
         map[plugin.key] = plugin;
         // @ts-expect-error private property
         if (process.env.NODE_ENV === "development" && plugin.editor !== this.editor) {

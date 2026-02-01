@@ -67,5 +67,8 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
   );
 };
 
-/** Wrap Block Model */
+/**
+ * Wrap Block Model
+ * - 渲染块级节点, 块视图的外部结构
+ */
 export const BlockXWrapModel = React.memo(BlockXWrapView);

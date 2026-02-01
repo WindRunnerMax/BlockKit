@@ -1,10 +1,10 @@
 import type { EditorSchema } from "@block-kit/core";
 
-import type { EditorXRules } from "./types";
+import type { EditorXSchema } from "./types";
 
 export class Schema {
   /** 编辑器块节点模式规则 */
-  public schema: EditorXRules;
+  public schema: EditorXSchema;
   /** 文本编辑器节点模式规则 */
   public textSchema: EditorSchema;
   /** Void */
@@ -20,7 +20,7 @@ export class Schema {
    * 构造函数
    * @param rules
    */
-  constructor(rules: EditorXRules, schema: EditorSchema) {
+  constructor(rules: EditorXSchema, schema: EditorSchema) {
     this.schema = rules;
     this.textSchema = schema;
     for (const [key, value] of Object.entries(schema)) {

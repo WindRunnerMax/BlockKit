@@ -54,6 +54,8 @@ export type ApplyOptions = {
   undoable?: boolean;
   /** 阻止规范化变更 */
   preventNormalize?: boolean;
+  /** 完全本地变更 */
+  client?: boolean;
   /** 额外携带的信息 */
   extra?: unknown;
 };

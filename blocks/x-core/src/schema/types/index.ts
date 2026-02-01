@@ -38,4 +38,4 @@ export type XSchemaRule = {
  * - key: 块节点类型, 即块的 type 字段
  * - value: 块节点模式规则
  */
-export type EditorXRules = O.Map<XSchemaRule>;
+export type EditorXSchema = O.Map<XSchemaRule>;

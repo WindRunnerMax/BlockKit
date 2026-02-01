@@ -22,7 +22,10 @@ const TextView: FC<{
     };
     let instance: TextEditor | null = null;
     const pluginMap = props.block.plugin.map;
-    const plugin = pluginMap[props.state.type] || pluginMap.text;
+    let plugin = pluginMap[props.state.type];
+    if (!plugin || !plugin.willCreateTextEditor) {
+      plugin = pluginMap.text;
+    }
     if (plugin && plugin.willCreateTextEditor) {
       instance = plugin.willCreateTextEditor(context);
     }
@@ -58,10 +61,9 @@ const TextView: FC<{
     if (!ops) return void 0;
     let isAppliedDelta = false;
     for (const op of ops) {
-      if (isTextDeltaOp(op)) {
-        isAppliedDelta = true;
-        editor.state.apply(new Delta(op.o), { autoCaret: false });
-      }
+      if (!isTextDeltaOp(op)) continue;
+      isAppliedDelta = true;
+      editor.state.apply(new Delta(op.o), { autoCaret: false, undoable: false });
     }
     if (!isAppliedDelta || flushing.current) return void 0;
     flushing.current = true;

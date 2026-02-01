@@ -12,6 +12,7 @@ export class HeadingXPlugin extends BlockXPlugin {
   public destroy(): void {}
 
   public renderTextWrap(context: ReactTextWrapContext): React.ReactNode {
+    if (context.state.type !== HEADING_KEY) return context.children;
     const data = context.state.data as BlockDataType<typeof HEADING_KEY>;
     return <div className={`block-kit-x-heading-${data.level}`}>{context.children}</div>;
   }

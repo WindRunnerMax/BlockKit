@@ -2,10 +2,10 @@
   "extends": "./tsconfig.json",
   "useTsconfigDeclarationDir": true,
   "compilerOptions": {
-    "module": "ES2015",
+    "module": "ESNext",
     "baseUrl": ".",
     "outDir": "dist/lib",
-    "declarationDir": "dist/lib",
+    "declarationDir": "dist/lib"
   },
   "include": ["src/**/*"]
 }

@@ -68,15 +68,18 @@ export const normalizeModelRange = (
     // 遇到起始节点, 则开始记录
     START: if (node.id === start.id) {
       startTracking = true;
-      // 在块节点中, 则会走到后续的统一节点处理逻辑
+      // 当前在块节点中, 则会走到后续的统一节点处理逻辑
       if (isInBlockStack) break START;
       // 如果当前不在块节点内, 则直接添加起始节点到结果中
       result.push(startEntry);
       continue;
     }
     // 遇到结束节点, 则停止记录
-    if (node.id === end.id) {
-      !isInBlockStack && result.push(endEntry);
+    END: if (node.id === end.id) {
+      // 当前在块节点中, 则会走到后续的统一节点处理逻辑
+      if (isInBlockStack) break END;
+      // 如果当前不在块节点内, 则直接添加末尾节点到结果中
+      result.push(endEntry);
       break;
     }
     if (!startTracking) continue;
@@ -92,6 +95,8 @@ export const normalizeModelRange = (
       // 否则, 则添加当前节点到结果中
       result.push(Entry.create(node.id, TEXT, 0, node.length));
     }
+    // 需要再次判断是否为结束节点, 避免上述统一处理后不结束迭代
+    if (node.id === end.id) break;
   }
   return result;
 };

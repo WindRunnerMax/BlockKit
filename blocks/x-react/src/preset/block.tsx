@@ -85,7 +85,7 @@ const BlockXView: FC<BlockViewProps> = props => {
         childClsList: [],
       };
       const plugin = editor.plugin.map[child.data.type];
-      if (plugin) {
+      if (plugin && plugin.renderBlock) {
         blockContext.children = plugin.renderBlock(blockContext);
       }
       if (!blockContext.children) {
@@ -133,5 +133,8 @@ const BlockXView: FC<BlockViewProps> = props => {
   );
 };
 
-/** Block Model */
+/**
+ * Block Model
+ * - 渲染块级节点, 块视图的内部结构
+ */
 export const BlockXModel = React.memo(BlockXView, blockPropsAreEqual);

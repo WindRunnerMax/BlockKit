@@ -1,0 +1,15 @@
+/* stylelint-disable selector-no-qualifying-type */
+.block-kit-x-codeblock {
+  background-color: rgba(var(--gray-5), 0.2);
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 3px 10px;
+
+  div[data-node] {
+    line-height: 22px;
+  }
+}
+
+.token.operator {
+  background-color: transparent !important;
+}

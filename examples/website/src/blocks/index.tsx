@@ -5,6 +5,7 @@ import { BlockEditor } from "@block-kit/x-core";
 import {
   AlignXPlugin,
   BulletXPlugin,
+  CodeXPlugin,
   HeadingXPlugin,
   IndentXPlugin,
   QuoteXPlugin,
@@ -17,12 +18,14 @@ import ReactDOM from "react-dom";
 
 import { SCHEMA } from "../react/config/schema";
 import { INIT } from "./config/blocks";
+import { RULES } from "./config/schema";
 
 const App: FC = () => {
   const block = useMemo(() => {
     const instance = new BlockEditor({
       initial: INIT,
       logLevel: LOG_LEVEL.DEBUG,
+      schema: RULES,
       textSchema: SCHEMA,
     });
     instance.plugin.register([
@@ -32,6 +35,7 @@ const App: FC = () => {
       new QuoteXPlugin(),
       new BulletXPlugin(),
       new IndentXPlugin(),
+      new CodeXPlugin(),
     ]);
     return instance;
   }, []);

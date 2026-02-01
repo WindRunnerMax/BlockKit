@@ -7,6 +7,7 @@ import { isDOMElement } from "@block-kit/utils";
 import type { BlockEditor } from "../../editor";
 import { X_SELECTION_KEY } from "../../model/types";
 import { getBlockEndTextNode, getBlockStartTextNode } from "../../model/utils/dom";
+import { isVoidBlockType } from "../../schema/utils/is";
 import { Entry } from "../modules/entry";
 import { Point } from "../modules/point";
 import type { Range } from "../modules/range";
@@ -38,8 +39,8 @@ export const toDOMPoint = (
   const def: DOMPoint = { node: null, offset: 0 };
   if (point.type === POINT_TYPE.BLOCK) {
     const state = editor.state.getBlock(point.id);
-    // 如果不存在子节点, 则为块级节点, 如图片等
-    if (state && !state.children.length) {
+    // 如果是空节点, 例如图片、视频等
+    if (state && isVoidBlockType(state)) {
       const zero = editor.model.getZeroNode(state);
       return { node: zero, offset: 0 };
     }
