@@ -2,7 +2,13 @@ import type { P } from "@block-kit/utils/dist/es/types";
 
 import type { BlockEditor } from "../../editor";
 import type { BlockState } from "../../state/modules/state";
-import type { BlockContext, BlockWrapContext, TextWrapContext } from "../types/context";
+import type { TextEditor } from "../types";
+import type {
+  BlockContext,
+  BlockWrapContext,
+  CreateTextEditorContext,
+  TextWrapContext,
+} from "../types/context";
 
 export abstract class CorePlugin {
   /** 插件注册编辑器容器 */
@@ -50,6 +56,11 @@ export abstract class CorePlugin {
    * - 调度优先级值越大 DOM 结构在越外层
    */
   public renderBlockWrap?(state: BlockWrapContext): P.Any;
+
+  /**
+   * 文本编辑器创建前调度
+   */
+  public willCreateTextEditor?(context: CreateTextEditorContext): TextEditor;
 
   /**
    * 将 Blocks 序列化为 HTML

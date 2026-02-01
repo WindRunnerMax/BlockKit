@@ -89,7 +89,7 @@ export class Mutate {
       isEqualAttributes(newOp.attributes, lastOp.attributes) &&
       isInsertOp(newOp) &&
       isInsertOp(lastOp) &&
-      // Embed/Block 节点不可合并
+      // Embed/Void 节点不可合并
       !this.editor.schema.hasVoidKey(lastOp)
     ) {
       // 合并相同属性的 insert
@@ -122,9 +122,10 @@ export class Mutate {
     const thisIter = new Iterator(this.lines);
     const otherIter = new OpIterator(otherOps);
     const firstOther = otherIter.peek();
-    // 当前处理的 LineState
+    // 当前处理的 LineState, 初始化创建新的行节点
     let lineState = LineState._create(this.block);
     if (firstOther && isRetainOp(firstOther) && !firstOther.attributes) {
+      // 初始的 retain 范围内的所有行数据, 直接追加到目标行组内, 返回剩余行级偏移量
       let firstLeft = thisIter.firstRetain(firstOther.retain, this.newLines);
       while (thisIter.peekType() === OP_TYPES.INSERT && thisIter.peekLength() <= firstLeft) {
         firstLeft = firstLeft - thisIter.peekLength();
@@ -134,8 +135,8 @@ export class Mutate {
         // 其他 Op 则可直接追加到当前处理的 LineState
         lineState._appendLeaf(leaf);
       }
+      // 若处理过的数据 > 0, 将 OtherIter 的指针前移
       if (firstOther.retain - firstLeft > 0) {
-        // 若处理过的数据 > 0, 将 OtherIter 的指针前移
         otherIter.next(firstOther.retain - firstLeft);
       }
     }
@@ -166,7 +167,7 @@ export class Mutate {
         lineState = this.insert(lineState, newLeaf);
         // 如果 Other 已经到达末尾, 且不对数据造成影响, 处理剩余数据
         if (!otherIter.hasNext() && newLeaf === thisLeaf) {
-          // 处理剩余的 Leaves 和 Lines
+          // 处理剩余的 Leaves 和 Lines, 直接追加到目标行组内
           const rest = thisIter.rest();
           for (const leaf of rest.leaf) {
             lineState = this.insert(lineState, leaf);

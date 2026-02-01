@@ -1,3 +1,5 @@
+import type { O } from "@block-kit/utils/dist/es/types";
+
 export const LOG_LEVEL = {
   DEBUG: -1,
   INFO: 0,
@@ -6,9 +8,9 @@ export const LOG_LEVEL = {
 } as const;
 
 export class Logger {
-  public constructor(protected level: number) {}
+  public constructor(public level: O.Values<typeof LOG_LEVEL>) {}
 
-  set(level: number) {
+  set(level: O.Values<typeof LOG_LEVEL>) {
     this.level = level;
   }
 

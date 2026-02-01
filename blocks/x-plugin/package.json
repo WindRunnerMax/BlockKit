@@ -42,6 +42,7 @@
     "@block-kit/core": "workspace: *",
     "@block-kit/delta": "workspace: *",
     "@block-kit/react": "workspace: *",
+    "@block-kit/plugin": "workspace: *",
     "@block-kit/utils": "workspace: *",
     "@block-kit/x-core": "workspace: *",
     "@block-kit/x-json": "workspace: *",

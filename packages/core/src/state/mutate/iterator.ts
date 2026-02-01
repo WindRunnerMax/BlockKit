@@ -5,13 +5,24 @@ import { LeafState } from "../modules/leaf-state";
 import type { LineState } from "../modules/line-state";
 
 export class Iterator {
-  /** 行索引 */
+  /**
+   * 行索引
+   * - 指向正在迭代的 Line
+   */
   protected row: number;
-  /** 列索引 */
+  /**
+   * 列索引
+   * - 指向正在迭代的 Leaf
+   */
   protected col: number;
-  /** Op 偏移 */
+  /**
+   * Leaf 偏移
+   * - 当前迭代 Leaf 内部偏移
+   */
   protected offset: number;
-  /** LineState 组 */
+  /**
+   * 初始 LineState 组
+   */
   protected lines: LineState[];
 
   /**
@@ -97,7 +108,7 @@ export class Iterator {
    */
   public firstRetain(retain: number, newLines: LineState[]) {
     let firstRetain = retain;
-    while (retain > 0) {
+    while (firstRetain > 0) {
       const line = this.lines[this.row];
       if (!line || firstRetain < line.length) break;
       this.row++;
@@ -153,13 +164,13 @@ export class Iterator {
   public rest() {
     type Rest = { leaf: LeafState[]; line: LineState[] };
     const rest: Rest = { leaf: [], line: [] };
+    // 不存在未迭代的部分, 直接返回预设的空值
     if (!this.hasNext()) {
-      // 不存在未迭代的部分
       return rest;
+      // 当前指针位置剩余完整的 Leaf, 则根据情况裁剪数组
     } else if (this.offset === 0) {
-      // 当前指针位置剩余完整的 Leaf
+      // col = 0 && offset = 0 则直接返回剩余的 Line
       if (this.col === 0) {
-        // col === 0 && offset === 0 则直接返回剩余的 Line
         rest.line = this.lines.slice(this.row);
         return rest;
       }
@@ -169,8 +180,8 @@ export class Iterator {
         rest.line = this.lines.slice(this.row + 1);
       }
       return rest;
+      // 当前指针位置非完整 Leaf, 则需要裁剪 Leaf 剩余内容
     } else {
-      // 当前指针位置非完整 Leaf
       const offset = this.offset;
       const row = this.row;
       const col = this.col;

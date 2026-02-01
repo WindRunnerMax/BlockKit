@@ -93,10 +93,8 @@ const BlockView: FC<{
         }
       }
     }
-    return lines.map((line, index) => {
-      const node = (
-        <LineModel key={line.key} editor={editor} lineState={line} index={index}></LineModel>
-      );
+    return lines.map(line => {
+      const node = <LineModel key={line.key} editor={editor} lineState={line}></LineModel>;
       JSX_TO_STATE.set(node, line);
       return node;
     });

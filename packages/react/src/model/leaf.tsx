@@ -12,7 +12,6 @@ import { LEAF_TO_REMOUNT, LEAF_TO_TEXT as LT } from "../utils/weak-map";
 
 const LeafView: FC<{
   editor: Editor;
-  index: number;
   leafState: LeafState;
 }> = props => {
   const { editor, leafState } = props;

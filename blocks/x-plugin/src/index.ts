@@ -9,3 +9,5 @@ export { HEADING_KEY } from "./heading/types/index";
 export { IndentXPlugin } from "./indent/index";
 export { QuoteXPlugin } from "./quote/index";
 export { QUOTE_KEY } from "./quote/types";
+export { TextXPlugin } from "./text";
+export { TEXT_KEY } from "./text/types/index";

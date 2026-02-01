@@ -10,7 +10,7 @@ export type Rule = XSchemaRule | undefined;
  */
 export const isBoxBlockType = (block: BlockState): boolean => {
   const editor = block.container.editor;
-  const rule: Rule = editor.schema.rules[block.type];
+  const rule: Rule = editor.schema.schema[block.type];
   return !rule ? !block.data.delta : !!rule.box;
 };
 
@@ -21,7 +21,7 @@ export const isBoxBlockType = (block: BlockState): boolean => {
  */
 export const isTextBlockType = (block: BlockState): boolean => {
   const editor = block.container.editor;
-  const rule: Rule = editor.schema.rules[block.type];
+  const rule: Rule = editor.schema.schema[block.type];
   return !rule ? !!block.data.delta : !!rule.text;
 };
 
@@ -31,7 +31,7 @@ export const isTextBlockType = (block: BlockState): boolean => {
  */
 export const isBoxLikeBlockType = (block: BlockState): boolean => {
   const editor = block.container.editor;
-  const rule: Rule = editor.schema.rules[block.type];
+  const rule: Rule = editor.schema.schema[block.type];
   return !rule ? !block.data.delta : !!rule.box || !!rule.box_text;
 };
 
@@ -42,7 +42,7 @@ export const isBoxLikeBlockType = (block: BlockState): boolean => {
  */
 export const isTextLikeBlockType = (block: BlockState): boolean => {
   const editor = block.container.editor;
-  const rule: Rule = editor.schema.rules[block.type];
+  const rule: Rule = editor.schema.schema[block.type];
   return !rule ? !!block.data.delta : !!rule.text || !!rule.box_text;
 };
 
@@ -53,6 +53,6 @@ export const isTextLikeBlockType = (block: BlockState): boolean => {
  */
 export const isVoidBlockType = (block: BlockState): boolean => {
   const editor = block.container.editor;
-  const rule: Rule = editor.schema.rules[block.type];
+  const rule: Rule = editor.schema.schema[block.type];
   return rule ? !!rule.void : false;
 };

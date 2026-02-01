@@ -51,12 +51,12 @@ export class BlockEditor {
     const {
       initial = getInitialBlocks(),
       logLevel = LOG_LEVEL.ERROR,
-      rules = {},
       schema = {},
+      textSchema = {},
     } = options;
     this.container = null;
     this.logger = new Logger(logLevel);
-    this.schema = new Schema(rules, schema);
+    this.schema = new Schema(schema, textSchema);
     this.state = new EditorState(this, initial);
     this.event = new Event(this);
     this.plugin = new Plugin(this);

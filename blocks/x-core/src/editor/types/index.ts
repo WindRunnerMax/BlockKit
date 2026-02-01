@@ -9,8 +9,8 @@ export type EditorOptions = {
   initial?: BlockMap;
   /** 日志等级 */
   logLevel?: O.Values<typeof LOG_LEVEL>;
-  /** 文本编辑器预设渲染规则 */
-  schema?: EditorSchema;
   /** 块编辑器预设渲染规则 */
-  rules?: EditorXRules;
+  schema?: EditorXRules;
+  /** 文本编辑器预设渲染规则 */
+  textSchema?: EditorSchema;
 };

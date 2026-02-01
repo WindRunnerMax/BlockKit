@@ -1,18 +1,6 @@
 import "./styles/index.scss";
 
-import { Editor as TextEditor, LOG_LEVEL } from "@block-kit/core";
-import type { Delta } from "@block-kit/delta";
-import {
-  BackgroundPlugin,
-  BoldPlugin,
-  FontColorPlugin,
-  FontSizePlugin,
-  InlineCodePlugin,
-  ItalicPlugin,
-  LinkPlugin,
-  StrikePlugin,
-  UnderlinePlugin,
-} from "@block-kit/plugin";
+import { LOG_LEVEL } from "@block-kit/core";
 import { BlockEditor } from "@block-kit/x-core";
 import {
   AlignXPlugin,
@@ -20,6 +8,7 @@ import {
   HeadingXPlugin,
   IndentXPlugin,
   QuoteXPlugin,
+  TextXPlugin,
 } from "@block-kit/x-plugin";
 import { BlockKitX, EditableX } from "@block-kit/x-react";
 import type { FC } from "react";
@@ -31,8 +20,13 @@ import { INIT } from "./config/blocks";
 
 const App: FC = () => {
   const block = useMemo(() => {
-    const instance = new BlockEditor({ initial: INIT, logLevel: LOG_LEVEL.DEBUG });
+    const instance = new BlockEditor({
+      initial: INIT,
+      logLevel: LOG_LEVEL.DEBUG,
+      textSchema: SCHEMA,
+    });
     instance.plugin.register([
+      new TextXPlugin(),
       new HeadingXPlugin(),
       new AlignXPlugin(),
       new QuoteXPlugin(),
@@ -47,24 +41,8 @@ const App: FC = () => {
     window.editor = block;
   }, [block]);
 
-  const onCreateTextEditor = (delta: Delta) => {
-    const instance = new TextEditor({ schema: SCHEMA, delta });
-    instance.plugin.register([
-      new BoldPlugin(),
-      new ItalicPlugin(),
-      new UnderlinePlugin(instance),
-      new StrikePlugin(instance),
-      new InlineCodePlugin(instance),
-      new FontSizePlugin(instance),
-      new FontColorPlugin(instance),
-      new BackgroundPlugin(instance),
-      new LinkPlugin(instance),
-    ]);
-    return instance;
-  };
-
   return (
-    <BlockKitX editor={block} onCreateTextEditor={onCreateTextEditor} readonly={false}>
+    <BlockKitX editor={block} readonly={false}>
       <div className="block-kit-editor-container">
         <div className="block-kit-editable-container">
           <div className="block-kit-mount-dom"></div>

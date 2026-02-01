@@ -291,8 +291,8 @@ export class LineState {
     const newOp = cloneOp(op);
     this.op = newOp;
     this.attributes = newOp.attributes || {};
+    // 在开发模式和测试环境下冻结, 避免 immutable 的对象被修改
     if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-      // 在开发模式和测试环境下冻结, 避免 immutable 的对象被修改
       Object.freeze(this.op);
       Object.freeze(this.attributes);
     }

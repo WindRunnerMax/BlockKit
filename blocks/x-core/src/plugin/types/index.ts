@@ -5,6 +5,7 @@ import type { CorePlugin } from "../modules/implement";
 export type PluginType = keyof CorePlugin;
 export type RequiredPlugin = Required<CorePlugin>;
 export type CallerType = O.Values<typeof CALLER_TYPE>;
+export { Editor as TextEditor } from "@block-kit/core";
 
 /** 插件批量调用方法 */
 export const CALLER_TYPE = {

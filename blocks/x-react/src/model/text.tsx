@@ -1,28 +1,40 @@
+import { Editor as TextEditor } from "@block-kit/core";
 import { EDITOR_EVENT, EDITOR_STATE } from "@block-kit/core";
 import { Delta } from "@block-kit/delta";
 import { BlockKitContext, LineModel, rewriteRemoveChild } from "@block-kit/react";
 import { useMemoFn, useSafeState } from "@block-kit/utils/dist/es/hooks";
-import type { BlockEditor, BlockState, Listener } from "@block-kit/x-core";
+import type { BlockEditor, BlockState, CreateTextEditorContext, Listener } from "@block-kit/x-core";
 import { X_TEXT_BLOCK_KEY } from "@block-kit/x-core";
 import { isTextDeltaOp } from "@block-kit/x-json";
 import type { FC } from "react";
 import React, { useLayoutEffect, useMemo, useRef } from "react";
-
-import { useMetaStatic } from "../hooks/use-meta";
 
 const TextView: FC<{
   block: BlockEditor;
   state: BlockState;
   className?: string;
 }> = props => {
-  const { onCreateTextEditor } = useMetaStatic();
-
   const editor = useMemo(() => {
     const ops = props.state.data.delta;
-    const text = onCreateTextEditor(new Delta(ops));
-    props.block.model.setTextEditor(props.state, text);
-    return text;
-  }, [onCreateTextEditor, props.block.model, props.state]);
+    const context: CreateTextEditorContext = {
+      state: props.state,
+      delta: new Delta(ops),
+    };
+    let instance: TextEditor | null = null;
+    const pluginMap = props.block.plugin.map;
+    const plugin = pluginMap[props.state.type] || pluginMap.text;
+    if (plugin && plugin.willCreateTextEditor) {
+      instance = plugin.willCreateTextEditor(context);
+    }
+    if (!instance) {
+      instance = new TextEditor({
+        delta: context.delta,
+        schema: props.block.schema.textSchema,
+      });
+    }
+    props.block.model.setTextEditor(props.state, instance);
+    return instance;
+  }, [props.block, props.state]);
 
   const flushing = useRef(false);
   const state = editor.state.block;
@@ -74,11 +86,8 @@ const TextView: FC<{
    * 处理行节点
    */
   const elements = useMemo(() => {
-    return lines.map((line, index) => {
-      const node = (
-        <LineModel key={line.key} editor={editor} lineState={line} index={index}></LineModel>
-      );
-      return node;
+    return lines.map(line => {
+      return <LineModel key={line.key} editor={editor} lineState={line}></LineModel>;
     });
   }, [editor, lines]);
 

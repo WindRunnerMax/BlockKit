@@ -1,3 +1,4 @@
+import type { Delta } from "@block-kit/delta";
 import type { P } from "@block-kit/utils/dist/es/types";
 import type { Properties } from "csstype";
 
@@ -56,4 +57,14 @@ export type TextWrapContext = {
   state: BlockState;
   /** 子元素 */
   children?: P.Any;
+};
+
+/**
+ * 文本编辑器创建状态
+ */
+export type CreateTextEditorContext = {
+  /** 状态对象 */
+  state: BlockState;
+  /** 文本元素 */
+  delta: Delta;
 };

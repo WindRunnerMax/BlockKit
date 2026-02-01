@@ -166,6 +166,9 @@ importers:
       '@block-kit/delta':
         specifier: 'workspace: *'
         version: link:../../packages/delta
+      '@block-kit/plugin':
+        specifier: 'workspace: *'
+        version: link:../../packages/plugin
       '@block-kit/react':
         specifier: 'workspace: *'
         version: link:../../packages/react

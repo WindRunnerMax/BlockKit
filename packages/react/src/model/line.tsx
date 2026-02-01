@@ -15,7 +15,6 @@ import { LeafModel } from "./leaf";
 
 const LineView: FC<{
   editor: Editor;
-  index: number;
   lineState: LineState;
 }> = props => {
   const { editor, lineState } = props;
@@ -67,13 +66,15 @@ const LineView: FC<{
       }
     }
     const leaves = lineState.getLeaves();
+    // 首先渲染所有非 EOL 的叶子节点
     const textLeaves = leaves.slice(0, -1);
-    const nodes = textLeaves.map((n, i) => {
-      const node = <LeafModel key={n.key} editor={editor} index={i} leafState={n} />;
+    const nodes = textLeaves.map(n => {
+      const node = <LeafModel key={n.key} editor={editor} leafState={n} />;
       JSX_TO_STATE.set(node, n);
       return node;
     });
-    // 空行则仅存在一个 Leaf, 此时需要渲染空的占位节点
+    // 存在内容时不渲染 EOL, 避免块级元素出现额外视觉上的换行
+    // 若是空行则仅存在一个 Leaf, 此时需要渲染空的占位节点
     if (!nodes.length && leaves[0]) {
       const leaf = leaves[0];
       const node = <EOLModel key={EOL} editor={editor} leafState={leaf} />;
