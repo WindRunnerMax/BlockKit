@@ -1,17 +1,22 @@
 import "../styles/index.scss";
 
-import { debounce, preventNativeEvent } from "@block-kit/utils";
-import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
+import { debounce, isDOMElement, preventNativeEvent } from "@block-kit/utils";
+import { useForceUpdate, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { BlockEditor, Listener } from "@block-kit/x-core";
 import { EDITOR_EVENT } from "@block-kit/x-core";
 import type { BlockModule } from "@block-kit/x-json";
 import type { ReactBlockContext } from "@block-kit/x-react";
-import { BlockXModel, MountNode, useReadonly } from "@block-kit/x-react";
-import type { FC, ReactNode } from "react";
+import { BlockXModel, useReadonly } from "@block-kit/x-react";
+import type { FC } from "react";
 import { useEffect, useMemo } from "react";
 
 import { Selector } from "../../shared/component/selector";
-import { DEFAULT_LANGUAGE, SELECTOR_ID, SUPPORTED_LANGUAGES } from "../utils/constant";
+import {
+  CODE_HL_LINE_NUM,
+  DEFAULT_LANGUAGE,
+  SELECTOR_ID,
+  SUPPORTED_LANGUAGES,
+} from "../utils/constant";
 
 export const CodeBlock: FC<{
   editor: BlockEditor;
@@ -20,6 +25,7 @@ export const CodeBlock: FC<{
   const { editor, context } = props;
   const state = context.state;
   const { readonly } = useReadonly();
+  const { index, forceUpdate } = useForceUpdate();
   const data = context.state.data as BlockModule["code"];
 
   const onParse = useMemoFn(() => {
@@ -41,7 +47,8 @@ export const CodeBlock: FC<{
 
   const onContentChange: Listener<"CONTENT_CHANGE"> = useMemoFn(e => {
     if (!e.changes[state.id] || e.options.client) return void 0;
-    onDebounceParse();
+    // onDebounceParse();
+    forceUpdate();
   });
 
   useEffect(() => {
@@ -52,17 +59,23 @@ export const CodeBlock: FC<{
     };
   }, [editor.event, onContentChange, onDebounceParse]);
 
+  /** 副作用更新行号 */
+  useEffect(() => {
+    const text = editor.model.getTextEditor(state);
+    const lines = text && text.state.block.getLines();
+    if (!lines || !text) return void 0;
+    lines.forEach((line, i) => {
+      const dom = text.model.getLineNode(line);
+      if (dom && dom.firstChild && isDOMElement(dom.firstChild)) {
+        const el = dom.firstChild as HTMLElement;
+        el && el.setAttribute(CODE_HL_LINE_NUM, String(i + 1));
+      }
+    });
+  }, [editor.model, state, index]);
+
   const onLanguageChange = useMemoFn((value: string) => {
     const change = editor.perform.atom.updateAttr(state.id, ["language"], value);
     editor.state.apply([change], { autoCaret: false });
-  });
-
-  const mountSelector = useMemoFn((node: ReactNode) => {
-    MountNode.mount(props.editor, SELECTOR_ID, node);
-  });
-
-  const unmountSelector = useMemoFn(() => {
-    MountNode.unmount(props.editor, SELECTOR_ID);
   });
 
   return (
@@ -73,12 +86,11 @@ export const CodeBlock: FC<{
         onMouseDown={preventNativeEvent}
       >
         <Selector
+          id={SELECTOR_ID}
           disabled={readonly}
-          defaultValue={data.language || DEFAULT_LANGUAGE}
+          value={data.language || DEFAULT_LANGUAGE}
           onChange={value => onLanguageChange(value)}
           options={SUPPORTED_LANGUAGES}
-          onMount={mountSelector}
-          onUnmount={unmountSelector}
         ></Selector>
       </div>
       <BlockXModel editor={editor} state={context.state}></BlockXModel>

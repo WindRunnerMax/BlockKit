@@ -1,3 +1,4 @@
+export { useEditorStatic } from "./hooks/use-editor";
 export { useReadonly } from "./hooks/use-readonly";
 export { PortalModel } from "./model/portal";
 export { TextModel } from "./model/text";

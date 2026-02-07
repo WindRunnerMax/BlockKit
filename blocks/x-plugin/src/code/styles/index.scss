@@ -26,3 +26,21 @@
     background-color: var(--color-fill-3);
   }
 }
+
+.block-x-code-hl-line {
+  font-family: monospace;
+  padding-left: 28px;
+  position: relative;
+
+  &::before {
+    color: var(--color-text-3);
+    content: attr(data-line-num);
+    display: inline-block;
+    left: 0;
+    padding-right: 10px;
+    pointer-events: none;
+    position: absolute;
+    text-align: right;
+    width: 18px;
+  }
+}

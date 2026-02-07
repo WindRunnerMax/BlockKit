@@ -14,6 +14,8 @@ const TextView: FC<{
   state: BlockState;
   className?: string;
 }> = props => {
+  const flushing = useRef(false);
+
   const editor = useMemo(() => {
     const ops = props.state.data.delta;
     const context: CreateTextEditorContext = {
@@ -39,7 +41,6 @@ const TextView: FC<{
     return instance;
   }, [props.block, props.state]);
 
-  const flushing = useRef(false);
   const state = editor.state.block;
   const [lines, setLines] = useSafeState(() => state.getLines());
 

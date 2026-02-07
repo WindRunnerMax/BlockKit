@@ -1,3 +1,5 @@
+@import '../../../node_modules/@block-kit/utils/dist/style/vars';
+
 .block-kit-x-selector {
   color: var(--color-text-1);
   cursor: pointer;
@@ -8,8 +10,34 @@
     margin-left: 4px;
     transition: all 0.1s ease-in-out;
   }
+}
+
+.block-kit-x-selector-options-container {
+  @include no-scrollbar;
+  @include frame-box;
+
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: var(--color-text-1);
+  font-size: 13px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 5px 7px;
+  position: absolute;
+  z-index: 10;
 
   .block-kit-x-selector-options {
-    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin: 3px 0;
+    padding: 2px 5px;
+
+    &.x-active {
+      color: rgb(var(--arcoblue-6, (0,87,255)));
+    }
+
+    &:hover {
+      background-color: var(--color-fill-2, #f5f5f5);
+    }
   }
 }
