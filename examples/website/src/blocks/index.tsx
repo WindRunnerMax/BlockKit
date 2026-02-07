@@ -11,7 +11,7 @@ import {
   QuoteXPlugin,
   TextXPlugin,
 } from "@block-kit/x-plugin";
-import { BlockKitX, EditableX } from "@block-kit/x-react";
+import { BlockKitX, EditableX, MountNode } from "@block-kit/x-react";
 import type { FC } from "react";
 import { useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
@@ -40,6 +40,10 @@ const App: FC = () => {
     return instance;
   }, []);
 
+  const onRef = (el: HTMLDivElement) => {
+    el && MountNode.set(block, el);
+  };
+
   useEffect(() => {
     // @ts-expect-error 仅调试用
     window.editor = block;
@@ -47,11 +51,9 @@ const App: FC = () => {
 
   return (
     <BlockKitX editor={block} readonly={false}>
-      <div className="block-kit-editor-container">
-        <div className="block-kit-editable-container">
-          <div className="block-kit-mount-dom"></div>
-          <EditableX placeholder="Input Placeholder..."></EditableX>
-        </div>
+      <div className="block-kit-editable-container">
+        <div className="block-kit-mount-dom" ref={onRef}></div>
+        <EditableX placeholder="Input Placeholder..."></EditableX>
       </div>
     </BlockKitX>
   );

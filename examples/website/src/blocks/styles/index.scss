@@ -15,39 +15,34 @@ body[arco-theme='dark'] {
   width: 800px;
 }
 
-.block-kit-editor-container {
-  box-sizing: border-box;
-  position: relative;
+.block-kit-toolbar {
+  background-color: var(--color-bg-2);
+  border-bottom: unset;
+  border-bottom: 1px solid var(--color-fill-2);
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-  .block-kit-toolbar {
-    background-color: var(--color-bg-2);
-    border-bottom: unset;
-    border-bottom: 1px solid var(--color-fill-2);
-    justify-content: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
+.block-kit-mount-dom {
+  left: 0;
+  position: absolute;
+  top: 0;
+}
 
-  .block-kit-mount-dom {
-    left: 0;
-    position: absolute;
-    top: 0;
-  }
+.block-kit-x-editable {
+  background-color: var(--color-bg-2);
+  color: var(--color-text-1);
+  padding: 10px 20px;
+}
 
-  .block-kit-x-editable {
-    background-color: var(--color-bg-2);
-    color: var(--color-text-1);
-    padding: 10px 20px;
-  }
+div[data-node],
+div.block-kit-x-editable > div[data-placeholder] {
+  line-height: 1.8;
+}
 
-  div[data-node],
-  div.block-kit-x-editable > div[data-placeholder] {
-    line-height: 1.8;
-  }
-
-  div[data-text-block],
-  div.block-kit-x-editable > div[data-placeholder] {
-    padding: 3px 0;
-  }
+div[data-text-block],
+div.block-kit-x-editable > div[data-placeholder] {
+  padding: 3px 0;
 }

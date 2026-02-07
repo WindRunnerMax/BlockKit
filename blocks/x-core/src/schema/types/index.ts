@@ -24,7 +24,7 @@ export type XSchemaRule = {
    * 1. 存在 delta 字段
    * 2. 不存在 children 内的子节点
    */
-  box_text?: boolean;
+  boxText?: boolean;
   /**
    * 空节点, 例如 Image 块类型
    * 1. 可以存在 delta 字段

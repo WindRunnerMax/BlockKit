@@ -1,6 +1,6 @@
 import type { O } from "@block-kit/utils/dist/es/types";
 import type { BlockEditor } from "@block-kit/x-core";
-import type { ReactPortal } from "react";
+import type { ReactNode, ReactPortal } from "react";
 import { createPortal } from "react-dom";
 
 export const EDITOR_TO_DOM = new WeakMap<BlockEditor, HTMLElement | null>();
@@ -36,7 +36,7 @@ export const MountNode = {
    * @param node
    * @param dom [?=undef]
    */
-  mount: (editor: BlockEditor, key: string, node: JSX.Element, dom?: HTMLElement) => {
+  mount: (editor: BlockEditor, key: string, node: ReactNode, dom?: HTMLElement) => {
     const setPortals = EDITOR_TO_PORTAL.get(editor);
     if (!setPortals) return void 0;
     const portal = createPortal(node, dom || MountNode.get(editor));

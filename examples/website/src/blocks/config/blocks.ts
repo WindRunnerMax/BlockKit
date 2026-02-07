@@ -157,7 +157,7 @@ export const INIT: Blocks = {
       type: "code",
       parent: "root",
       children: [],
-      language: "javascript",
+      language: "JavaScript",
       delta: [{ insert: "const a = 1;\nconst b = 2;" }],
     },
   },

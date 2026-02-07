@@ -4,7 +4,7 @@ import type { EditorXSchema } from "../../src";
 import { BlockEditor, normalizeModelRange } from "../../src";
 
 const schema: EditorXSchema = {
-  code: { box_text: true },
+  code: { boxText: true },
 };
 
 export const getBlocks = (): Blocks => ({
@@ -36,7 +36,7 @@ export const getBlocks = (): Blocks => ({
 });
 
 describe("selection box-text model", () => {
-  it("box_text schema start range type", () => {
+  it("box text schema start range type", () => {
     const editor = new BlockEditor({ initial: getBlocks(), schema });
     const ranges = normalizeModelRange(
       editor,
@@ -49,7 +49,7 @@ describe("selection box-text model", () => {
     ]);
   });
 
-  it("box_text schema end range type", () => {
+  it("box text schema end range type", () => {
     const editor = new BlockEditor({ initial: getBlocks(), schema });
     const ranges = normalizeModelRange(
       editor,

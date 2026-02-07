@@ -1,12 +1,26 @@
 import type { Delta } from "@block-kit/delta";
+import type { Path } from "@block-kit/ot-json";
 import { getId, isString } from "@block-kit/utils";
 import type { BlockDataField, JSONOp } from "@block-kit/x-json";
+import { json } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../../editor";
 import type { ApplyChange } from "../../state/types";
 
 export class Atom {
   public constructor(protected editor: BlockEditor) {}
+
+  /**
+   * 获取 Block 节点指定 path 数据
+   * @param blockId 块节点 id
+   * @param path 数据路径
+   */
+  public get(blockId: string, path: Path): unknown | null {
+    const block = this.editor.state.getBlock(blockId);
+    if (!block) return null;
+    const data = block.data;
+    return json.get(data, path);
+  }
 
   /**
    * 创建新 Block 的变更
@@ -76,15 +90,6 @@ export class Atom {
   }
 
   /**
-   * 生成文本变更
-   * @param id 变更块 id
-   * @param delta Delta 变更内容
-   */
-  public updateText(id: string, delta: Delta): ApplyChange {
-    return { id, ops: [{ p: ["delta"], t: "delta", o: delta.ops }] };
-  }
-
-  /**
    * 某节点子节点位置移动的变更
    * @param nodeId 将要移动节点 id
    * @param toParentId  新的父节点 id
@@ -99,5 +104,28 @@ export class Atom {
       { id: nodeId, ops: [{ p: ["parent"], od: block.data.parent, oi: toParentId }] },
     ];
     return changes;
+  }
+
+  /**
+   * 生成文本变更
+   * @param id 变更块 id
+   * @param delta Delta 变更内容
+   */
+  public updateText(id: string, delta: Delta): ApplyChange {
+    return { id, ops: [{ p: ["delta"], t: "delta", o: delta.ops }] };
+  }
+
+  /**
+   * 更新 Block 节点指定 path 数据的变更
+   * @param blockId 块节点 id
+   * @param path 数据路径
+   * @param value 新值
+   */
+  public updateAttr(blockId: string, path: Path, value: unknown): ApplyChange {
+    const initial = this.get(blockId, path);
+    return {
+      id: blockId,
+      ops: [{ p: path, od: initial, oi: value }],
+    };
   }
 }

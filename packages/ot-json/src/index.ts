@@ -15,6 +15,7 @@ export type {
   ObjectInsertOp,
   ObjectReplaceOp,
   Op,
+  Path,
   Side,
   Snapshot,
   TextOp,

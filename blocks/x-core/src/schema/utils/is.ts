@@ -32,7 +32,7 @@ export const isTextBlockType = (block: BlockState): boolean => {
 export const isBoxLikeBlockType = (block: BlockState): boolean => {
   const editor = block.container.editor;
   const rule: Rule = editor.schema.schema[block.type];
-  return !rule ? !block.data.delta : !!rule.box || !!rule.box_text;
+  return !rule ? !block.data.delta : !!rule.box || !!rule.boxText;
 };
 
 /**
@@ -43,7 +43,7 @@ export const isBoxLikeBlockType = (block: BlockState): boolean => {
 export const isTextLikeBlockType = (block: BlockState): boolean => {
   const editor = block.container.editor;
   const rule: Rule = editor.schema.schema[block.type];
-  return !rule ? !!block.data.delta : !!rule.text || !!rule.box_text;
+  return !rule ? !!block.data.delta : !!rule.text || !!rule.boxText;
 };
 
 /**

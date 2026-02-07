@@ -1,0 +1,15 @@
+.block-kit-x-selector {
+  color: var(--color-text-1);
+  cursor: pointer;
+  display: inline-block;
+  font-size: 12px;
+
+  .arco-icon.arco-icon-down {
+    margin-left: 4px;
+    transition: all 0.1s ease-in-out;
+  }
+
+  .block-kit-x-selector-options {
+    padding: 4px 8px;
+  }
+}

@@ -43,6 +43,7 @@ export const normalizeModelRange = (
   const stack: BlockState[] = [];
   const result: RangeEntry[] = [];
   let startTracking = false;
+  let exitingTracking = false;
   for (let k = 0, n = nodes.length; k < n; k++) {
     const node = nodes[k];
     // 在 k 为 0 的情况下, node 实际上即为 lca 节点
@@ -76,6 +77,7 @@ export const normalizeModelRange = (
     }
     // 遇到结束节点, 则停止记录
     END: if (node.id === end.id) {
+      exitingTracking = true;
       // 当前在块节点中, 则会走到后续的统一节点处理逻辑
       if (isInBlockStack) break END;
       // 如果当前不在块节点内, 则直接添加末尾节点到结果中
@@ -95,8 +97,8 @@ export const normalizeModelRange = (
       // 否则, 则添加当前节点到结果中
       result.push(Entry.create(node.id, TEXT, 0, node.length));
     }
-    // 需要再次判断是否为结束节点, 避免上述统一处理后不结束迭代
-    if (node.id === end.id) break;
+    // 退出过程结束, 避免上述统一处理后不结束迭代
+    if (exitingTracking) break;
   }
   return result;
 };

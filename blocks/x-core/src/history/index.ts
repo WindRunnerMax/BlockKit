@@ -295,9 +295,6 @@ export class History {
         latestRange: latestRange && this.transformRange(latestRange, remoteChanges),
       };
       remoteChanges = Transform.transform(prevItem.changes, remoteChanges);
-      if (!stack[i].changes.ops.length) {
-        stack.splice(i, 1);
-      }
     }
   }
 
