@@ -1,6 +1,6 @@
 import type { Delta } from "@block-kit/delta";
-import type { Path } from "@block-kit/ot-json";
 import { getId, isString } from "@block-kit/utils";
+import type { Path } from "@block-kit/x-json";
 import type { BlockDataField, JSONOp } from "@block-kit/x-json";
 import { json } from "@block-kit/x-json";
 
