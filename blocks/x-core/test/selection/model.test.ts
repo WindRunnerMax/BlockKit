@@ -19,6 +19,7 @@ Quote3
     Text8
     Text9
 Text10
+Text11
 */
 
 const getBlocks = (): Blocks => ({
@@ -27,7 +28,7 @@ const getBlocks = (): Blocks => ({
     version: 1,
     data: {
       type: "ROOT",
-      children: ["Text1", "Text2", "Quote1", "Quote2", "Text7", "Quote3", "Text10"],
+      children: ["Text1", "Text2", "Quote1", "Quote2", "Text7", "Quote3", "Text10", "Text11"],
       parent: "",
     },
   },
@@ -108,6 +109,11 @@ const getBlocks = (): Blocks => ({
   },
   Text10: {
     id: "Text10",
+    version: 1,
+    data: { type: "text", children: [], delta: [{ insert: "xx" }], parent: "Root" },
+  },
+  Text11: {
+    id: "Text11",
     version: 1,
     data: { type: "text", children: [], delta: [{ insert: "xx" }], parent: "Root" },
   },
@@ -218,6 +224,20 @@ describe("selection model", () => {
     expect(ranges).toEqual([
       { id: "Text1", type: "T", start: 2, len: 3 },
       { id: "GrandText1", type: "T", start: 0, len: 3 },
+    ]);
+  });
+
+  it("mixin block and text", () => {
+    const editor = new BlockEditor({ initial: getBlocks() });
+    const ranges = normalizeModelRange(
+      editor,
+      { id: "Quote3", type: "B" },
+      { id: "Text11", type: "T", offset: 1 }
+    );
+    expect(ranges).toEqual([
+      { id: "Quote3", type: "B" },
+      { id: "Text10", type: "T", start: 0, len: 2 },
+      { id: "Text11", type: "T", start: 0, len: 1 },
     ]);
   });
 });

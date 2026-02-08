@@ -28,4 +28,26 @@ describe("leaf text", () => {
     expect(leaf1).not.toBe(leaf2);
     expect(LEAF_TO_TEXT.get(leaf2)?.textContent).toBe("te");
   });
+
+  it("leaf state retain keep ref", async () => {
+    const delta = new Delta()
+      .insert("text")
+      .insert("aaa", { a: "true" })
+      .insert("b", { a: "true", b: "true" })
+      .insertEOL();
+    const editor = new Editor({ delta });
+    render(
+      <BlockKit editor={editor}>
+        <Editable></Editable>
+      </BlockKit>
+    );
+    const leaf1 = editor.state.block.getLine(0)!.getLeaf(1)!;
+    await act(() => {
+      editor.state.apply(new Delta().retain(4).retain(3, { a: "true" }));
+      return waitRenderComplete(editor, 10);
+    });
+    const leaf2 = editor.state.block.getLine(0)!.getLeaf(1)!;
+    expect(leaf1.op).toEqual(leaf2.op);
+    expect(leaf1).toBe(leaf2);
+  });
 });

@@ -3,6 +3,7 @@ import { isBoxLikeBlockType, isTextBlockType } from "../../schema/utils/is";
 import type { BlockState } from "../../state/modules/state";
 import { getLCAWithChildren } from "../../state/utils/tree";
 import { Entry } from "../modules/entry";
+import { Point } from "../modules/point";
 import type { RangeEntry, RangePoint } from "../types";
 import { POINT_TYPE } from "./constant";
 
@@ -33,12 +34,17 @@ export const normalizeModelRange = (
   const lcaResult = getLCAWithChildren(startState, endState);
   if (!lcaResult) return [];
   const { lca, child1, child2 } = lcaResult;
-  if (start.type === BLOCK || end.type === BLOCK) {
+  // 全部为块节点的情况下, 返回所有中间块节点
+  if (start.type === BLOCK && end.type === BLOCK) {
     return lca.children.slice(child1.index, child2.index + 1).map(it => Entry.create(it.id, BLOCK));
   }
   // 文本节点下, 无论端点深度是否相同, 都处理为 DFS 序
-  const startEntry = Entry.fromPoint(start, start.offset, startState.length - start.offset);
-  const endEntry = Entry.fromPoint(end, 0, end.offset);
+  const startEntry = Point.isBlock(start)
+    ? Entry.create(start.id, BLOCK)
+    : Entry.fromPoint(start, start.offset, startState.length - start.offset);
+  const endEntry = Point.isBlock(end)
+    ? Entry.create(end.id, BLOCK)
+    : Entry.fromPoint(end, 0, end.offset);
   const nodes = lca.getTreeNodes();
   const stack: BlockState[] = [];
   const result: RangeEntry[] = [];

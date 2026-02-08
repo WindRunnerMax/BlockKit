@@ -75,13 +75,17 @@ export const Selector: FC<{
     }
     setIsOpen(true);
     const rect = getMountRect(editor, ref.current);
+    const onConfirm = (v: string) => {
+      closeOptions();
+      v !== props.value && props.onChange(v);
+    };
     const el = createElement(SelectorOptions, {
       left: rect.left,
       top: rect.top,
       value: props.value,
       options: props.options,
       className: props.optionsClsName,
-      onChange: (v: string) => closeOptions() || props.onChange(v),
+      onChange: onConfirm,
     });
     MountNode.mount(editor, props.id, el);
     document.addEventListener(EDITOR_EVENT.CLICK, closeOptions, { once: true });

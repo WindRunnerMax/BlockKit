@@ -9,6 +9,7 @@ import {
   isEqualAttributes,
   isInsertOp,
   isRetainOp,
+  isSubsetAttributes,
   normalizeEOL,
   OP_TYPES,
 } from "@block-kit/delta";
@@ -156,7 +157,11 @@ export class Mutate {
         if (!thisLeaf || !newLeaf) {
           continue;
         }
-        if (otherOp.attributes) {
+        COMPOSE_ATTRS: if (otherOp.attributes) {
+          // 校验是否需要修改 attribute, 若是子集则无需处理 compose
+          if (isSubsetAttributes(otherOp.attributes, thisLeaf.op.attributes)) {
+            break COMPOSE_ATTRS;
+          }
           const attrs = composeAttributes(thisLeaf.op.attributes, otherOp.attributes);
           const newOp = cloneOp(thisLeaf.op);
           newOp.attributes = attrs;

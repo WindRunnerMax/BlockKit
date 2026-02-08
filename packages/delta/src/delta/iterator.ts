@@ -71,6 +71,7 @@ export class OpIterator {
           // 通过之前暂存的 Offset 以及计算的 Length 截取 Insert 字符串
           retOp.insert = nextOp.insert.substr(offset, length);
         } else {
+          // 这段逻辑仅留作兼容 insert 为 object 的类型
           // offset should === 0, length should === 1
           retOp.insert = nextOp.insert;
         }

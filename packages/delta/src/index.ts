@@ -1,5 +1,5 @@
 export { composeAttributes } from "./attributes/compose";
-export { diffAttributes } from "./attributes/diff";
+export { diffAttributes, isSubsetAttributes } from "./attributes/diff";
 export type { AttributeMap } from "./attributes/interface";
 export { invertAttributes } from "./attributes/invert";
 export { transformAttributes } from "./attributes/transform";
