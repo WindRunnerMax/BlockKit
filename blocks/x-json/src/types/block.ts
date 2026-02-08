@@ -9,7 +9,7 @@ export type BlockModuleField = BlockModule[keyof BlockModule];
 export type BlockDataField = BasicBlock & BlockModuleField;
 
 /** Block 数据类型 */
-export type BlockDataType<T extends keyof BlockModule> = BlockModule[T];
+export type BlockDataType<T extends keyof BlockModule> = BasicBlock & BlockModule[T];
 
 /** Block 类型 */
 export type Block = {

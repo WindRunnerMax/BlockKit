@@ -9,12 +9,12 @@ export const BulletText: FC<{
 }> = props => {
   const context = props.context;
   const state = context.state;
-  const dot = ["●", "◯", "■"][(state.linear - 1) % 3];
+  const marker = ["●", "◯", "■"][(state.linear - 1) % 3];
 
   return (
     <div className="block-kit-x-bullet">
       <div className="block-kit-x-bullet-marker" contentEditable={false}>
-        {dot}
+        {marker}
       </div>
       {props.children}
     </div>

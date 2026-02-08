@@ -14,8 +14,8 @@ import { useEffect } from "react";
 import { Selector } from "../../shared/component/selector";
 import {
   CODE_HL_LINE_NUM,
+  CODE_SELECTOR_ID,
   DEFAULT_LANGUAGE,
-  SELECTOR_ID,
   SUPPORTED_LANGUAGES,
 } from "../utils/constant";
 import { restoreSelectionMarks } from "../utils/parser";
@@ -86,7 +86,7 @@ export const CodeBlock: FC<{
         onMouseDown={preventNativeEvent}
       >
         <Selector
-          id={SELECTOR_ID}
+          id={CODE_SELECTOR_ID}
           disabled={readonly}
           value={data.language || DEFAULT_LANGUAGE}
           onChange={value => onLanguageChange(value)}

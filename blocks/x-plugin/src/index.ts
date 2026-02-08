@@ -10,6 +10,8 @@ export { CODE_HL_KEY } from "./code/utils/constant";
 export { HeadingXPlugin } from "./heading";
 export { HEADING_KEY } from "./heading/types/index";
 export { IndentXPlugin } from "./indent/index";
+export { OrderXPlugin } from "./order/index";
+export { ORDER_KEY } from "./order/types/index";
 export { QuoteXPlugin } from "./quote/index";
 export { QUOTE_KEY } from "./quote/types";
 export { createComplexTextEditor } from "./shared/utils/text";

@@ -44,6 +44,7 @@ export { SuggestModule } from "./mention/modules/suggest";
 export { MENTION_KEY, MENTION_NAME } from "./mention/types";
 export { OrderListPlugin } from "./order-list";
 export { LIST_RESTART_KEY, LIST_START_KEY, ORDER_LIST_TYPE } from "./order-list/types";
+export { formatListLevel } from "./order-list/utils/format";
 export { QuotePlugin } from "./quote";
 export { QUOTE_KEY } from "./quote/types";
 export { SelectionHOC } from "./shared/components/selection";

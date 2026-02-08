@@ -1,24 +1,22 @@
 /* stylelint-disable selector-no-qualifying-type */
-.block-kit-x-bullet {
+.block-kit-x-order {
   display: flex;
 
   >div[data-text-block] {
     flex: 1 0;
   }
 
-  >.block-kit-x-bullet-marker {
+  >.block-kit-x-order-marker {
     align-items: center;
     color: rgb(var(--arcoblue-6));
     display: flex;
     flex-shrink: 0;
-    font-size: 12px;
     margin-right: 1px;
     padding: 0 5px;
-    transform: scale(0.5);
     user-select: none;
   }
 }
 
-.block-kit-x-editable .block-kit-x-bullet-children {
+.block-kit-x-editable .block-kit-x-order-children {
   margin-left: 20px;
 }

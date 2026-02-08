@@ -19,7 +19,7 @@ export class BlockState {
   public version: number;
   /** 标记是否删除 */
   public removed: boolean;
-  /** Block 父节点索引 */
+  /** 所属父节点 children 索引号 */
   public index: number;
   /** 块结构深度 */
   public depth: number;

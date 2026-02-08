@@ -282,7 +282,8 @@ export class Perform {
     const del = new Delta().retain(start).delete(block.length - start);
     const content = new Delta(block.data.delta).slice(start, block.length);
     const newData = data || { type: "text", children: [], delta: [], parent: "" };
-    newData.delta = content.ops;
+    newData.delta && (newData.delta = content.ops);
+    newData.children && (newData.children = []);
     const delChange = this.atom.updateText(block.id, del);
     const newBlockChange = this.atom.create(newData);
     const parentId = block.children.length ? block.id : block.data.parent;

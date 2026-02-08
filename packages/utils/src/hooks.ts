@@ -18,7 +18,9 @@ export const useIsMounted = () => {
   }, []);
 
   return {
+    /** 是否挂载 MutableRefObject */
     mounted: isMounted,
+    /** 是否挂载 Function */
     isMounted: useCallback(() => isMounted.current, []),
   };
 };
@@ -36,7 +38,12 @@ export const useMountState = <S = undefined>(value: S, mounted: MutableRefObject
     setStateOrigin(next);
   }, []);
 
-  return [state, setCurrentState] as const;
+  return [
+    /** 状态 */
+    state,
+    /** 更新状态 Function */
+    setCurrentState,
+  ] as const;
 };
 
 /**
@@ -58,7 +65,12 @@ export const useSafeState = <S = undefined>(value: S | (() => S)) => {
     setStateOrigin(next);
   }, []);
 
-  return [state, setCurrentState] as const;
+  return [
+    /** 状态 */
+    state,
+    /** 更新状态 Function */
+    setCurrentState,
+  ] as const;
 };
 
 /**
@@ -74,7 +86,14 @@ export const useStateRef = <S = undefined>(value: S) => {
     setStateOrigin(next);
   }, []);
 
-  return [state, setState, ref] as const;
+  return [
+    /** 状态 */
+    state,
+    /** 更新状态 Function */
+    setState,
+    /** 状态 MutableRefObject */
+    ref,
+  ] as const;
 };
 
 /**
@@ -140,7 +159,14 @@ export const useForceUpdate = () => {
     setState(prev => prev + 1);
   }, []);
 
-  return { index, update, forceUpdate: update };
+  return {
+    /** 索引值 */
+    index,
+    /** 强制刷新组件 */
+    update,
+    /** 强制刷新组件 */
+    forceUpdate: update,
+  };
 };
 
 /**
@@ -154,7 +180,9 @@ export const useIsFirstRender = () => {
   }, []);
 
   return {
+    /** 是否首次渲染 MutableRefObject */
     firstRender: isFirst,
+    /** 是否首次渲染 Function */
     isFirstRender: useCallback(() => isFirst.current, []),
   };
 };

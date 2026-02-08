@@ -50,8 +50,8 @@ const startToRoman = (start: number) => {
 
 /**
  * 序列化有序列表前缀值
- * @param start
- * @param level
+ * @param start 列表值
+ * @param level 列表层级
  */
 export const formatListLevel = (start: number, level: number) => {
   let serial = "";
