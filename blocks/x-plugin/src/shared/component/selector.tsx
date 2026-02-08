@@ -31,7 +31,7 @@ export const SelectorOptions: FC<{
     <div
       ref={ref}
       style={{ left: props.left, top: props.top }}
-      className="block-kit-x-selector-options-container"
+      className={cs("block-kit-x-selector-options-container", props.className)}
       onClick={stopNativeEvent}
       onMouseDown={preventNativeEvent}
     >
@@ -51,11 +51,12 @@ export const SelectorOptions: FC<{
 export const Selector: FC<{
   disabled?: boolean;
   className?: string;
+  optionsClsName?: string;
   value: string;
   options: string[];
-  onChange: (value: string) => void;
   id: string;
   children?: never;
+  onChange: (value: string) => void;
 }> = props => {
   const { editor } = useEditorStatic();
   const [isOpen, setIsOpen] = useState(false);
@@ -79,6 +80,7 @@ export const Selector: FC<{
       top: rect.top,
       value: props.value,
       options: props.options,
+      className: props.optionsClsName,
       onChange: (v: string) => closeOptions() || props.onChange(v),
     });
     MountNode.mount(editor, props.id, el);

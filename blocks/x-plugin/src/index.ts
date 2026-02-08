@@ -6,6 +6,7 @@ export { BulletXPlugin } from "./bullet/index";
 export { BULLET_KEY } from "./bullet/types/index";
 export { CodeXPlugin } from "./code";
 export { CODE_KEY } from "./code/types";
+export { CODE_HL_KEY } from "./code/utils/constant";
 export { HeadingXPlugin } from "./heading";
 export { HEADING_KEY } from "./heading/types/index";
 export { IndentXPlugin } from "./indent/index";

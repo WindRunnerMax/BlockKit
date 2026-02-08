@@ -1,5 +1,6 @@
 export { useComposing } from "./hooks/use-composing";
 export { BlockKitContext, useEditorStatic } from "./hooks/use-editor";
+export { useDebounceMemoFn, useThrottleMemoFn } from "./hooks/use-limit";
 export { ReadonlyContext, useReadonly } from "./hooks/use-readonly";
 export { BlockModel } from "./model/block";
 export { EOLModel } from "./model/eol";

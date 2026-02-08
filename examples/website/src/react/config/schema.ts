@@ -15,4 +15,5 @@ export const SCHEMA: EditorSchema = {
   "mention": { void: true, inline: true },
   "divider": { block: true, void: true },
   "emoji": { void: true, inline: true },
+  "_client_code-hl": { mark: true },
 };

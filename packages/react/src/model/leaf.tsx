@@ -1,7 +1,7 @@
 import type { Editor, LeafState } from "@block-kit/core";
 import { LEAF_KEY, PLUGIN_FUNC } from "@block-kit/core";
 import { SPACE } from "@block-kit/utils";
-import { useForceUpdate, useMemoFn } from "@block-kit/utils/dist/es/hooks";
+import { useForceUpdate } from "@block-kit/utils/dist/es/hooks";
 import type { FC } from "react";
 import React, { useMemo } from "react";
 
@@ -20,13 +20,13 @@ const LeafView: FC<{
   /**
    * 设置叶子 DOM 节点
    */
-  const setModel = useMemoFn((ref: HTMLSpanElement | null) => {
+  const setModel = (ref: HTMLSpanElement | null) => {
     if (ref) {
       rewriteRemoveChild(ref);
       editor.model.setLeafModel(ref, leafState);
     }
     LEAF_TO_REMOUNT.set(leafState, forceUpdate);
-  });
+  };
 
   /**
    * 处理叶子节点的渲染

@@ -28,13 +28,13 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
   /**
    * 设置行 DOM 节点
    */
-  const setModel = useMemoFn((ref: HTMLDivElement | null) => {
+  const setModel = (ref: HTMLDivElement | null) => {
     if (ref) {
       editor.model.setBlockModel(ref, state);
       rewriteRemoveChild(ref);
     }
     props.onRef && props.onRef(ref);
-  });
+  };
 
   const onSelectionChange = useMemoFn((e: SelectionChangeEvent) => {
     const { current } = e;

@@ -1897,6 +1897,35 @@ const setModel = useMemoFn((ref: HTMLDivElement | null) => {
 });
 ```
 
+但是后来发现，若是保持引用不变, 会导致节点变化渲染时, 即使文本内容变化了, 也不会触发回调。而由于`LEAF`映射`TEXT`依赖于回调函数的执行, 就会导致叶子对象变化时, 不会重新映射。因此依赖该回调执行的方法就会出现问题，包括`editor`状态变化也会由于回调不执行导致问题。
+
+在下面的例子中，`ref2`仅有初始化组件才会调用，而即使点击`add`导致文本内容变化其回调也不会执行，也就是说除非对应的`DOM`移除重建，否则该回调只会执行一次。而`ref1`的表现是每次`count`变化时都会先调用回调置`ref1`为`null`，然后再调用回调置为新的`ref1`节点。
+
+```js
+// https://react-lab.skyone.host/
+function App() {
+    const [count, setCount] = React.useState(1);
+
+    const onRef1 = (ref) => {
+        console.log("plain ref", ref);
+    }
+
+    const onRef2 = React.useCallback((ref) => {
+        console.log("callback ref", ref);
+    }, []);
+    
+    return (
+      <div>
+        <div ref={onRef1}>{count}</div>
+        <div ref={onRef2}>{count}</div>
+        <button onClick={() => setCount(v => ++v)}>add</button>
+      </div>
+    );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+```
+
 从本质上来看，是执行输入法时没有办法控制`DOM`的变更行为，或者阻止浏览器的默认行为。但是我们却可以在`start`的时候就执行相关的处理，类似于将`end`时的删除且插入的行为分离出来，也就是说先执行`deleteFragment`方法，将所有的`DOM`直接通过先移除掉来同步行为。
 
 但是这里又出现了新的问题，因为本身的`delete`方法会将选区内的内容全部删除，这样的话会导致唤醒`IME`时，选区所在的`DOM`节点会被删除掉，因此浏览器会将光标兜底到当前行的起始位置，虽然不影响最终输入的内容，但是在输入的时候就可以明显地看出来问题，有些影响用户体验。

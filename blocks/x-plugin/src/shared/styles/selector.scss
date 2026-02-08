@@ -29,11 +29,18 @@
   .block-kit-x-selector-options {
     border-radius: 3px;
     cursor: pointer;
+    display: flex;
+    justify-content: space-between;
     margin: 3px 0;
     padding: 2px 5px;
+    width: 120px;
 
     &.x-active {
       color: rgb(var(--arcoblue-6, (0,87,255)));
+
+      &::after {
+        content: '✓';
+      }
     }
 
     &:hover {

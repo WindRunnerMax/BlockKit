@@ -85,7 +85,7 @@ export class Lookup {
   }
 
   /**
-   * 选区变化事件
+   * 选区变化更新 marks
    * @param event
    */
   @Bind

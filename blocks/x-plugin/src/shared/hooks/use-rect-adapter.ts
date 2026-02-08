@@ -1,5 +1,6 @@
 import type { Rect } from "@block-kit/core";
 import { relativeTo } from "@block-kit/core";
+import { SPACE } from "@block-kit/utils";
 import type { RefObject } from "react";
 import { useLayoutEffect } from "react";
 
@@ -17,10 +18,17 @@ export const useRectAdapterEffect = (ref: RefObject<HTMLDivElement | null>, offs
       width: window.innerWidth,
     };
     const relative = relativeTo(rect, baseRect);
+    const transform: string[] = [];
     if (relative.bottom > baseRect.height) {
-      el.style.transform = `translateY(calc(-100% - ${offset}px))`;
+      transform.push(`translateY(calc(-100% - ${offset}px))`);
     } else {
-      el.style.transform = `translateY(${offset}px)`;
+      transform.push(`translateY(${offset}px)`);
     }
+    if (relative.right > baseRect.width) {
+      transform.push(`translateX(-100%)`);
+    } else {
+      transform.push(`translateX(-25%)`);
+    }
+    el.style.transform = transform.join(SPACE);
   }, []);
 };

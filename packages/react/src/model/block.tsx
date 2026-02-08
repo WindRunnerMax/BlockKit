@@ -22,13 +22,13 @@ const BlockView: FC<{
   /**
    * 设置 Block DOM 节点
    */
-  const setModel = useMemoFn((ref: HTMLDivElement | null) => {
+  const setModel = (ref: HTMLDivElement | null) => {
     if (ref) {
       // ref 触发时机最早 ref -> layout effect -> effect
       editor.model.setBlockModel(ref, state);
       rewriteRemoveChild(ref);
     }
-  });
+  };
 
   /**
    * 数据同步变更, 异步批量绘制变更

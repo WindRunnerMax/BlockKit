@@ -2,7 +2,7 @@ import type { Editor, LineState } from "@block-kit/core";
 import { CALLER_TYPE, NODE_KEY, PLUGIN_FUNC } from "@block-kit/core";
 import { EOL, EOL_OP } from "@block-kit/delta";
 import { SPACE } from "@block-kit/utils";
-import { useMemoFn, useUpdateEffect, useUpdateLayoutEffect } from "@block-kit/utils/dist/es/hooks";
+import { useUpdateEffect, useUpdateLayoutEffect } from "@block-kit/utils/dist/es/hooks";
 import type { FC } from "react";
 import React, { useMemo } from "react";
 
@@ -22,12 +22,12 @@ const LineView: FC<{
   /**
    * 设置行 DOM 节点
    */
-  const setModel = useMemoFn((ref: HTMLDivElement | null) => {
+  const setModel = (ref: HTMLDivElement | null) => {
     if (ref) {
       editor.model.setLineModel(ref, lineState);
       rewriteRemoveChild(ref);
     }
-  });
+  };
 
   /**
    * 编辑器行结构布局计算后同步调用

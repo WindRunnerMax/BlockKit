@@ -35,6 +35,15 @@ export type { EditorXSchema, XSchemaRule } from "./schema/types";
 export { Entry } from "./selection/modules/entry";
 export { Point } from "./selection/modules/point";
 export { Range } from "./selection/modules/range";
+export type {
+  BlockEntry,
+  BlockPoint,
+  BlockType,
+  RangeEntry,
+  RangePoint,
+  TextEntry,
+  TextPoint,
+} from "./selection/types";
 export { POINT_TYPE } from "./selection/utils/constant";
 export { toModelPoint, toModelRange } from "./selection/utils/model";
 export { normalizeModelRange } from "./selection/utils/normalize";

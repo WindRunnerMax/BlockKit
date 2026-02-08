@@ -1,6 +1,7 @@
 import "../styles/index.scss";
 
-import { debounce, isDOMElement, preventNativeEvent } from "@block-kit/utils";
+import { useDebounceMemoFn } from "@block-kit/react";
+import { isDOMElement, preventNativeEvent } from "@block-kit/utils";
 import { useForceUpdate, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { BlockEditor, Listener } from "@block-kit/x-core";
 import { EDITOR_EVENT } from "@block-kit/x-core";
@@ -8,7 +9,7 @@ import type { BlockModule } from "@block-kit/x-json";
 import type { ReactBlockContext } from "@block-kit/x-react";
 import { BlockXModel, useReadonly } from "@block-kit/x-react";
 import type { FC } from "react";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
 import { Selector } from "../../shared/component/selector";
 import {
@@ -17,6 +18,7 @@ import {
   SELECTOR_ID,
   SUPPORTED_LANGUAGES,
 } from "../utils/constant";
+import { restoreSelectionMarks } from "../utils/parser";
 
 export const CodeBlock: FC<{
   editor: BlockEditor;
@@ -28,7 +30,8 @@ export const CodeBlock: FC<{
   const { index, forceUpdate } = useForceUpdate();
   const data = context.state.data as BlockModule["code"];
 
-  const onParse = useMemoFn(() => {
+  /** 防抖解析代码高亮 */
+  const onDebounceParse = useDebounceMemoFn(() => {
     const lang = data.language || DEFAULT_LANGUAGE;
     const ops = data.delta || [];
     const code = ops.map(op => op.insert).join("");
@@ -37,17 +40,14 @@ export const CodeBlock: FC<{
       const delta = m.tokenize(code, lang);
       const change = editor.perform.atom.updateText(state.id, delta);
       editor.state.apply([change], { autoCaret: false, undoable: false, client: true });
+      restoreSelectionMarks(editor, state, delta);
       editor.logger.debug("Tokenize Code Cost:", Date.now() - now + "ms");
     });
-  });
-
-  const onDebounceParse = useMemo(() => {
-    return debounce(onParse, 200);
-  }, [onParse]);
+  }, 200);
 
   const onContentChange: Listener<"CONTENT_CHANGE"> = useMemoFn(e => {
     if (!e.changes[state.id] || e.options.client) return void 0;
-    // onDebounceParse();
+    onDebounceParse();
     forceUpdate();
   });
 
@@ -59,7 +59,7 @@ export const CodeBlock: FC<{
     };
   }, [editor.event, onContentChange, onDebounceParse]);
 
-  /** 副作用更新行号 */
+  /** 更新行号 */
   useEffect(() => {
     const text = editor.model.getTextEditor(state);
     const lines = text && text.state.block.getLines();
