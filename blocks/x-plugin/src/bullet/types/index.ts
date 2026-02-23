@@ -6,7 +6,6 @@ declare module "@block-kit/x-json/dist/es/types/interface" {
   interface BlockModule {
     [BULLET_KEY]: {
       type: typeof BULLET_KEY;
-      align?: string;
       delta: DeltaOp[];
     };
   }

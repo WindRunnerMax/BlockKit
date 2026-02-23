@@ -1,15 +1,18 @@
 import type { Op as JSONOp } from "@block-kit/ot-json";
 
-import type { BasicBlock, BlockModule } from "./interface";
+import type { BasicBlock, BlockModule, GenericBlock } from "./interface";
+
+/** Block 通用属性 */
+export type BlockBasicField = BasicBlock & GenericBlock;
 
 /** Block 数据模块类型 */
 export type BlockModuleField = BlockModule[keyof BlockModule];
 
 /** Block 数据类型字段 */
-export type BlockDataField = BasicBlock & BlockModuleField;
+export type BlockDataField = BlockBasicField & BlockModuleField;
 
-/** Block 数据类型 */
-export type BlockDataType<T extends keyof BlockModule> = BasicBlock & BlockModule[T];
+/** Block 数据字段类型 */
+export type BlockDataType<T extends keyof BlockModule> = BlockBasicField & BlockModule[T];
 
 /** Block 类型 */
 export type Block = {

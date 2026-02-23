@@ -16,7 +16,10 @@ export interface BasicBlock {
   children: string[];
 }
 
-/** Block 类型属性扩展 */
+/** BasicBlock 通用属性扩展 */
+export interface GenericBlock {}
+
+/** Block 类型数据属性扩展 */
 export interface BlockModule {
   root: {
     type: typeof ROOT_BLOCK;

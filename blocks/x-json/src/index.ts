@@ -2,6 +2,7 @@ export type { DeltaSubOp } from "./modules/subtype";
 export { deltaType, json } from "./modules/subtype";
 export type {
   Block,
+  BlockBasicField,
   BlockChange,
   BlockDataField,
   BlockDataType,
@@ -10,7 +11,7 @@ export type {
   Blocks,
   BlocksChange,
 } from "./types/block";
-export type { BasicBlock, BlockModule } from "./types/interface";
+export type { BasicBlock, BlockModule, GenericBlock } from "./types/interface";
 export { isEmptyChanges, isTextDeltaOp } from "./utils/is";
 export { normalizeBatchOps } from "./utils/transform";
 export { createBlockTreeWalker, createBlockTreeWalkerBFS } from "./utils/walker";

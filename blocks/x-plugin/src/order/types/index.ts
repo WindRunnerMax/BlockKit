@@ -13,7 +13,6 @@ declare module "@block-kit/x-json/dist/es/types/interface" {
        * - 值为 >=1 表示从指定序号开始
        */
       start: number;
-      align?: string;
       delta: DeltaOp[];
     };
   }

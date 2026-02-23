@@ -6,7 +6,6 @@ declare module "@block-kit/x-json/dist/es/types/interface" {
   interface BlockModule {
     [HEADING_KEY]: {
       type: typeof HEADING_KEY;
-      align?: string;
       delta: Op[];
       level: string;
     };
