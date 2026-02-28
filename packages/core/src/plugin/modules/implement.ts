@@ -12,16 +12,18 @@ import type { LineState } from "../../state/modules/line-state";
 import type { LeafContext, LineContext } from "../types/context";
 
 export abstract class CorePlugin {
-  /** 插件注册编辑器容器 */
-  public static editor: Editor | null = null;
   /** 自动注入编辑器实例 */
   protected editor!: Editor;
+  /** 插件注册编辑器容器 */
+  public static editor: Editor | null = null;
+  /** 避免自动注入编辑器实例的异常抛出 */
+  public static preventInjectEditorError: boolean = false;
 
   constructor() {
-    if (!CorePlugin.editor) {
+    if (!new.target.preventInjectEditorError && !CorePlugin.editor) {
       throw new Error(`${this} - Miss Editor Container`);
     }
-    this.editor = CorePlugin.editor;
+    this.editor = CorePlugin.editor!;
   }
   /**
    * 插件唯一标识

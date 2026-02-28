@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import { isNil } from "@block-kit/utils";
 
 class SharedTypes {
   public static string(defaultValue: string): string;
-  public static string(defaultValue?: string): string | undefined;
-  public static string(defaultValue?: string): string | undefined {
-    return defaultValue;
+  public static string(defaultValue?: string): string | null;
+  public static string(defaultValue?: string): string | null {
+    return isNil(defaultValue) ? null : defaultValue;
   }
 }
 
 namespace SharedTypes {
   export type infer<T> = {
-    [K in keyof T as undefined extends T[K] ? K : never]?: T[K];
+    [K in keyof T as null extends T[K] ? K : never]?: Exclude<T[K], null>;
   } & {
-    [K in keyof T as undefined extends T[K] ? never : K]: T[K];
+    [K in keyof T as null extends T[K] ? never : K]: T[K];
   };
 }
 

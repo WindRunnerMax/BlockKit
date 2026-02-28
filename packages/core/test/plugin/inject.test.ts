@@ -21,4 +21,14 @@ describe("plugin inject", () => {
     expect(pluginEditor2).toBe(editor2);
     expect(pluginEditor1).not.toBe(pluginEditor2);
   });
+
+  it("prevent inject editor", () => {
+    class Plugin2 extends CorePlugin {
+      public static preventInjectEditorError = true;
+      public key = "plugin";
+      public destroy(): void {}
+      public match = () => true;
+    }
+    expect(() => new Plugin2()).not.toThrowError();
+  });
 });
