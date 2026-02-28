@@ -1,7 +1,7 @@
 import { EDITOR_KEY, Point, Range } from "@block-kit/core";
 import { cs } from "@block-kit/utils";
-import { useUpdateEffect } from "@block-kit/utils/dist/es/hooks";
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import { useIsomorphicLayoutEffect, useUpdateEffect } from "@block-kit/utils/dist/es/hooks";
+import React, { useEffect, useRef } from "react";
 
 import { useEditorStatic } from "../hooks/use-editor";
 import { useReadonly } from "../hooks/use-readonly";
@@ -35,7 +35,7 @@ export const Editable: React.FC<{
   const { readonly } = useReadonly();
   const ref = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = ref.current;
     el && editor.mount(el);
     return () => {

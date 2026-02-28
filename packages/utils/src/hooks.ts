@@ -114,6 +114,11 @@ export const useUpdateEffect: typeof useEffect = (effect, deps?) => {
 };
 
 /**
+ * Prevent warning on SSR by falling back to useEffect when DOM isn't available
+ */
+export const useIsomorphicLayoutEffect = IS_DOM_ENV ? useLayoutEffect : useEffect;
+
+/**
  * 避免挂载时触发副作用
  * @param effect 副作用依赖
  * @param deps 依赖
@@ -121,7 +126,7 @@ export const useUpdateEffect: typeof useEffect = (effect, deps?) => {
 export const useUpdateLayoutEffect: typeof useLayoutEffect = (effect, deps?) => {
   const isMounted = useRef(false);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!isMounted.current) {
       isMounted.current = true;
     } else {
@@ -186,11 +191,6 @@ export const useIsFirstRender = () => {
     isFirstRender: useCallback(() => isFirst.current, []),
   };
 };
-
-/**
- * Prevent warning on SSR by falling back to useEffect when DOM isn't available
- */
-export const useIsomorphicLayoutEffect = IS_DOM_ENV ? useLayoutEffect : useEffect;
 
 /**
  * 带 re-render 前后值参数的 use-effect

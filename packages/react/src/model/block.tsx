@@ -1,8 +1,8 @@
 import type { BlockState, Editor } from "@block-kit/core";
 import { BLOCK_ID_KEY, BLOCK_KEY, EDITOR_EVENT, EDITOR_STATE } from "@block-kit/core";
-import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
+import { useIsomorphicLayoutEffect, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { FC } from "react";
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { withWrapLineNodes } from "../plugin/modules/wrap";
 import { rewriteRemoveChild } from "../utils/dirty-dom";
@@ -47,9 +47,9 @@ const BlockView: FC<{
   });
 
   /**
-   * 监听内容变更事件, 更新当前块视图
+   * 观察内容变更事件, 更新当前块视图
    */
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     editor.event.on(EDITOR_EVENT.CONTENT_CHANGE, onContentChange);
     return () => {
       editor.event.off(EDITOR_EVENT.CONTENT_CHANGE, onContentChange);
@@ -59,7 +59,7 @@ const BlockView: FC<{
   /**
    * 视图更新需要重新设置选区, 依赖于行状态变更
    */
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const selection = editor.selection.get();
     // 同步计算完成后更新浏览器选区, 等待 Paint
     if (editor.state.isFocused() && selection) {
