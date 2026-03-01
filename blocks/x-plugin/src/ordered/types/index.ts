@@ -24,7 +24,7 @@ declare module "@block-kit/x-json/dist/es/types/interface" {
   }
 }
 
-export type XOrderStore = O.Map<{
+export type XOrderedStore = O.Map<{
   start: number;
   update: F.Plain;
 }>;

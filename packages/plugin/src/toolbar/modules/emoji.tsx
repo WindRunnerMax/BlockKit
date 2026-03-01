@@ -1,8 +1,8 @@
 import "../styles/emoji.scss";
 
 import { Trigger } from "@arco-design/web-react";
-import Picker from "@emoji-mart/react";
 import { cs } from "@block-kit/utils";
+import Picker from "@emoji-mart/react";
 import type { FC } from "react";
 
 import { EMOJI_KEY } from "../../emoji/types";

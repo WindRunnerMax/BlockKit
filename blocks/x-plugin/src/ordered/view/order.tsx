@@ -6,11 +6,11 @@ import type { ReactBlockWrapContext } from "@block-kit/x-react";
 import type { FC } from "react";
 import { useEffect, useMemo } from "react";
 
-import type { XOrderStore } from "../types";
+import type { XOrderedStore } from "../types";
 
 export const OrderText: FC<{
   start: number;
-  store: XOrderStore;
+  store: XOrderedStore;
   context: ReactBlockWrapContext;
   children: React.ReactNode;
 }> = props => {

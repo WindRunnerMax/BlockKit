@@ -3,7 +3,7 @@ import type { P } from "@block-kit/utils/dist/es/types";
 import type { BlockState } from "@block-kit/x-core";
 import type { BlockDataType } from "@block-kit/x-json";
 
-import type { XOrderStore } from "../types";
+import type { XOrderedStore } from "../types";
 import { ORDERED_KEY } from "../types";
 
 export const isOrderBlock = (state: BlockState | P.Nil) => {
@@ -18,7 +18,7 @@ export const isOrderBlock = (state: BlockState | P.Nil) => {
  * @param editor
  * @param sel
  */
-export const updateNewOrderList = (store: XOrderStore, state: BlockState | null) => {
+export const updateNewOrderList = (store: XOrderedStore, state: BlockState | null) => {
   if (!state) return void 0;
   let start = state.index;
   const startBlock = state;
@@ -36,7 +36,7 @@ export const updateNewOrderList = (store: XOrderStore, state: BlockState | null)
   while (--start >= 0) {
     const block = parent.children[start];
     if (!block) continue;
-    const data = block.data as BlockDataType<"order">;
+    const data = block.data as BlockDataType<"ordered">;
     // 若是当前块非有序列表, 或者值非自动计算的, 则需要重置 start
     if (!isOrderBlock(block) || data.start > 0) {
       start++;
@@ -47,7 +47,7 @@ export const updateNewOrderList = (store: XOrderStore, state: BlockState | null)
   for (let i = start; i < parent.children.length; i++) {
     const block = parent.children[i];
     if (!block) continue;
-    const data = block.data as BlockDataType<"order">;
+    const data = block.data as BlockDataType<"ordered">;
     if (!isOrderBlock(block) || data.start > 0) {
       break;
     }

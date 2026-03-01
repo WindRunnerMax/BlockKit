@@ -7,14 +7,14 @@ import { BlockXPlugin } from "@block-kit/x-react";
 
 import { BlockConvert } from "../shared/modules/block-convert";
 import { inheritLineProperties } from "../shared/utils/input";
-import type { XOrderStore } from "./types/index";
+import type { XOrderedStore } from "./types/index";
 import { DEFINE_ORDERED_TYPE, ORDERED_KEY } from "./types/index";
 import { updateNewOrderList } from "./utils/serial";
 import { OrderText } from "./view/order";
 
 export class OrderedXPlugin extends BlockXPlugin {
   public key: string = ORDERED_KEY;
-  public store: XOrderStore = {};
+  public store: XOrderedStore = {};
 
   public constructor() {
     super();
