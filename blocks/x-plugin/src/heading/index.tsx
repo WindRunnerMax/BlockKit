@@ -4,10 +4,16 @@ import type { BlockDataType } from "@block-kit/x-json";
 import type { ReactTextWrapContext } from "@block-kit/x-react";
 import { BlockXPlugin } from "@block-kit/x-react";
 
-import { HEADING_KEY } from "./types/index";
+import { BlockConvert } from "../shared/modules/block-convert";
+import { DEFINE_HEADING_TYPE, HEADING_KEY } from "./types/index";
 
 export class HeadingXPlugin extends BlockXPlugin {
   public key: string = HEADING_KEY;
+
+  public constructor() {
+    super();
+    BlockConvert.register(this.editor, HEADING_KEY, DEFINE_HEADING_TYPE);
+  }
 
   public destroy(): void {}
 

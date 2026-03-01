@@ -8,7 +8,7 @@ import {
   CodeXPlugin,
   HeadingXPlugin,
   IndentXPlugin,
-  OrderXPlugin,
+  OrderedXPlugin,
   QuoteXPlugin,
   TextXPlugin,
 } from "@block-kit/x-plugin";
@@ -37,7 +37,7 @@ const App: FC = () => {
       new BulletXPlugin(),
       new IndentXPlugin(),
       new CodeXPlugin(),
-      new OrderXPlugin(),
+      new OrderedXPlugin(),
     ]);
     return instance;
   }, []);

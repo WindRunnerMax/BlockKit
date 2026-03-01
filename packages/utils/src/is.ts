@@ -144,7 +144,8 @@ export const isBoolean = (value: unknown): value is boolean => {
 };
 
 /**
- * 检查 object like
+ * 检查 object like (typeof -> "object")
+ * - 1 => false
  * - {} => true
  * - [] => true
  * - null => false

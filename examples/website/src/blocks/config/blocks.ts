@@ -156,7 +156,7 @@ export const INIT: Blocks = {
     id: "order_l1",
     version: 1,
     data: {
-      type: "order",
+      type: "ordered",
       start: -1,
       children: ["order_l2"],
       delta: [{ insert: "一级有序列表" }],
@@ -167,7 +167,7 @@ export const INIT: Blocks = {
     id: "order_l2",
     version: 1,
     data: {
-      type: "order",
+      type: "ordered",
       start: -1,
       children: ["order_l3"],
       delta: [{ insert: "二级有序列表" }],
@@ -178,7 +178,7 @@ export const INIT: Blocks = {
     id: "order_l3",
     version: 1,
     data: {
-      type: "order",
+      type: "ordered",
       start: -1,
       children: [],
       delta: [{ insert: "三级有序列表" }],

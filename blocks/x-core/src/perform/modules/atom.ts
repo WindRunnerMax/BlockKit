@@ -1,5 +1,5 @@
 import type { Delta } from "@block-kit/delta";
-import { getId, isString } from "@block-kit/utils";
+import { getId, isString, isUndef } from "@block-kit/utils";
 import type { Path } from "@block-kit/x-json";
 import type { BlockDataField, JSONOp } from "@block-kit/x-json";
 import { json } from "@block-kit/x-json";
@@ -119,13 +119,13 @@ export class Atom {
    * 更新 Block 节点指定 path 数据的变更
    * @param blockId 块节点 id
    * @param path 数据路径
-   * @param value 新值
+   * @param value 新值, 支持 undefined 作为删除操作
    */
   public updateAttr(blockId: string, path: Path, value: unknown): ApplyChange {
     const initial = this.get(blockId, path);
-    return {
-      id: blockId,
-      ops: [{ p: path, od: initial, oi: value }],
-    };
+    const op: JSONOp = { p: path };
+    if (!isUndef(initial)) op.od = initial;
+    if (!isUndef(value)) op.oi = value;
+    return { id: blockId, ops: [op] };
   }
 }

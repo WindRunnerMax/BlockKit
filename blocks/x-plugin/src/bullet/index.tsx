@@ -5,8 +5,9 @@ import { Point } from "@block-kit/x-core";
 import type { ReactBlockContext, ReactBlockWrapContext } from "@block-kit/x-react";
 import { BlockXPlugin } from "@block-kit/x-react";
 
+import { BlockConvert } from "../shared/modules/block-convert";
 import { inheritLineProperties } from "../shared/utils/input";
-import { BULLET_KEY } from "./types/index";
+import { BULLET_KEY, DEFINE_BULLET_TYPE } from "./types/index";
 import { BulletText } from "./view/bullet";
 
 export class BulletXPlugin extends BlockXPlugin {
@@ -14,6 +15,7 @@ export class BulletXPlugin extends BlockXPlugin {
 
   public constructor() {
     super();
+    BlockConvert.register(this.editor, BULLET_KEY, DEFINE_BULLET_TYPE);
     this.editor.event.on(EDITOR_EVENT.BEFORE_INPUT, this.onBeforeInput, 99);
   }
 

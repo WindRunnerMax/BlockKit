@@ -10,10 +10,10 @@ export const SIDE = {
  * 深克隆
  * - 仅支持 Snapshot 定义的类型
  * @param value Snapshot/Op
- * @param cache WeakSet 作用域缓存
+ * @param cache 作用域缓存
  */
 export const clone = <T>(value: T, cache = new WeakSet<O.Any>()): T => {
-  // 基本类型直接返回
+  // 非对象类型的值直接返回
   if (isObjectLike(value) === false) {
     return value;
   }

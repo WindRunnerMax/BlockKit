@@ -4,11 +4,11 @@ import type { BlockState } from "@block-kit/x-core";
 import type { BlockDataType } from "@block-kit/x-json";
 
 import type { XOrderStore } from "../types";
-import { ORDER_KEY } from "../types";
+import { ORDERED_KEY } from "../types";
 
 export const isOrderBlock = (state: BlockState | P.Nil) => {
   if (!state) return false;
-  return state.type === ORDER_KEY;
+  return state.type === ORDERED_KEY;
 };
 
 /**

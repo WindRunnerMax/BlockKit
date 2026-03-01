@@ -8,7 +8,7 @@ import { renderToString } from "react-dom/server";
 import { BlockKit, Editable } from "../../src";
 
 describe("node ssr", () => {
-  it("dom env prev-check", () => {
+  it("dom env preflight", () => {
     expect(() => window).toThrowError();
     expect(() => document).toThrowError();
     expect(() => navigator).toThrowError();

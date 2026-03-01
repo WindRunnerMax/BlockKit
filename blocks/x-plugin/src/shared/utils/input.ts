@@ -3,6 +3,7 @@ import type { EventContext } from "@block-kit/utils";
 import type { Range } from "@block-kit/x-core";
 import type { BlockEditor } from "@block-kit/x-core";
 import type { BlockDataField } from "@block-kit/x-json";
+import { cloneSnapshot } from "@block-kit/x-json";
 
 /**
  * 输入回车时继承当前行属性
@@ -16,13 +17,14 @@ export const inheritLineProperties = (
   selection: Range,
   data: BlockDataField
 ) => {
-  const copied: BlockDataField = { ...data };
   const { inputType } = event;
   switch (inputType) {
     case "insertLineBreak":
     case "insertParagraph": {
-      copied.delta = [];
-      copied.children = [];
+      const spread: BlockDataField = Object.assign({}, data);
+      spread.delta = [];
+      spread.children = [];
+      const copied = cloneSnapshot(spread);
       const res = editor.perform.insertBreak(selection, copied);
       preventContextEvent(event, context);
       return res;
