@@ -4,7 +4,7 @@ import { render } from "@testing-library/react";
 
 import { BlockKit, Editable } from "../../src";
 
-// <div data-block-kit-editor="true" contenteditable="true">
+// <div data-block-kit="true" contenteditable="true">
 //   <div data-block="true" data-block-id="ROOT">
 //     <div data-node="true" dir="auto">
 //       <span data-leaf="true">

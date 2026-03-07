@@ -1,5 +1,5 @@
 // Editor
-export const EDITOR_KEY = "data-block-kit-editor";
+export const EDITOR_KEY = "data-block-kit";
 export const EDITABLE = "contenteditable";
 
 // Line

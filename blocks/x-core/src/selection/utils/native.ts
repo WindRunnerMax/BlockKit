@@ -1,8 +1,8 @@
-import type { DOMPoint, DOMRange, NormalizePointContext } from "@block-kit/core";
-import { getTextNode, toDOMPoint as toTextDOMPoint } from "@block-kit/core";
+import type { DOMNode, DOMPoint, DOMRange, NormalizePointContext } from "@block-kit/core";
+import { getTextNode, ISOLATED_KEY, toDOMPoint as toTextDOMPoint } from "@block-kit/core";
 import { RawPoint } from "@block-kit/core";
 import { Point as TextPoint } from "@block-kit/core";
-import { isDOMElement } from "@block-kit/utils";
+import { IS_BROWSER_ENV, isDOMElement } from "@block-kit/utils";
 
 import type { BlockEditor } from "../../editor";
 import { X_SELECTION_KEY } from "../../model/types";
@@ -117,4 +117,28 @@ export const toDOMRange = (editor: BlockEditor, range: Range): DOMRange | null =
     return domRange;
   }
   return null;
+};
+
+/**
+ * 基于 DOM 节点判断焦点是否在编辑器内
+ * @param editor
+ * @returns
+ */
+export const isFocusedInEditor = (editor: BlockEditor) => {
+  if (!IS_BROWSER_ENV) return false;
+  const sel = window.getSelection();
+  if (!sel || !document.hasFocus()) return false;
+  const node = sel.anchorNode;
+  const container = editor.getContainer();
+  for (let n: DOMNode | null = node; n !== container; n = n.parentNode) {
+    // node 节点向上查找到 body, 说明 node 并非在 container 下, 返回 false
+    if (!n || n === document.body || n === document.documentElement) {
+      return false;
+    }
+    // 如果是 ISOLATED_KEY 的元素, 则认为焦点需要忽略
+    if (isDOMElement(n) && n.hasAttribute(ISOLATED_KEY)) {
+      return false;
+    }
+  }
+  return true;
 };

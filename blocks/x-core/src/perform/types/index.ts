@@ -1,7 +1,4 @@
-import type { ApplyOptions, BatchApplyChange } from "../../state/types";
+import type { ContentChangeEvent } from "../../event/bus";
 
 /** 变更结果 */
-export type PerformResult = {
-  changes: BatchApplyChange;
-  options?: ApplyOptions;
-};
+export type PerformResult = ContentChangeEvent | null;

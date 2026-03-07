@@ -22,7 +22,8 @@ describe("perform insert break", () => {
       Point.create("child1", "T", 1),
       Point.create("child1", "T", 1)
     );
-    const { changes, options } = editor.perform.insertBreak(new Range(range))!;
+    const res = editor.perform.insertBreak(new Range(range))!;
+    const { changes, options } = res[1]!;
     const newId = Object.entries(changes).find(([, it]) => it[0].p.length === 0)?.[0];
     const blockSet = editor.state.toBlockSet();
     expect(Object.keys(blockSet)).toEqual(["root", "child1", newId!]);
@@ -50,7 +51,8 @@ describe("perform insert break", () => {
       Point.create("child1", "T", 1),
       Point.create("child1", "T", 2)
     );
-    const { changes, options } = editor.perform.insertBreak(new Range(range))!;
+    const res = editor.perform.insertBreak(new Range(range))!;
+    const { changes, options } = res[1]!;
     const newId = Object.entries(changes).find(([, it]) => it[0].p.length === 0)?.[0];
     expect(changes.child1[0].o).toEqual([{ retain: 1 }, { delete: 1 }]);
     const blockSet = editor.state.toBlockSet();
@@ -84,7 +86,8 @@ describe("perform insert break", () => {
       Point.create("child1", "T", 1),
       Point.create("child2", "T", 2)
     );
-    const { changes } = editor.perform.insertBreak(new Range(range))!;
+    const res = editor.perform.insertBreak(new Range(range))!;
+    const { changes } = res[1]!;
     const blockSet = editor.state.toBlockSet();
     const newId = Object.entries(changes).find(([, it]) => it[0].p.length === 0)?.[0];
     expect(blockSet.child1.data.delta?.[0]).toEqual({ insert: "1" });
@@ -140,7 +143,8 @@ describe("perform insert break", () => {
       Point.create("child1", "T", 3),
       Point.create("grandchild1", "T", 5)
     );
-    const { changes } = editor.perform.insertBreak(new Range(range))!;
+    const res = editor.perform.insertBreak(new Range(range))!;
+    const { changes } = res[1]!;
     const blockSet = editor.state.toBlockSet();
     const newId = Object.entries(changes).find(([, it]) => it[0].p.length === 0)?.[0];
     expect(Object.keys(blockSet)).toEqual(["root", "child1", "child2", "grandgrandchild1", newId]);

@@ -85,6 +85,15 @@ describe("perform delete-tree", () => {
     expect(blockSet.E.data.parent).toEqual("D");
   });
 
+  it("delete all blocks", () => {
+    const editor = new BlockEditor({ initial: getBlocks() });
+    const range = normalizeModelRange(editor, Point.create("A", "T", 0), Point.create("I", "T", 1));
+    const res = editor.perform.deleteFragment(new Range(range))!;
+    const blockSet = editor.state.toBlockSet();
+    expect(Object.keys(blockSet)).toEqual(["root", "A"]);
+    expect(Object.keys(res.changes)).toEqual(["A", "root"]);
+  });
+
   it("apply text node", () => {
     const blocks: Blocks = {
       root: {

@@ -12,6 +12,7 @@ export {
   X_BLOCK_ID_KEY,
   X_BLOCK_KEY,
   X_BLOCK_TYPE_KEY,
+  X_EDITOR_KEY,
   X_SELECTION_KEY,
   X_TEXT_BLOCK_KEY,
   X_ZERO_KEY,
@@ -46,6 +47,12 @@ export type {
 } from "./selection/types";
 export { POINT_TYPE } from "./selection/utils/constant";
 export { toModelPoint, toModelRange } from "./selection/utils/model";
+export {
+  isFocusedInEditor,
+  isSelectionElement,
+  toDOMPoint,
+  toDOMRange,
+} from "./selection/utils/native";
 export { normalizeModelRange } from "./selection/utils/normalize";
 export { BlockState } from "./state/modules/state";
 export type { ApplyChange, ApplyOptions, ApplyResult } from "./state/types";

@@ -16,6 +16,7 @@ import { POINT_TYPE } from "../selection/utils/constant";
 import type { BlockState } from "../state/modules/state";
 import type { ApplyOptions, BatchApplyChange } from "../state/types";
 import { Atom } from "./modules/atom";
+import type { PerformResult } from "./types";
 
 export class Perform {
   /** BlockMap 原子化变更 */
@@ -255,25 +256,29 @@ export class Perform {
    * 插入换行符
    * @param sel
    * @param attributes
+   * @returns [删除事件, 插入事件]
    */
-  public insertBreak(sel: Range, data?: BlockDataField): ContentChangeEvent | null {
-    if (!sel || sel.isEmpty()) return null;
+  public insertBreak(sel: Range, data?: BlockDataField) {
+    const result: [PerformResult, PerformResult] = [null, null];
+    if (!sel || sel.isEmpty()) return result;
     const changes: BatchApplyChange = [];
     const options: ApplyOptions = {};
     if (!sel.isCollapsed) {
-      const res = this.deleteFragment(sel);
+      // 这里是分别执行的 apply, 需要先删除再插入, 变更不易合并
+      const deleteResult = this.deleteFragment(sel);
+      result[0] = deleteResult;
       const first = sel.at(0)!;
       const last = sel.at(-1)!;
       if (Entry.isBlock(first) || Entry.isBlock(last)) {
-        return res;
+        return result;
       }
-      res && (options.selection = res.options.selection);
+      deleteResult && (options.selection = deleteResult.options.selection);
     }
     // 执行到这里一定是折叠的选区
     const entry = options.selection ? options.selection.at(0)! : sel.at(0)!;
     const block = this.editor.state.getBlock(entry.id);
     if (!block || !block.data.parent || Entry.isBlock(entry)) {
-      return this.editor.state.apply(changes, options);
+      return result;
     }
     // 文本节点需要拆分当前节点
     const start = entry.start;
@@ -290,7 +295,9 @@ export class Perform {
     changes.push(delChange, newBlockChange, insertBlockChange);
     const newEntry = Entry.create(newBlockChange.id, POINT_TYPE.TEXT, 0, 0);
     options.selection = new Range(newEntry, false);
-    return this.editor.state.apply(changes, options);
+    const insertResult = this.editor.state.apply(changes, options);
+    result[1] = insertResult;
+    return result;
   }
 
   /**

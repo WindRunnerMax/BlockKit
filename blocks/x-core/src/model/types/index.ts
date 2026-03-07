@@ -1,4 +1,5 @@
 // Block
+export const X_EDITOR_KEY = "data-block-kit-x";
 export const X_BLOCK_KEY = "data-block";
 export const X_TEXT_BLOCK_KEY = "data-text-block";
 export const X_BLOCK_ID_KEY = "data-block-id";

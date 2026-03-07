@@ -1,10 +1,10 @@
 import "../styles/editable.scss";
 
-import { EDITOR_EVENT, EDITOR_KEY } from "@block-kit/core";
+import { EDITOR_EVENT } from "@block-kit/core";
 import { cs, ROOT_BLOCK } from "@block-kit/utils";
 import { useForceUpdate, useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { Listener } from "@block-kit/x-core";
-import { EDITOR_STATE, X_SELECTION_KEY } from "@block-kit/x-core";
+import { EDITOR_STATE, X_EDITOR_KEY, X_SELECTION_KEY } from "@block-kit/x-core";
 import type { ReactNode } from "react";
 import React, { useEffect, useLayoutEffect, useRef } from "react";
 
@@ -129,7 +129,7 @@ export const EditableX: React.FC<{
     <div
       ref={ref}
       className={cs(className, "block-kit-x-editable", "notranslate")}
-      {...{ [EDITOR_KEY]: true }}
+      {...{ [X_EDITOR_KEY]: true }}
       contentEditable={!readonly}
       suppressContentEditableWarning
       spellCheck={false}
