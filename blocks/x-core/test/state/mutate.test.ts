@@ -51,7 +51,7 @@ describe("state mutate", () => {
     expect(newBlocks.child1).toBe(void 0);
     // 这里的判断需要注意, 文本级别的删除是存在未删除的子节点位置移动情况的
     // 因此, 这里的文本节点仍然存在, 在真正删除的情况下应该是挂在起始的父节点上
-    expect(newBlocks.grandchild1).toBeTruthy();
+    // expect(newBlocks.grandchild1).toBeTruthy(); // 子节点会一并删除
     expect(editor.state.blocks.child2.index).toBe(0);
   });
 

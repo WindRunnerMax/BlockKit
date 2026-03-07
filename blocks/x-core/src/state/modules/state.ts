@@ -139,7 +139,14 @@ export class BlockState {
    * - 当前树节点所有子节点, 含自身节点(首个节点为当前节点)
    */
   public getTreeNodes(): BlockState[] {
-    if (this._nodes) return this._nodes;
+    TREE_CACHE: if (this._nodes) {
+      // 当存在子节点, 但子树仅有一个节点即自身节点时, 需要更新子树节点
+      if (this.children.length && this._nodes.length === 1) {
+        this.container.editor.logger.warning(`${this.id} tree not correct`);
+        break TREE_CACHE;
+      }
+      return this._nodes;
+    }
     const nodes: BlockState[] = [this];
     let index = 0;
     this._nodesIndex = { [this.id]: index++ };

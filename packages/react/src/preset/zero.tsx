@@ -6,7 +6,6 @@ import {
   ZERO_SYMBOL,
   ZERO_VOID_KEY,
 } from "@block-kit/core";
-import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { FC } from "react";
 
 import { NO_CURSOR } from "../utils/constant";
@@ -37,12 +36,10 @@ export type ZeroSpaceProps = {
 export const ZeroSpace: FC<ZeroSpaceProps> = props => {
   /**
    * 处理 ref 回调
-   * - 需要保证引用不变, 否则会导致回调在 rerender 时被多次调用 null/span 状态
-   * - https://18.react.dev/reference/react-dom/components/common#ref-callback
    */
-  const onRef = useMemoFn((dom: HTMLSpanElement | null) => {
+  const onRef = (dom: HTMLSpanElement | null) => {
     props.onRef && props.onRef(dom);
-  });
+  };
 
   return (
     <span

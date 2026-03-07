@@ -1,6 +1,5 @@
 import { EDITOR_EVENT, ISOLATED_KEY } from "@block-kit/core";
 import { stopNativeEvent } from "@block-kit/utils";
-import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { FC, PropsWithChildren } from "react";
 import React, { useEffect, useState } from "react";
 
@@ -18,10 +17,10 @@ export type IsolateProps = PropsWithChildren<{
 export const Isolate: FC<IsolateProps> = props => {
   const [ref, setRef] = useState<HTMLSpanElement | null>(null);
 
-  const onRef = useMemoFn((dom: HTMLSpanElement | null) => {
+  const onRef = (dom: HTMLSpanElement | null) => {
     setRef(dom);
     props.onRef && props.onRef(dom);
-  });
+  };
 
   useEffect(() => {
     const el = ref;

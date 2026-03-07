@@ -14,6 +14,20 @@
 
 .block-kit-x-editable div[data-block] {
   border-radius: 4px;
+  position: relative;
+
+  > .block-kit-x-selected-cover {
+    background-color: rgba(20, 86, 240, 0.18);
+    border-radius: 4px;
+    height: 100%;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    user-select: none;
+    width: 100%;
+    z-index: 999999;
+  }
 }
 
 .block-kit-x-editable {
@@ -23,8 +37,6 @@
 }
 
 .block-kit-x-editable div[data-block].block-kit-x-selected {
-  background-color: rgba(20, 86, 240, 0.18);
-
   ::selection {
     background: transparent;
   }

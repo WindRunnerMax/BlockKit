@@ -3,7 +3,6 @@ import type { Block, BlocksChange, JSONOp } from "@block-kit/x-json";
 import { json } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../../editor";
-import { isBoxBlockType } from "../../schema/utils/is";
 import type { EditorState } from "../index";
 import { clearTreeCache } from "../utils/tree";
 import { BlockState } from "./state";
@@ -59,17 +58,6 @@ export class Mutate {
     }
     // 统一更新变更的 Block 元信息
     this.updateBlockMeta();
-    // 如果节点同时被删除和插入, 则认为是更新操作, 需要恢复节点挂载状态
-    // 否则可能会造成移动的情况下, 节点被认为是删除的情况(顺序问题)
-    // 虽然存在误判的可能, 但通常应该不会出现刚创建就删除的批量执行场景
-    for (const id of this.inserts) {
-      if (!this.deletes.has(id)) continue;
-      this.inserts.delete(id);
-      this.deletes.delete(id);
-      this.updates.add(id);
-      const state = this.state.getBlock(id);
-      state && state.restore();
-    }
   }
 
   /**
@@ -110,46 +98,32 @@ export class Mutate {
    * - 变更的状态更新需要统一处理, 否则会因为树形副作用导致计算差异
    */
   protected updateBlockMeta() {
-    /** 已经更新过 Meta 的节点 */
-    const updatedMeta = new Set<string>();
+    // 如果节点同时被删除和插入, 通常还会伴随更新, 需要恢复节点挂载状态
+    // 否则可能会造成移动/列表子节点的情况下, 节点被认为是删除的情况(顺序问题)
+    // 虽然存在误判的可能, 但通常应该不会出现刚创建就删除的批量执行场景
+    // 不能在处理完成 i/d/u 合并之后再统一更新 Meta, 需要非常完整的结构变更
+    // 由此, 批量更新状态的顺序应该是 更新-删除-新增
+    // ......
     // 处理更新节点的情况
     for (const id of this.updates) {
       if (this.inserts.has(id)) continue;
-      updatedMeta.add(id);
       const block = this.state.getBlock(id);
       block && block._updateMeta();
     }
     // 处理删除节点的情况
     for (const id of this.deletes) {
       const ldBlock = this.state.getOrCreateBlock(id);
-      const isBlockType = isBoxBlockType(ldBlock);
       const nodes = ldBlock.getTreeNodes();
-      ldBlock.remove();
-      // 文本/容器文本/空节点仅需要处理本身
-      if (!isBlockType) continue;
-      // 块级节点需要处理本身及其子树节点
-      for (let i = 1; i < nodes.length; i++) {
-        const child = nodes[i];
-        child && child.remove();
+      for (const node of nodes) {
+        node.remove();
       }
     }
     // 处理新增节点的情况
     for (const id of this.inserts) {
       const liBlock = this.state.getOrCreateBlock(id);
       const nodes = liBlock.getTreeNodes();
-      const isBlockType = isBoxBlockType(liBlock);
-      liBlock.restore();
-      updatedMeta.add(id);
-      for (let i = 1; i < nodes.length; i++) {
-        const child = nodes[i];
-        // 文本类子节点不标记状态, 仅更新元信息
-        IF_L1: if (!isBlockType) {
-          if (updatedMeta.has(child.id)) break IF_L1;
-          child._updateMeta(true);
-          // 块级节点需要处理本身及其子树节点
-        } else {
-          child.restore();
-        }
+      for (const node of nodes) {
+        node.restore();
       }
     }
     return void 0;

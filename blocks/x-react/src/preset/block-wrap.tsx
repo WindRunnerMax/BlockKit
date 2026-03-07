@@ -63,6 +63,7 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
       className={cs(props.className, selected && "block-kit-x-selected")}
     >
       {props.children}
+      {selected && <div className="block-kit-x-selected-cover" contentEditable={false} />}
     </div>
   );
 };

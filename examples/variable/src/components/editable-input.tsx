@@ -29,10 +29,10 @@ export const EditableTextInput: FC<{
   const [isComposing, setIsComposing] = useState(false);
   const [editNode, setEditNode] = useState<HTMLDivElement | null>(null);
 
-  const onEditableRef = useMemoFn((ref: HTMLDivElement | null) => {
+  const onEditableRef = (ref: HTMLDivElement | null) => {
     props.onRef && props.onRef(ref);
     ref && setEditNode(ref);
-  });
+  };
 
   useLayoutEffect(() => {
     if (!editNode) return void 0;

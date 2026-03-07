@@ -75,8 +75,9 @@ export class Perform {
     const firstBlock = this.editor.state.getBlock(firstEntry.id);
     const lastBlock = this.editor.state.getBlock(lastEntry.id);
     if (!firstBlock || !lastBlock) return null;
-    // 记录已经删除的父节点, 此时子节点就不必删除
-    const deleted = new Set<string>();
+    // 本次选区操作要执行删除的所有节点, 若首节点为文本节点则不会删除
+    const deleted = new Set<string>(Object.keys(sel.map));
+    Entry.isText(firstEntry) && deleted.delete(firstEntry.id);
     // 记录父节点删除单子节点应该保留的情况
     const remain: string[] = [];
     // ========== 遍历选区节点, 逐一执行删除 ==========
@@ -112,16 +113,13 @@ export class Perform {
         continue;
       }
       const parentId = state.data.parent;
-      // 块级节点需要删除整个节点, 父节点已经删除的不再处理
       const isParentDeleted = parentId && deleted.has(parentId);
-      // 如果父节点是文本节点, 则不会删除所有子节点, 在此处需要继续处理
-      const isTextParentBlock = state.parent && isTextBlockType(state.parent);
-      if (!isParentDeleted || isTextParentBlock) {
+      // 父节点没有被删除, 则删除该节点, 即如果父节点被删除了, 则无需删除当前节点
+      if (!isParentDeleted) {
         const change = this.atom.remove(parentId, state.index);
         changes.push(change);
-        deleted.add(state.id);
       }
-      // 删除的块节点需要将子节点收集, 未删除的需要重新插入到父节点中
+      // 删除的文本节点需要将子节点收集, 未删除的需要重新插入到父节点中, 任一级都可能有所属子节点
       // 由于块节点仅存在直属类型的子节点, 会被直接删除, 因此这里仅文本块需要处理
       const children = state.data.children;
       isTextBlockType(state) && remain.push(...children);
