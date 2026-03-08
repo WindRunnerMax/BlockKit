@@ -1,0 +1,32 @@
+$width: 10px;
+
+.block-kit-x-table-wrapper {
+  .block-kit-x-table-col-tools {
+    display: flex;
+    left: 0;
+    max-width: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+  }
+
+  .block-kit-x-table-col-tools-item {
+    background-color: var(--color-fill-2);
+    cursor: pointer;
+    flex-shrink: 0;
+    height: $width;
+
+    &:first-child {
+      border-top-left-radius: 4px;
+    }
+
+    &:last-child {
+      border-top-right-radius: 4px;
+    }
+
+    &:hover,
+    &.active {
+      background-color: var(--color-fill-3);
+    }
+  }
+}

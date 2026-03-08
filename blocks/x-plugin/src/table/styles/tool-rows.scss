@@ -1,0 +1,28 @@
+$width: 10px;
+
+.block-kit-x-table-wrapper {
+  .block-kit-x-table-row-tools {
+    left: -$width;
+    position: absolute;
+    top: $width;
+  }
+
+  .block-kit-x-table-row-tools-item {
+    background-color: var(--color-fill-2);
+    cursor: pointer;
+    width: $width;
+
+    &:first-child {
+      border-top-left-radius: 4px;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: 4px;
+    }
+
+    &:hover,
+    &.active {
+      background-color: var(--color-fill-3);
+    }
+  }
+}

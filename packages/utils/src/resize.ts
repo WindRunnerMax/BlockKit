@@ -1,7 +1,7 @@
 import { IS_DOM_ENV } from "./env";
 
-export type Rect = { width: number; height: number };
-export type ResizeCallback = (prev: Rect, next: Rect) => void;
+export type ResizeRect = { width: number; height: number };
+export type ResizeCallback = (prev: ResizeRect, next: ResizeRect) => void;
 
 export class Resize {
   /** 前次调度宽度 */
@@ -28,6 +28,7 @@ export class Resize {
    */
   public connect() {
     if (!IS_DOM_ENV) return void 0;
+    this.disconnect();
     if (window.ResizeObserver) {
       this.observeByResizeObserver();
     } else {
@@ -46,7 +47,6 @@ export class Resize {
    * 基于 ResizeObserver 观察元素
    */
   private observeByResizeObserver() {
-    this.disconnect();
     const observer = new ResizeObserver(entries => {
       const [entry] = entries;
       if (!entry) return void 0;

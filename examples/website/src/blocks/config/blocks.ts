@@ -321,7 +321,7 @@ export const INIT: Blocks = {
       type: "table",
       parent: "root",
       size: [3, 2],
-      config: [],
+      config: [{ width: 300 }, { width: 300 }],
       children: ["cell_1_1", "cell_1_2", "cell_2_1", "cell_2_2", "cell_3_1", "cell_3_2"],
     },
   },

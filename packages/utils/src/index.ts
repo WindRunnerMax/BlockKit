@@ -73,7 +73,7 @@ export { TSON } from "./json";
 export { Literal } from "./literal";
 export { hasOwnProperty, sleep, to } from "./native";
 export { RegExec } from "./regexp";
-export type { Rect, ResizeCallback } from "./resize";
+export type { ResizeCallback, ResizeRect } from "./resize";
 export { Resize } from "./resize";
 export type { Invoke, Task } from "./schedule";
 export { Schedule } from "./schedule";

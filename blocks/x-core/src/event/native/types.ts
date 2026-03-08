@@ -23,6 +23,7 @@ export const NATIVE_EVENTS = {
   MOUSE_DOWN_GLOBAL: "mousedown_global",
   MOUSE_UP_GLOBAL: "mouseup_global",
   CLICK: "click",
+  CLICK_GLOBAL: "click_global",
 } as const;
 
 export type NativeEventMap = {
@@ -48,6 +49,7 @@ export type NativeEventMap = {
   [NATIVE_EVENTS.MOUSE_UP_GLOBAL]: MouseEvent;
   [NATIVE_EVENTS.MOUSE_MOVE]: MouseEvent;
   [NATIVE_EVENTS.CLICK]: MouseEvent;
+  [NATIVE_EVENTS.CLICK_GLOBAL]: MouseEvent;
 };
 
 export type NativeEventMapType = typeof NATIVE_EVENTS;

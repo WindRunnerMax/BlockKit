@@ -98,6 +98,10 @@ export class NativeEvent {
     this.event.emit(NATIVE_EVENTS.CLICK, e);
   };
 
+  protected onClickGlobal = (e: MouseEvent) => {
+    this.event.emit(NATIVE_EVENTS.CLICK_GLOBAL, e);
+  };
+
   public bind() {
     this.unbind();
     const container = this.editor.getContainer();
@@ -122,6 +126,7 @@ export class NativeEvent {
     document.addEventListener(NATIVE_EVENTS.SELECTION_CHANGE_NATIVE, this.onSelectionChange);
     document.addEventListener(NATIVE_EVENTS.MOUSE_DOWN, this.onMouseDownGlobal);
     document.addEventListener(NATIVE_EVENTS.MOUSE_UP, this.onMouseUpGlobal);
+    document.addEventListener(NATIVE_EVENTS.CLICK, this.onClickGlobal);
   }
 
   public unbind() {
@@ -147,5 +152,6 @@ export class NativeEvent {
     document.removeEventListener(NATIVE_EVENTS.SELECTION_CHANGE_NATIVE, this.onSelectionChange);
     document.removeEventListener(NATIVE_EVENTS.MOUSE_DOWN, this.onMouseDownGlobal);
     document.removeEventListener(NATIVE_EVENTS.MOUSE_UP, this.onMouseUpGlobal);
+    document.removeEventListener(NATIVE_EVENTS.CLICK, this.onClickGlobal);
   }
 }

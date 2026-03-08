@@ -4,6 +4,11 @@ import { SPACE } from "@block-kit/utils";
 import type { RefObject } from "react";
 import { useLayoutEffect } from "react";
 
+/**
+ * 调整浮层元素位置, 确保在视口内
+ * @param ref
+ * @param offset
+ */
 export const useRectAdapterEffect = (ref: RefObject<HTMLDivElement | null>, offset: number) => {
   useLayoutEffect(() => {
     const el = ref.current;

@@ -3,13 +3,13 @@
 .block-kit-x-table-scroll {
   @include min-scrollbar;
 
-  cursor: text;
+  cursor: auto;
   max-width: 100%;
   // 总是存在占位 避免产生高度突变
   // 配合 @min-scrollbar 可以防止禁用的滚动条样式显示出来
   overflow-x: scroll;
   padding-bottom: 3px;
-  padding-top: 15px;
+  padding-top: 10px;
   position: relative;
   width: 100%;
 }
@@ -32,8 +32,26 @@
 
   .block-kit-x-table-tr {
     border-width: 0;
-    // FIX: 单元格合并使得行高为`0`的情况
+    // 单元格合并使得行高为`0`的情况
     // 表格 3 x 3 合并 [[0,0]-[1,0]] [[2,2]-[3,3]]
     height: 40px;
+  }
+}
+
+.block-kit-x-table-wrapper .block-kit-x-table-tools {
+  opacity: 0;
+  user-select: none;
+  visibility: hidden;
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.block-kit-x-table-wrapper:hover {
+  .block-kit-x-table-tools {
+    opacity: 1;
+    visibility: visible;
   }
 }

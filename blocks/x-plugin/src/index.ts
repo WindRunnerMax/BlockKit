@@ -18,6 +18,7 @@ export { DEFINE_ORDERED_TYPE, ORDERED_KEY } from "./ordered/types/index";
 export { QuoteXPlugin } from "./quote/index";
 export type { QuoteBlockDataType } from "./quote/types";
 export { DEFINE_QUOTE_TYPE, QUOTE_KEY } from "./quote/types";
+export { useFocusedInState } from "./shared/hooks/use-focus-in";
 export { useRectAdapterEffect } from "./shared/hooks/use-rect-adapter";
 export { BlockConvert } from "./shared/modules/block-convert";
 export { st } from "./shared/modules/shared-types";
