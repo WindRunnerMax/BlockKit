@@ -1,0 +1,39 @@
+@import '../../../node_modules/@block-kit/utils/dist/style/vars';
+
+.block-kit-x-table-scroll {
+  @include min-scrollbar;
+
+  cursor: text;
+  max-width: 100%;
+  // 总是存在占位 避免产生高度突变
+  // 配合 @min-scrollbar 可以防止禁用的滚动条样式显示出来
+  overflow-x: scroll;
+  padding-bottom: 3px;
+  padding-top: 15px;
+  position: relative;
+  width: 100%;
+}
+
+.block-kit-x-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  cursor: auto;
+  position: relative;
+  table-layout: fixed;
+  width: 100%;
+
+  colgroup {
+    user-select: none;
+  }
+
+  .block-kit-x-table-full-col {
+    width: 100%;
+  }
+
+  .block-kit-x-table-tr {
+    border-width: 0;
+    // FIX: 单元格合并使得行高为`0`的情况
+    // 表格 3 x 3 合并 [[0,0]-[1,0]] [[2,2]-[3,3]]
+    height: 40px;
+  }
+}

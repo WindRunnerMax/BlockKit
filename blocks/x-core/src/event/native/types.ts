@@ -19,6 +19,7 @@ export const NATIVE_EVENTS = {
   SELECTION_CHANGE_NATIVE: "selectionchange",
   MOUSE_DOWN: "mousedown",
   MOUSE_UP: "mouseup",
+  MOUSE_MOVE: "mousemove",
   MOUSE_DOWN_GLOBAL: "mousedown_global",
   MOUSE_UP_GLOBAL: "mouseup_global",
   CLICK: "click",
@@ -45,6 +46,7 @@ export type NativeEventMap = {
   [NATIVE_EVENTS.MOUSE_UP]: MouseEvent;
   [NATIVE_EVENTS.MOUSE_DOWN_GLOBAL]: MouseEvent;
   [NATIVE_EVENTS.MOUSE_UP_GLOBAL]: MouseEvent;
+  [NATIVE_EVENTS.MOUSE_MOVE]: MouseEvent;
   [NATIVE_EVENTS.CLICK]: MouseEvent;
 };
 

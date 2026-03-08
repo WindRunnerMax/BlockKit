@@ -10,6 +10,7 @@ import {
   IndentXPlugin,
   OrderedXPlugin,
   QuoteXPlugin,
+  TableXPlugin,
   TextXPlugin,
 } from "@block-kit/x-plugin";
 import { BlockKitX, EditableX, MountNode } from "@block-kit/x-react";
@@ -38,6 +39,7 @@ const App: FC = () => {
       new IndentXPlugin(),
       new CodeXPlugin(),
       new OrderedXPlugin(),
+      new TableXPlugin(),
     ]);
     return instance;
   }, []);

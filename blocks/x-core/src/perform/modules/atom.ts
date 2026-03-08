@@ -118,7 +118,7 @@ export class Atom {
   /**
    * 更新 Block 节点指定 path 数据的变更
    * @param blockId 块节点 id
-   * @param path 数据路径
+   * @param path 数据路径, 仅支持对象操作
    * @param value 新值, 支持 undefined 作为删除操作
    */
   public updateAttr(blockId: string, path: Path, value: unknown): ApplyChange {

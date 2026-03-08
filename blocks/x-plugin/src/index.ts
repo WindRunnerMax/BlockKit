@@ -24,5 +24,7 @@ export { st } from "./shared/modules/shared-types";
 export { getMountRect } from "./shared/utils/dom";
 export { inheritLineProperties } from "./shared/utils/input";
 export { createComplexTextEditor } from "./shared/utils/text";
+export { TableXPlugin } from "./table";
+export { TABLE_KEY } from "./table/types/index";
 export { TextXPlugin } from "./text";
 export { TEXT_KEY } from "./text/types/index";

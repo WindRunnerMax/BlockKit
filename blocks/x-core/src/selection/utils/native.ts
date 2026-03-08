@@ -72,7 +72,7 @@ export const toDOMRange = (editor: BlockEditor, range: Range): DOMRange | null =
   if (!start || !end) {
     return null;
   }
-  if (Entry.isBlock(start) && Entry.isBlock(end)) {
+  if (range.isBlockRange) {
     const node = editor.selection.element || editor.getContainer();
     const domRange = window.document.createRange();
     domRange.setStart(node, 0);

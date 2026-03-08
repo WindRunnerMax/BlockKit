@@ -1,6 +1,7 @@
 import { st } from "../../shared/modules/shared-types";
 
 export const TABLE_KEY = "table" as const;
+export const TABLE_CELL_KEY = "table-cell" as const;
 export const MIN_CELL_WIDTH = 100;
 
 export type CellConfig = {
@@ -20,5 +21,6 @@ export type TableBlockDataType = st.infer<typeof DEFINE_TABLE_TYPE>;
 declare module "@block-kit/x-json/dist/es/types/interface" {
   interface BlockModule {
     [TABLE_KEY]: TableBlockDataType;
+    [TABLE_CELL_KEY]: { type: typeof TABLE_CELL_KEY };
   }
 }

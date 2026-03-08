@@ -1,20 +1,22 @@
 import type { BlockState } from "@block-kit/x-core";
 import { createContext, useContext } from "react";
 
+import type { CellConfig } from "../types";
+
 export type TableStateContext = {
   state: BlockState;
-  widths: number[];
+  config: CellConfig[];
   trs: HTMLTableRowElement[];
   size: [row: number, col: number];
 };
 
-export const TableContext = createContext<TableStateContext>({
+export const TableStateContext = createContext<TableStateContext>({
   state: null as unknown as BlockState,
-  widths: [],
+  config: [],
   trs: [],
   size: [0, 0],
 });
 
-export const useTableContext = () => {
-  return useContext(TableContext);
+export const useTableStateContext = () => {
+  return useContext(TableStateContext);
 };

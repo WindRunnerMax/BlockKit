@@ -13,18 +13,20 @@ export const INIT: Blocks = {
         "h2_inline",
         "inline_text",
         "h2_quote",
-        "quote_container",
+        "quote_block",
         "h2_bullet",
         "bullet_l1",
         "h2_order",
         "order_l1",
         "h2_code",
         "code_block",
-        "child2",
+        "h2_table",
+        "table_block",
       ],
       parent: "",
     },
   },
+
   h1: {
     id: "h1",
     version: 1,
@@ -103,6 +105,7 @@ export const INIT: Blocks = {
       children: [],
     },
   },
+
   h2_inline: {
     id: "h2_inline",
     version: 1,
@@ -148,6 +151,7 @@ export const INIT: Blocks = {
       children: [],
     },
   },
+
   h2_quote: {
     id: "h2_quote",
     version: 1,
@@ -159,8 +163,8 @@ export const INIT: Blocks = {
       parent: "root",
     },
   },
-  quote_container: {
-    id: "quote_container",
+  quote_block: {
+    id: "quote_block",
     version: 1,
     data: {
       type: "quote",
@@ -173,7 +177,7 @@ export const INIT: Blocks = {
     version: 1,
     data: {
       type: "text",
-      parent: "quote_container",
+      parent: "quote_block",
       children: [],
       delta: [{ insert: "引用内容" }],
     },
@@ -185,9 +189,10 @@ export const INIT: Blocks = {
       type: "bullet",
       children: [],
       delta: [{ insert: "可嵌套列表结构" }],
-      parent: "quote_container",
+      parent: "quote_block",
     },
   },
+
   h2_bullet: {
     id: "h2_bullet",
     version: 1,
@@ -229,6 +234,7 @@ export const INIT: Blocks = {
       parent: "bullet_l2",
     },
   },
+
   h2_order: {
     id: "h2_order",
     version: 1,
@@ -273,6 +279,7 @@ export const INIT: Blocks = {
       parent: "order_l2",
     },
   },
+
   h2_code: {
     id: "h2_code",
     version: 1,
@@ -295,9 +302,141 @@ export const INIT: Blocks = {
       delta: [{ insert: "const a = 1;\nconst b = 2;" }],
     },
   },
-  child2: {
-    id: "child2",
+
+  h2_table: {
+    id: "h2_table",
     version: 1,
-    data: { type: "text", children: [], delta: [{ insert: "child2" }], parent: "root" },
+    data: {
+      type: "heading",
+      level: "h2",
+      children: [],
+      delta: [{ insert: "表格块" }],
+      parent: "root",
+    },
+  },
+  table_block: {
+    id: "table_block",
+    version: 1,
+    data: {
+      type: "table",
+      parent: "root",
+      size: [3, 2],
+      config: [],
+      children: ["cell_1_1", "cell_1_2", "cell_2_1", "cell_2_2", "cell_3_1", "cell_3_2"],
+    },
+  },
+  cell_1_1: {
+    id: "cell_1_1",
+    version: 1,
+    data: {
+      type: "table-cell",
+      parent: "table_block",
+      children: ["cell_1_1_text"],
+    },
+  },
+  cell_1_1_text: {
+    id: "cell_1_1_text",
+    version: 1,
+    data: {
+      type: "text",
+      parent: "cell_1_1",
+      children: [],
+      delta: [{ insert: "单元格1" }],
+    },
+  },
+  cell_1_2: {
+    id: "cell_1_2",
+    version: 1,
+    data: {
+      type: "table-cell",
+      parent: "table_block",
+      children: ["cell_1_2_text"],
+    },
+  },
+  cell_1_2_text: {
+    id: "cell_1_2_text",
+    version: 1,
+    data: {
+      type: "text",
+      parent: "cell_1_2",
+      children: [],
+      delta: [{ insert: "单元格2" }],
+    },
+  },
+  cell_2_1: {
+    id: "cell_2_1",
+    version: 1,
+    data: {
+      type: "table-cell",
+      parent: "table_block",
+      children: ["cell_2_1_text"],
+    },
+  },
+  cell_2_1_text: {
+    id: "cell_2_1_text",
+    version: 1,
+    data: {
+      type: "text",
+      parent: "cell_2_1",
+      children: [],
+      delta: [{ insert: "单元格3" }],
+    },
+  },
+  cell_2_2: {
+    id: "cell_2_2",
+    version: 1,
+    data: {
+      type: "table-cell",
+      parent: "table_block",
+      children: ["cell_2_2_text"],
+    },
+  },
+  cell_2_2_text: {
+    id: "cell_2_2_text",
+    version: 1,
+    data: {
+      type: "text",
+      parent: "cell_2_2",
+      children: [],
+      delta: [{ insert: "单元格4" }],
+    },
+  },
+  cell_3_1: {
+    id: "cell_3_1",
+    version: 1,
+    data: {
+      type: "table-cell",
+      parent: "table_block",
+      children: ["cell_3_1_text"],
+    },
+  },
+  cell_3_1_text: {
+    id: "cell_3_1_text",
+    version: 1,
+    data: {
+      type: "text",
+      parent: "cell_3_1",
+      children: [],
+      delta: [{ insert: "单元格5" }],
+    },
+  },
+  cell_3_2: {
+    id: "cell_3_2",
+    version: 1,
+    data: {
+      type: "table-cell",
+      parent: "table_block",
+      children: ["cell_3_2_text"],
+    },
+  },
+  cell_3_2_text: {
+    id: "cell_3_2_text",
+    version: 1,
+    data: {
+      type: "text",
+      parent: "cell_3_2",
+      children: [],
+      delta: [{ insert: "单元格6" }],
+    },
   },
 };

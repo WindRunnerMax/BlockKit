@@ -76,12 +76,12 @@ export class JSONType {
    * @param snapshot
    * @param path
    */
-  public get<T>(snapshot: O.Any, path: Path): T | null {
+  public get<T>(snapshot: O.Any, path: Path): T | null | undefined {
     let node: P.Any = snapshot;
     if (!snapshot) return null;
     for (let i = 0; i < path.length; i++) {
       const currentPath = path[i];
-      if (isNil(node)) return null;
+      if (isNil(node)) return node;
       node = node[currentPath];
     }
     return node || null;
