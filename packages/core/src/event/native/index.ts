@@ -111,7 +111,6 @@ export class NativeEvent {
   };
 
   public bind() {
-    this.unbind();
     const container = this.editor.getContainer();
     container.addEventListener(NATIVE_EVENTS.COMPOSITION_START, this.onCompositionStart);
     container.addEventListener(NATIVE_EVENTS.COMPOSITION_UPDATE, this.onCompositionUpdate);

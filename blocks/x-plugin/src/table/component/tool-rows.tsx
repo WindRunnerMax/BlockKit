@@ -28,7 +28,7 @@ export const RowTools: FC<{
       if (!cell) continue;
       entries.push(Entry.create(cell.id, POINT_TYPE.BLOCK));
     }
-    editor.selection.set(new Range(entries));
+    editor.selection.set(new Range(entries), true);
     setSelectedRowIndex(index);
     const reset = () => setSelectedRowIndex(-1);
     editor.event.once(EDITOR_EVENT.SELECTION_CHANGE, reset);

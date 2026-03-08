@@ -116,16 +116,30 @@ export class Atom {
   }
 
   /**
-   * 更新 Block 节点指定 path 数据的变更
+   * 更新 Block 节点指定 path 对象数据的变更
    * @param blockId 块节点 id
    * @param path 数据路径, 仅支持对象操作
    * @param value 新值, 支持 undefined 作为删除操作
    */
-  public updateAttr(blockId: string, path: Path, value: unknown): ApplyChange {
+  public updateObjectAttr(blockId: string, path: Path, value: unknown): ApplyChange {
     const initial = this.get(blockId, path);
     const op: JSONOp = { p: path };
     if (!isUndef(initial)) op.od = initial;
     if (!isUndef(value)) op.oi = value;
+    return { id: blockId, ops: [op] };
+  }
+
+  /**
+   * 更新 Block 节点指定 path 列表数据的变更
+   * @param blockId 块节点 id
+   * @param path 数据路径, 仅支持列表操作
+   * @param value 新值, 支持 undefined 作为删除操作
+   */
+  public updateListNode(blockId: string, path: Path, value: unknown): ApplyChange {
+    const initial = this.get(blockId, path);
+    const op: JSONOp = { p: path };
+    if (!isUndef(initial)) op.ld = initial;
+    if (!isUndef(value)) op.li = value;
     return { id: blockId, ops: [op] };
   }
 }

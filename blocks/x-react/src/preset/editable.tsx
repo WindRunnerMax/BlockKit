@@ -80,14 +80,15 @@ export const EditableX: React.FC<{
    * 挂载编辑器 DOM
    */
   useLayoutEffect(() => {
-    const el = ref.current;
-    el && editor.mount(el);
     // 创建隐藏的选区元素
     const textarea = document.createElement("textarea");
     textarea.hidden = true;
     textarea.setAttribute(X_SELECTION_KEY, "true");
     document.body.appendChild(textarea);
     editor.selection.element = textarea;
+    // 挂载编辑器 DOM 节点
+    const el = ref.current;
+    el && editor.mount(el);
     return () => {
       editor.unmount();
       textarea.remove();

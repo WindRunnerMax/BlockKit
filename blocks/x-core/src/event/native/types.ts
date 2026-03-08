@@ -8,6 +8,7 @@ export const NATIVE_EVENTS = {
   CUT: "cut",
   PASTE: "paste",
   KEY_DOWN: "keydown",
+  KEY_DOWN_GLOBAL: "keydown_global",
   KEY_PRESS: "keypress",
   KEY_UP: "keyup",
   BEFORE_INPUT: "beforeinput",
@@ -36,6 +37,7 @@ export type NativeEventMap = {
   [NATIVE_EVENTS.CUT]: ClipboardEvent;
   [NATIVE_EVENTS.PASTE]: ClipboardEvent;
   [NATIVE_EVENTS.KEY_DOWN]: KeyboardEvent;
+  [NATIVE_EVENTS.KEY_DOWN_GLOBAL]: KeyboardEvent;
   [NATIVE_EVENTS.KEY_PRESS]: KeyboardEvent;
   [NATIVE_EVENTS.KEY_UP]: KeyboardEvent;
   [NATIVE_EVENTS.FOCUS]: FocusEvent;

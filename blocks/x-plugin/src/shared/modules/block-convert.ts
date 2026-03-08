@@ -33,17 +33,17 @@ export class BlockConvert {
     const fromDefKeysSet = new Set(Object.keys(fromDef));
     const toDefKeysSet = new Set(Object.keys(toDef));
     // 首先更新 block type 字段
-    changes.push(atom.updateAttr(basic.id, ["type"], to));
+    changes.push(atom.updateObjectAttr(basic.id, ["type"], to));
     for (const key of fromDefKeysSet) {
       // 在目标定义中不存在，需要 delete
       if (!toDefKeysSet.has(key)) {
-        changes.push(atom.updateAttr(basic.id, [key], void 0));
+        changes.push(atom.updateObjectAttr(basic.id, [key], void 0));
       }
     }
     for (const key of toDefKeysSet) {
       // 在源定义中不存在, 并且定义值必填的情况下, 需要 insert
       if (!fromDefKeysSet.has(key) && !isNil(toDef[key])) {
-        changes.push(atom.updateAttr(basic.id, [key], toDef[key]));
+        changes.push(atom.updateObjectAttr(basic.id, [key], toDef[key]));
       }
     }
     // 强制合并的字段值
@@ -51,7 +51,7 @@ export class BlockConvert {
       for (const key of Object.keys(merge)) {
         const value = merge[key];
         if (value === basicRaw[key]) continue;
-        changes.push(atom.updateAttr(basic.id, [key], value));
+        changes.push(atom.updateObjectAttr(basic.id, [key], value));
       }
     }
     return changes;

@@ -74,7 +74,7 @@ export const CodeBlock: FC<{
   }, [editor.model, state, index]);
 
   const onLanguageChange = useMemoFn((value: string) => {
-    const change = editor.perform.atom.updateAttr(state.id, ["language"], value);
+    const change = editor.perform.atom.updateObjectAttr(state.id, ["language"], value);
     editor.state.apply([change], { autoCaret: false });
   });
 

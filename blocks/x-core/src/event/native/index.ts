@@ -4,6 +4,8 @@ import type { InternalEventBus } from "../bus/types";
 import { NATIVE_EVENTS } from "./types";
 
 export class NativeEvent {
+  protected container: HTMLDivElement | null = null;
+
   constructor(protected event: InternalEventBus, protected editor: BlockEditor) {}
 
   protected onCompositionStart = (e: CompositionEvent) => {
@@ -44,6 +46,15 @@ export class NativeEvent {
     this.event.emit(NATIVE_EVENTS.KEY_DOWN, e);
   };
 
+  protected onKeydownGlobal = (e: KeyboardEvent) => {
+    const sel = window.getSelection();
+    // 选区在 textarea 时, 认为焦点在编辑器内, 需要额外触发 keydown 事件
+    if (sel && sel.anchorNode === this.editor.selection.element) {
+      this.onKeydown(e);
+    }
+    this.event.emit(NATIVE_EVENTS.KEY_DOWN_GLOBAL, e);
+  };
+
   protected onKeypress = (e: KeyboardEvent) => {
     this.event.emit(NATIVE_EVENTS.KEY_PRESS, e);
   };
@@ -80,13 +91,13 @@ export class NativeEvent {
     this.event.emit(NATIVE_EVENTS.MOUSE_DOWN, e);
   };
 
-  protected onMouseUp = (e: MouseEvent) => {
-    this.event.emit(NATIVE_EVENTS.MOUSE_UP, e);
-  };
-
   protected onMouseDownGlobal = (e: MouseEvent) => {
     this.editor.state.set(EDITOR_STATE.MOUSE_DOWN, true);
     this.event.emit(NATIVE_EVENTS.MOUSE_DOWN_GLOBAL, e);
+  };
+
+  protected onMouseUp = (e: MouseEvent) => {
+    this.event.emit(NATIVE_EVENTS.MOUSE_UP, e);
   };
 
   protected onMouseUpGlobal = (e: MouseEvent) => {
@@ -103,8 +114,8 @@ export class NativeEvent {
   };
 
   public bind() {
-    this.unbind();
     const container = this.editor.getContainer();
+    this.container = container;
     container.addEventListener(NATIVE_EVENTS.COMPOSITION_START, this.onCompositionStart);
     container.addEventListener(NATIVE_EVENTS.COMPOSITION_UPDATE, this.onCompositionUpdate);
     container.addEventListener(NATIVE_EVENTS.COMPOSITION_END, this.onCompositionEnd);
@@ -127,10 +138,11 @@ export class NativeEvent {
     document.addEventListener(NATIVE_EVENTS.MOUSE_DOWN, this.onMouseDownGlobal);
     document.addEventListener(NATIVE_EVENTS.MOUSE_UP, this.onMouseUpGlobal);
     document.addEventListener(NATIVE_EVENTS.CLICK, this.onClickGlobal);
+    document.addEventListener(NATIVE_EVENTS.KEY_DOWN, this.onKeydownGlobal);
   }
 
   public unbind() {
-    const container = this.editor.getContainer();
+    const container = this.container || this.editor.getContainer();
     container.removeEventListener(NATIVE_EVENTS.COMPOSITION_START, this.onCompositionStart);
     container.removeEventListener(NATIVE_EVENTS.COMPOSITION_UPDATE, this.onCompositionUpdate);
     container.removeEventListener(NATIVE_EVENTS.COMPOSITION_END, this.onCompositionEnd);
@@ -153,5 +165,6 @@ export class NativeEvent {
     document.removeEventListener(NATIVE_EVENTS.MOUSE_DOWN, this.onMouseDownGlobal);
     document.removeEventListener(NATIVE_EVENTS.MOUSE_UP, this.onMouseUpGlobal);
     document.removeEventListener(NATIVE_EVENTS.CLICK, this.onClickGlobal);
+    document.removeEventListener(NATIVE_EVENTS.KEY_DOWN, this.onKeydownGlobal);
   }
 }

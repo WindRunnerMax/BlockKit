@@ -57,7 +57,7 @@ export const Cell: FC<{
       let change: ApplyChange;
       if (cellConfigItem) {
         const path = ["config", newColIndex, "width"];
-        change = editor.perform.atom.updateAttr(tableState.id, path, newWidth);
+        change = editor.perform.atom.updateObjectAttr(tableState.id, path, newWidth);
       } else {
         const op: JSONOp = { p: ["config", newColIndex], li: { width: newWidth } };
         change = { id: tableState.id, ops: [op] };

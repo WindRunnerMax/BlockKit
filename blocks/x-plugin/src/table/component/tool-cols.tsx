@@ -35,7 +35,7 @@ export const ColTools: FC<{
       if (!cell) continue;
       entries.push(Entry.create(cell.id, POINT_TYPE.BLOCK));
     }
-    editor.selection.set(new Range(entries));
+    editor.selection.set(new Range(entries), true);
     setSelectedColIndex(index);
     const reset = () => setSelectedColIndex(-1);
     editor.event.once(EDITOR_EVENT.SELECTION_CHANGE, reset);
