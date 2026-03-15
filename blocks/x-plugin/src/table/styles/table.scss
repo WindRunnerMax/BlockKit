@@ -40,6 +40,7 @@
 
 .block-kit-x-table-wrapper .block-kit-x-table-tools {
   opacity: 0;
+  transition: opacity 0.1s ease-in;
   user-select: none;
   visibility: hidden;
 

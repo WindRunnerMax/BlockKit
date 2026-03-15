@@ -58,6 +58,8 @@ export { STRIKE_KEY } from "./strike/types";
 export { FloatToolbar, Toolbar, ToolBarMixin } from "./toolbar";
 export type { ToolbarContextType } from "./toolbar/context/provider";
 export { ToolbarContext, useToolbarContext } from "./toolbar/context/provider";
+export { TOOLBAR_NO_PREVENT } from "./toolbar/types";
+export { filterLineMarkMap, filterMarkMap } from "./toolbar/utils/marks";
 export { UnderlinePlugin } from "./underline/index";
 export { UNDERLINE_KEY } from "./underline/types";
 export const BLOCK_KIT_VERSION = process.env.VERSION || "0.0.0";

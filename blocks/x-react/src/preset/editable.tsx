@@ -80,11 +80,19 @@ export const EditableX: React.FC<{
    * 挂载编辑器 DOM
    */
   useLayoutEffect(() => {
+    // 创建隐藏的选区元素, 块级选区落点
+    const textarea = document.createElement("textarea");
+    textarea.hidden = true;
+    textarea.className = "block-kit-x-editable-textarea";
+    textarea.setAttribute(X_SELECTION_KEY, "true");
+    document.body.appendChild(textarea);
+    editor.selection.element = textarea;
     // 挂载编辑器 DOM 节点
     const el = ref.current;
     el && editor.mount(el);
     return () => {
       editor.unmount();
+      textarea.remove();
       !preventDestroy && editor.destroy();
     };
   }, [editor, preventDestroy]);
@@ -114,11 +122,6 @@ export const EditableX: React.FC<{
     });
   }, [editor, index]);
 
-  const onTextareaRef = (textarea: HTMLTextAreaElement) => {
-    // 隐藏的选区元素, 块级选区落点
-    editor.selection.element = textarea;
-  };
-
   if (!root) {
     editor.logger.error("Missing Root Block");
     return null;
@@ -146,13 +149,6 @@ export const EditableX: React.FC<{
           <BlockXModel editor={editor} state={root}></BlockXModel>
         </BlockXWrapModel>
       </LayoutEffectContext.Provider>
-      <textarea
-        className="block-kit-x-editable-textarea"
-        hidden={true}
-        ref={onTextareaRef}
-        {...{ [X_SELECTION_KEY]: true }}
-        contentEditable={false}
-      ></textarea>
     </div>
   );
 };

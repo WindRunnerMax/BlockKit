@@ -6,8 +6,8 @@ export type ToolbarContextType = {
   editor: BlockEditor;
   refreshMarks: () => void;
   keys: Record<string, string>;
-  setKeys: (v: Record<string, string>) => void;
   selection: Range | null;
+  setKeys: (v: Record<string, string>) => void;
 };
 
 export const ToolbarContext = React.createContext<ToolbarContextType>({
