@@ -41,3 +41,15 @@
     background: transparent;
   }
 }
+
+.block-kit-x-editable-textarea {
+  bottom: 0;
+  caret-color: transparent;
+  color: transparent;
+  height: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  user-select: none;
+  width: 0;
+}

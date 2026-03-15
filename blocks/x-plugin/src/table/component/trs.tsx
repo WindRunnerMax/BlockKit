@@ -4,7 +4,10 @@ import { Fragment } from "react";
 import { useTableStateContext } from "../hooks/use-state-context";
 import { Cell } from "./cell";
 
-export const Trs: FC = () => {
+export const Trs: FC<{
+  readonly: boolean;
+}> = props => {
+  const { readonly } = props;
   const { state, trs, size, config } = useTableStateContext();
   const [rowSize, colSize] = size;
 
@@ -22,6 +25,7 @@ export const Trs: FC = () => {
       const cellState = state.children[flatIndex];
       cells.push(
         <Cell
+          readonly={readonly}
           key={cellState.id}
           cellState={cellState}
           rowIndex={i}

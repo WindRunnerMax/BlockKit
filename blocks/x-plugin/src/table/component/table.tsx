@@ -1,10 +1,12 @@
 import "../styles/table.scss";
 
 import { cs } from "@block-kit/utils";
+import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { BlockState } from "@block-kit/x-core";
+import { EDITOR_EVENT } from "@block-kit/x-core";
 import { useReadonly } from "@block-kit/x-react";
 import type { FC } from "react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useFocusedInState } from "../../shared/hooks/use-focus-in";
 import { TableRefContext } from "../hooks/use-ref-context";
@@ -13,6 +15,7 @@ import { MIN_CELL_WIDTH } from "../types";
 import { resetTableState } from "../utils/calculate";
 import { ColTools } from "./tool-cols";
 import { RowTools } from "./tool-rows";
+import { Trs } from "./trs";
 
 export const Table: FC<{
   state: BlockState;
@@ -23,14 +26,27 @@ export const Table: FC<{
   const { readonly } = useReadonly();
   const { isFocused } = useFocusedInState(props.state);
   const [, colSize] = context.size;
+  const editor = props.state.container.editor;
 
   const ref = useMemo((): TableRefContext => {
     return {
+      anchorCell: null,
       state: props.state,
       setClientState: c => setContext(o => Object.assign({}, o, c)),
       refreshTableState: () => resetTableState(props.state),
     };
   }, [props.state]);
+
+  const onMouseUp = useMemoFn(() => {
+    ref.anchorCell = null;
+  });
+
+  useEffect(() => {
+    editor.event.on(EDITOR_EVENT.MOUSE_UP_GLOBAL, onMouseUp);
+    return () => {
+      editor.event.off(EDITOR_EVENT.MOUSE_UP_GLOBAL, onMouseUp);
+    };
+  }, [editor.event, onMouseUp]);
 
   return (
     <div className="block-kit-x-table-wrapper" ref={wrapper}>
@@ -48,7 +64,9 @@ export const Table: FC<{
           </colgroup>
           <TableRefContext.Provider value={ref}>
             <TableStateContext.Provider value={context}>
-              <tbody>{props.children}</tbody>
+              <tbody>
+                <Trs readonly={readonly} />
+              </tbody>
             </TableStateContext.Provider>
           </TableRefContext.Provider>
         </table>

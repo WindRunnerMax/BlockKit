@@ -155,6 +155,20 @@ export class Selection {
   }
 
   /**
+   * 聚焦到选区元素
+   * - 通常在块级选区前调用, 用于选中纯块级选区效果
+   */
+  public focusOnSelectionElement() {
+    const selection = window.getSelection();
+    if (!selection || !this.element) {
+      this.editor.logger.warning("Invalid Selection/Element", this.element);
+      return void 0;
+    }
+    const node = this.element;
+    selection.setBaseAndExtent(node, 0, node, 0);
+  }
+
+  /**
    * 检查时间片执行次数限制
    */
   protected limit() {
@@ -189,7 +203,7 @@ export class Selection {
   @Bind
   protected onEditorSelectionBlur() {
     // 由于块级选区存在, 焦点若不在则需要重置模型选区
-    this.set(null);
+    document.hasFocus() && this.set(null);
   }
 
   /**

@@ -15,15 +15,15 @@ import React, { useEffect } from "react";
 export type BlockXWrapViewProps = {
   editor: BlockEditor;
   state: BlockState;
-  tag?: "div" | "td";
   className?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
+  preventSelectionCover?: boolean;
   onRef?: (ref: HTMLElement | null) => void;
 };
 
 const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
-  const { editor, state, tag: Tag = "div" } = props;
+  const { editor, state, preventSelectionCover } = props;
   const [selected, setSelected] = useSafeState(false);
 
   /**
@@ -45,14 +45,15 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
   });
 
   useEffect(() => {
+    if (preventSelectionCover) return void 0;
     editor.event.on(EDITOR_EVENT.SELECTION_CHANGE, onSelectionChange);
     return () => {
       editor.event.off(EDITOR_EVENT.SELECTION_CHANGE, onSelectionChange);
     };
-  }, [editor.event, onSelectionChange]);
+  }, [editor.event, onSelectionChange, preventSelectionCover]);
 
   return (
-    <Tag
+    <div
       key={state.id}
       {...{
         [X_BLOCK_KEY]: true,
@@ -65,7 +66,7 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
     >
       {props.children}
       {selected && <div className="block-kit-x-selected-cover" contentEditable={false} />}
-    </Tag>
+    </div>
   );
 };
 

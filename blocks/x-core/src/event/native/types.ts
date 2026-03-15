@@ -14,8 +14,6 @@ export const NATIVE_EVENTS = {
   BEFORE_INPUT: "beforeinput",
   INPUT: "input",
   FOCUS: "focus",
-  FOCUSIN: "focusin",
-  FOCUSOUT: "focusout",
   BLUR: "blur",
   SELECTION_CHANGE_NATIVE: "selectionchange",
   MOUSE_DOWN: "mousedown",
@@ -42,8 +40,6 @@ export type NativeEventMap = {
   [NATIVE_EVENTS.KEY_UP]: KeyboardEvent;
   [NATIVE_EVENTS.FOCUS]: FocusEvent;
   [NATIVE_EVENTS.BLUR]: FocusEvent;
-  [NATIVE_EVENTS.FOCUSIN]: FocusEvent;
-  [NATIVE_EVENTS.FOCUSOUT]: FocusEvent;
   [NATIVE_EVENTS.SELECTION_CHANGE_NATIVE]: Event;
   [NATIVE_EVENTS.MOUSE_DOWN]: MouseEvent;
   [NATIVE_EVENTS.MOUSE_UP]: MouseEvent;
