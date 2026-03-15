@@ -15,20 +15,21 @@ import React, { useEffect } from "react";
 export type BlockXWrapViewProps = {
   editor: BlockEditor;
   state: BlockState;
+  tag?: "div" | "td";
   className?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
-  onRef?: (ref: HTMLDivElement | null) => void;
+  onRef?: (ref: HTMLElement | null) => void;
 };
 
 const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
-  const { editor, state } = props;
+  const { editor, state, tag: Tag = "div" } = props;
   const [selected, setSelected] = useSafeState(false);
 
   /**
    * 设置行 DOM 节点
    */
-  const setModel = (ref: HTMLDivElement | null) => {
+  const setModel = (ref: HTMLElement | null) => {
     if (ref) {
       editor.model.setBlockModel(ref, state);
       rewriteRemoveChild(ref);
@@ -51,7 +52,7 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
   }, [editor.event, onSelectionChange]);
 
   return (
-    <div
+    <Tag
       key={state.id}
       {...{
         [X_BLOCK_KEY]: true,
@@ -60,11 +61,11 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
       }}
       ref={setModel}
       style={props.style}
-      className={cs(props.className, selected && "block-kit-x-selected")}
+      className={cs("block-kit-x-block-wrap", props.className, selected && "block-kit-x-selected")}
     >
       {props.children}
       {selected && <div className="block-kit-x-selected-cover" contentEditable={false} />}
-    </div>
+    </Tag>
   );
 };
 

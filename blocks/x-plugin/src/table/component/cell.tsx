@@ -73,10 +73,8 @@ export const Cell: FC<{
   };
 
   return (
-    <td className="block-kit-x-table-td">
-      <BlockXWrapModel editor={editor} state={cellState}>
-        <BlockXModel editor={editor} state={cellState}></BlockXModel>
-      </BlockXWrapModel>
+    <BlockXWrapModel className="block-kit-x-table-td" editor={editor} state={cellState} tag="td">
+      <BlockXModel editor={editor} state={cellState}></BlockXModel>
       {!readonly && (
         <div
           contentEditable={false}
@@ -84,6 +82,6 @@ export const Cell: FC<{
           className="block-kit-x-table-cell-resize"
         ></div>
       )}
-    </td>
+    </BlockXWrapModel>
   );
 };

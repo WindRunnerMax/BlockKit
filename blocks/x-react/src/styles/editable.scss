@@ -12,7 +12,7 @@
   margin-left: 10px;
 }
 
-.block-kit-x-editable div[data-block] {
+.block-kit-x-editable .block-kit-x-block-wrap {
   border-radius: 4px;
   position: relative;
 
@@ -36,7 +36,7 @@
   }
 }
 
-.block-kit-x-editable div[data-block].block-kit-x-selected {
+.block-kit-x-editable .block-kit-x-block-wrap.block-kit-x-selected {
   ::selection {
     background: transparent;
   }

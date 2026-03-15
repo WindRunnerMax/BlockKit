@@ -127,8 +127,9 @@ export const toDOMRange = (editor: BlockEditor, range: Range): DOMRange | null =
 export const isFocusedInEditor = (editor: BlockEditor) => {
   if (!IS_BROWSER_ENV) return false;
   const sel = window.getSelection();
-  if (!sel || !document.hasFocus()) return false;
-  const node = sel.anchorNode;
+  const node = sel && sel.anchorNode;
+  if (!node || !document.hasFocus()) return false;
+  if (node && node === editor.selection.element) return true;
   const container = editor.getContainer();
   for (let n: DOMNode | null = node; n !== container; n = n.parentNode) {
     // node 节点向上查找到 body, 说明 node 并非在 container 下, 返回 false

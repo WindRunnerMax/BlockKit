@@ -1,6 +1,6 @@
 import type { Blocks } from "@block-kit/x-json";
 
-import { BlockEditor, normalizeModelRange, Point, Range } from "../../src";
+import { BlockEditor, Entry, normalizeModelRange, Point, Range } from "../../src";
 
 const getBlocks = (): Blocks => ({
   root: {
@@ -155,5 +155,80 @@ describe("perform delete-tree", () => {
     expect(blockSet.child1.data.children).toEqual([]);
     expect(blockSet.child2.data.children).toEqual([]);
     expect(blockSet.child1.data.delta).toEqual([{ insert: "chichild1" }]);
+  });
+
+  it("delete head&tail blocks with head text", () => {
+    const blocks: Blocks = {
+      root: {
+        id: "root",
+        version: 1,
+        data: { type: "ROOT", children: ["text0", "block1", "block2"], parent: "" },
+      },
+      text0: {
+        id: "text0",
+        version: 1,
+        data: {
+          type: "text",
+          children: [],
+          delta: [{ insert: "text0" }],
+          parent: "root",
+        },
+      },
+      block1: {
+        id: "block1",
+        version: 1,
+        data: {
+          // @ts-expect-error quote
+          type: "quote",
+          children: ["text1"],
+          parent: "root",
+        },
+      },
+      text1: {
+        id: "text1",
+        version: 1,
+        data: {
+          type: "text",
+          children: [],
+          delta: [{ insert: "text1" }],
+          parent: "block1",
+        },
+      },
+      block2: {
+        id: "block2",
+        version: 1,
+        data: {
+          // @ts-expect-error quote
+          type: "quote",
+          children: ["text2"],
+          parent: "root",
+        },
+      },
+      text2: {
+        id: "text2",
+        version: 1,
+        data: {
+          type: "text",
+          children: [],
+          delta: [{ insert: "text2" }],
+          parent: "block2",
+        },
+      },
+    };
+    const editor = new BlockEditor({ initial: blocks });
+    // ├── root
+    // ├── text0
+    // ├── block1
+    // │   └── text1
+    // └── block2
+    //     └── text2
+    // logTreeState(editor);
+    const range = normalizeModelRange(
+      editor,
+      Point.create("block1", "B"),
+      Point.create("block2", "B")
+    );
+    const res = editor.perform.deleteFragment(new Range(range))!;
+    expect(res.options.selection).toEqual(new Range([Entry.create("text0", "T", 5, 0)]));
   });
 });

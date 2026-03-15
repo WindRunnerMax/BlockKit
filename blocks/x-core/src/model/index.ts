@@ -37,7 +37,7 @@ export class Model {
    * @param node
    * @param state
    */
-  public setBlockModel(node: HTMLDivElement, state: BlockState) {
+  public setBlockModel(node: HTMLElement, state: BlockState) {
     this.DOM_MODEL.set(node, state);
     this.MODEL_DOM.set(state, node);
   }

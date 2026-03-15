@@ -55,7 +55,7 @@ export class Perform {
     // 非折叠选区时, 需要以 start 起始判断该节点的尾部 marks
     if (!sel.isCollapsed) {
       const meta = this.editor.lookup.getLeafAtOffset(start.id, start.offset);
-      attributes = getOpMetaMarks(this.editor, meta!);
+      attributes = meta ? getOpMetaMarks(this.editor, meta) : attributes;
     }
     const delta = new Delta().retain(start.offset).insert(text, attributes);
     const textChange = this.atom.updateText(start.id, delta);
@@ -141,7 +141,7 @@ export class Perform {
       // 存在前节点且前节点是文本块的情况下, 选区设置到前节点的末尾
       if (prevBlock && isTextLikeBlockType(prevBlock)) {
         const offset = prevBlock.length;
-        const entry = Entry.create(lastBlock.id, POINT_TYPE.TEXT, offset, 0);
+        const entry = Entry.create(prevBlock.id, POINT_TYPE.TEXT, offset, 0);
         options.selection = new Range(entry, false);
         // 同级无前节点的情况下需要创建空白的文本节点
       } else {

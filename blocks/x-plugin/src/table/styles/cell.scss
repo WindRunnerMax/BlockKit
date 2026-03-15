@@ -9,6 +9,15 @@
     word-break: break-word;
   }
 
+  /* stylelint-disable-next-line no-duplicate-selectors */
+  .block-kit-x-table-td {
+    border-radius: 0;
+
+    > .block-kit-x-selected-cover {
+      border-radius: 0;
+    }
+  }
+
   .block-kit-x-table-cell-resize {
     background-color: transparent;
     bottom: 0;
