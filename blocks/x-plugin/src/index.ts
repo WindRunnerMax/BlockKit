@@ -29,3 +29,5 @@ export { TableXPlugin } from "./table";
 export { TABLE_KEY } from "./table/types/index";
 export { TextXPlugin } from "./text";
 export { TEXT_KEY } from "./text/types/index";
+export { ToolbarXPlugin } from "./toolbar";
+export { TOOLBAR_KEY } from "./toolbar/types/index";

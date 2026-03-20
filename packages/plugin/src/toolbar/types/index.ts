@@ -1,4 +1,4 @@
-export const TOOLBAR_NO_PREVENT = "data-no-prevent" as const;
+export const PASS_FOCUS_KEY = "data-pass-focus" as const;
 
 export type ToolbarProps = {
   className?: string;

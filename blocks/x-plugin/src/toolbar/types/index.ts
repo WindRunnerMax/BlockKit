@@ -6,3 +6,8 @@ export type ToolbarProps = {
   styles?: React.CSSProperties;
   onRef?: React.MutableRefObject<HTMLDivElement | null>;
 };
+
+export type ToolbarFloatContext = {
+  isMouseDown?: boolean;
+  isWakeUp?: boolean;
+};

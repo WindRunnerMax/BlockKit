@@ -66,9 +66,14 @@ export class LinkPlugin extends EditorPlugin {
 
   public renderLeaf(context: ReactLeafContext): React.ReactNode {
     const attrs = context.attributes;
-    if (!attrs) return context.children;
+    if (!attrs) {
+      return context.children;
+    }
     if (attrs[LINK_TEMP_KEY]) {
       context.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+    }
+    if (!attrs[LINK_KEY]) {
+      return context.children;
     }
     return <A attrs={attrs}>{context.children}</A>;
   }

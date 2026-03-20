@@ -124,12 +124,12 @@ export const Link: FC<{
             >
               {collapsed && (
                 <Form.Item label="文本内容" field="link-insert">
-                  <Input data-no-prevent autoComplete="off" size="mini" placeholder="输入文本" />
+                  <Input data-pass-focus autoComplete="off" size="mini" placeholder="输入文本" />
                 </Form.Item>
               )}
               <Form.Item label="链接地址" field={LINK_KEY}>
                 <Input
-                  data-no-prevent
+                  data-pass-focus
                   autoComplete="off"
                   size="mini"
                   placeholder="输入链接"

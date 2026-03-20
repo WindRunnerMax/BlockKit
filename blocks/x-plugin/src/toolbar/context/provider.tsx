@@ -1,8 +1,8 @@
 import "../styles/index.scss";
 
 import { EDITOR_EVENT } from "@block-kit/core";
-import { TOOLBAR_NO_PREVENT } from "@block-kit/plugin";
-import { cs } from "@block-kit/utils";
+import { PASS_FOCUS_KEY } from "@block-kit/plugin";
+import { cs, isHTMLElement } from "@block-kit/utils";
 import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import { useEditorStatic } from "@block-kit/x-react";
 import type { FC } from "react";
@@ -39,13 +39,13 @@ export const Toolbar: FC<ToolbarProps> = props => {
     <div
       ref={props.onRef}
       style={props.styles}
-      className={cs("block-kit-menu-toolbar", props.className)}
+      className={cs("block-kit-x-float-toolbar", props.className)}
       onMouseDown={e => {
         const target = e.target;
         // 避免 float 的情况下触发按下事件
         e.stopPropagation();
         // 存在需要抢夺焦点的情况, 例如超链接输入的弹出层
-        if (target instanceof HTMLElement && target.hasAttribute(TOOLBAR_NO_PREVENT)) {
+        if (isHTMLElement(target) && target.hasAttribute(PASS_FOCUS_KEY)) {
           return void 0;
         }
         e.preventDefault();

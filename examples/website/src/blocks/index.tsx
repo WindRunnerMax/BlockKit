@@ -12,6 +12,7 @@ import {
   QuoteXPlugin,
   TableXPlugin,
   TextXPlugin,
+  ToolbarXPlugin,
 } from "@block-kit/x-plugin";
 import { BlockKitX, EditableX, MountNode } from "@block-kit/x-react";
 import type { FC } from "react";
@@ -40,6 +41,7 @@ const App: FC = () => {
       new CodeXPlugin(),
       new OrderedXPlugin(),
       new TableXPlugin(),
+      new ToolbarXPlugin(),
     ]);
     return instance;
   }, []);

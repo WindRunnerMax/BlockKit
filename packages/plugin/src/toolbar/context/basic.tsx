@@ -3,13 +3,14 @@ import "../styles/index.scss";
 import { EDITOR_EVENT } from "@block-kit/core";
 import type { Op } from "@block-kit/delta";
 import { useEditorStatic } from "@block-kit/react";
-import { cs } from "@block-kit/utils";
+import { cs, isHTMLElement } from "@block-kit/utils";
 import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 
 import { PLUGIN_EVENTS } from "../../shared/utils/event";
 import type { ToolbarProps } from "../types";
+import { PASS_FOCUS_KEY } from "../types";
 import { filterLineMarkMap, filterMarkMap } from "../utils/marks";
 import { ToolbarContext } from "./provider";
 
@@ -68,7 +69,7 @@ export const Toolbar: FC<ToolbarProps> = props => {
         // 避免 float 的情况下触发按下事件
         e.stopPropagation();
         // 存在需要抢夺焦点的情况, 例如超链接输入的弹出层
-        if (target instanceof HTMLElement && target.hasAttribute("data-no-prevent")) {
+        if (isHTMLElement(target) && target.hasAttribute(PASS_FOCUS_KEY)) {
           return void 0;
         }
         e.preventDefault();
