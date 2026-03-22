@@ -41,7 +41,7 @@ const App: FC = () => {
       new CodeXPlugin(),
       new OrderedXPlugin(),
       new TableXPlugin(),
-      new ToolbarXPlugin(),
+      new ToolbarXPlugin({ offsetTop: -8 }),
     ]);
     return instance;
   }, []);

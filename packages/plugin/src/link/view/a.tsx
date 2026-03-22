@@ -24,6 +24,7 @@ export const A: FC<{
   return (
     <a
       href={href}
+      title={href}
       target={target}
       rel="noreferrer"
       className="block-kit-hyper-link"

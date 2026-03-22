@@ -1,11 +1,13 @@
 import type { AttributeMap, InsertOp } from "@block-kit/delta";
-import { cloneOp, getOpLength } from "@block-kit/delta";
+import { cloneOp, Delta, getOpLength } from "@block-kit/delta";
 import { Bind } from "@block-kit/utils";
+import type { Block } from "@block-kit/x-json";
 
 import type { BlockEditor } from "../editor";
 import type { SelectionChangeEvent } from "../event/bus/";
 import { EDITOR_EVENT } from "../event/bus/";
 import { Entry } from "../selection/modules/entry";
+import type { Range } from "../selection/modules/range";
 import type { OpMeta } from "./types";
 import { getOpMetaMarks } from "./utils/marks";
 
@@ -82,6 +84,36 @@ export class Lookup {
       index = index - opLength;
     }
     return null;
+  }
+
+  /**
+   * 通过 Range 获取 Block 片段
+   * @param range
+   */
+  public getFragment(range?: Range): Block[] | null {
+    const at = range || this.editor.selection.get();
+    if (!at || at.isCollapsed) return null;
+    const blocks: Record<string, Block> = {};
+    for (let i = 0, n = at.nodes.length; i < n; ++i) {
+      const item = at.nodes[i];
+      const state = this.editor.state.getBlock(item.id);
+      if (!state) continue;
+      const block = state.toBlock();
+      if (Entry.isText(item)) {
+        blocks[block.id] = block;
+        if (block.data.delta && (i === 0 || i === n - 1)) {
+          const delta = new Delta(block.data.delta);
+          const sliced = delta.slice(item.start, item.start + item.len);
+          block.data.delta = sliced.ops;
+        }
+      } else {
+        const tree = state.getTreeNodes();
+        for (const child of tree) {
+          blocks[child.id] = child.toBlock();
+        }
+      }
+    }
+    return Object.values(blocks);
   }
 
   /**

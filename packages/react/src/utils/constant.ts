@@ -3,4 +3,5 @@ export const NO_CURSOR: React.CSSProperties = {
   height: 0,
   color: "transparent",
   position: "absolute",
+  caretColor: "transparent",
 } as const;
