@@ -1807,7 +1807,7 @@ public didPaintLineState(lineState: LineState): void {
 虽然看起来已经解决了问题，然而在`React`中还是存在一些问题，主要的原因此时的`DOM`处理是非受控的。在下面的例子中，由于`React`在处理`style`属性时，只会更新发生变化的样式属性，即使整体是新对象，但具体值与上次渲染时相同，因此`React`不会重新设置这个样式属性。
 
 ```js
-// https://playcode.io/react
+// https://stackblitz.com/edit/react-playground-practice // react playground
 import React from "react";
 export function App() {
   const el = React.useRef();
@@ -2023,7 +2023,6 @@ useLayoutEffect(() => {
 这里还有需要关注的是，如果能够直接找到文本节点自然不需要继续深度查找，在`HTML`中文本节点并不属于`DOMElement`。此外，由于已经确定了当前是非文本节点，因此我们此时的`offset`值只会是`0`或者子节点长度偏移。
 
 - <https://github.com/ianstormtaylor/slate/blob/9a21251/packages/slate-dom/src/utils/dom.ts#L105>
-
 
 对于`Embed`节点来说这里更加复杂，具体来说则是注释节点、非编辑节点、空子节点等。因此主要差异在于`getEditableChildAndIndex`的方法中，这里就是在查找子节点时，分别尝试正向和反向查找，以此来尝试找到可编辑节点。
 
