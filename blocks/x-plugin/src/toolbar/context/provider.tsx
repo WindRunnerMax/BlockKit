@@ -2,17 +2,26 @@ import "../styles/index.scss";
 
 import { PASS_FOCUS_KEY } from "@block-kit/plugin";
 import { isHTMLElement } from "@block-kit/utils";
+import { useForceUpdate } from "@block-kit/utils/dist/es/hooks";
 import type { FC } from "react";
 import { useMemo } from "react";
 
 import type { ToolbarProps } from "../types";
+import { getToolbarContext, getToolbarPlugins } from "../utils/schedule";
 
 export const Toolbar: FC<ToolbarProps> = props => {
-  const children = useMemo(() => {
-    return [];
-  }, []);
+  const { index: updateIndex, forceUpdate } = useForceUpdate();
 
-  if (!children.length) {
+  const children = useMemo(() => {
+    const range = props.range;
+    if (!range) return null;
+    const plugins = getToolbarPlugins(props.editor);
+    const context = getToolbarContext(props.editor, range, forceUpdate);
+    return plugins.map(plugin => plugin.renderToolbar(context));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateIndex, props.editor, props.range, forceUpdate]);
+
+  if (!children || !children.length) {
     return null;
   }
 

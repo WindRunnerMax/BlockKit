@@ -24,15 +24,23 @@ export class Range {
   public readonly map: O.Map<RangeEntry> = {};
   /** 块级结构选区 */
   public readonly isBlockRange: boolean;
+  /** 文本结构选区 */
+  public readonly isTextRange: boolean;
 
   /** 构造函数 */
   public constructor(nodes: RangeEntry | RangeEntry[], isBackward?: boolean) {
     this.isBlockRange = true;
+    this.isTextRange = true;
     const entries = Array.isArray(nodes) ? nodes : [nodes];
     for (const entry of entries) {
       this.map[entry.id] = entry;
-      // 默认为块级选区, 若选区包含 Text Entry 时, 则认为是非块级结构选区
-      this.isBlockRange && Entry.isText(entry) && (this.isBlockRange = false);
+      if (Entry.isText(entry)) {
+        // 默认为块级选区, 若选区包含 Text Entry 时, 则认为是非块级结构选区
+        this.isBlockRange && (this.isBlockRange = false);
+      } else {
+        // 默认为文本结构选区, 若选区包含 Block Entry 时, 则认为是非文本结构选区
+        this.isTextRange && (this.isTextRange = false);
+      }
     }
     this.nodes = entries;
     this.length = entries.length;

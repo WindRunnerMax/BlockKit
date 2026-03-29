@@ -1,0 +1,20 @@
+.block-kit-x-toolbar-item {
+  align-items: center;
+  border-radius: 3px;
+  color: var(--color-text-1);
+  cursor: pointer;
+  display: flex;
+  margin: 0 3px;
+  padding: 6px 7px;
+
+  &.active,
+  &:hover {
+    background-color: var(--color-fill-2);
+    color: var(--color-text-1);
+  }
+
+  &.disable {
+    background-color: unset;
+    color: var(--color-text-3);
+  }
+}
