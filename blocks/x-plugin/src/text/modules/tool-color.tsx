@@ -1,18 +1,19 @@
-import "../styles/font-color.scss";
+import "../styles/tool-color.scss";
 
 import { Trigger } from "@arco-design/web-react";
 import { IconDown } from "@arco-design/web-react/icon";
+import { BACKGROUND_KEY, FONT_COLOR_KEY } from "@block-kit/plugin";
+import { BACKGROUND_PRESET as BACKGROUND, COLOR_PRESET as COLOR } from "@block-kit/plugin";
 import { cs } from "@block-kit/utils";
 import type { FC } from "react";
 
-import { BACKGROUND_KEY } from "../../background/types";
-import { FONT_COLOR_KEY } from "../../font-color/types";
 import { FontColorIcon } from "../../shared/icons/font-color";
-import { useToolbarContext } from "../context/provider";
-import { BACKGROUND, COLOR } from "../utils/constant";
+import type { RenderToolbarContext } from "../../toolbar/utils/schedule";
 
-export const FontColor: FC = () => {
-  const { keys, refreshMarks, editor } = useToolbarContext();
+export const FontColorTool: FC<{
+  context: RenderToolbarContext;
+}> = props => {
+  const { keys } = props.context;
 
   return (
     <Trigger
@@ -20,47 +21,42 @@ export const FontColor: FC = () => {
       popupAlign={{ bottom: 10 }}
       getPopupContainer={e => e.parentElement || document.body}
       popup={() => (
-        <div className="block-kit-toolbar-dropdown block-kit-color-picker" onClick={refreshMarks}>
-          <div className="kit-color-picker-label">字体颜色</div>
-          <div className="kit-picker-group">
+        <div className="block-kit-x-toolbar-dropdown block-kit-x-color-picker">
+          <div className="block-kit-x-color-picker-label">字体颜色</div>
+          <div className="block-kit-x-picker-group">
             {COLOR.map(it => (
               <div
                 className={cs(
-                  "kit-picker-item-wrapper",
+                  "block-kit-x-picker-item-wrapper",
                   keys[FONT_COLOR_KEY] === it && "active",
                   !keys[FONT_COLOR_KEY] && !it && "active"
                 )}
                 key={it}
                 style={{ color: it ? it : void 0 }}
-                onClick={() => {
-                  editor.command.exec(FONT_COLOR_KEY, { value: it });
-                  refreshMarks();
-                }}
               >
-                <div className="kit-picker-item">
+                <div className="block-kit-x-picker-item">
                   <FontColorIcon></FontColorIcon>
                 </div>
               </div>
             ))}
           </div>
-          <div className="kit-color-picker-label">背景颜色</div>
-          <div className="kit-picker-group kit-picker-background-case">
+          <div className="block-kit-x-color-picker-label">背景颜色</div>
+          <div className="block-kit-x-picker-group block-kit-x-picker-background-case">
             {BACKGROUND.map(it => (
               <div
                 className={cs(
-                  "kit-picker-item-wrapper",
+                  "block-kit-x-picker-item-wrapper",
                   keys[BACKGROUND_KEY] === it && "active",
                   !keys[BACKGROUND_KEY] && !it && "active"
                 )}
                 key={it}
-                onClick={() => {
-                  editor.command.exec(BACKGROUND_KEY, { value: it });
-                  refreshMarks();
-                }}
               >
                 <div
                   style={{ background: it ? it : void 0 }}
-                  className={cs("kit-picker-item", !it && "kit-picker-item-empty-background")}
+                  className={cs(
+                    "block-kit-x-picker-item",
+                    !it && "block-kit-x-picker-item-empty-background"
+                  )}
                 ></div>
               </div>
             ))}
@@ -68,14 +64,14 @@ export const FontColor: FC = () => {
         </div>
       )}
     >
-      <div className="menu-toolbar-item kit-color-case">
+      <div className="block-kit-x-toolbar-item block-kit-x-color-case">
         <div
-          className="kit-color-block"
+          className="block-kit-x-color-block"
           style={{ color: keys[FONT_COLOR_KEY], background: keys[BACKGROUND_KEY] }}
         >
           <FontColorIcon></FontColorIcon>
         </div>
-        <IconDown className="menu-toolbar-icon-down" />
+        <IconDown className="block-kit-x-toolbar-icon-down" />
       </div>
     </Trigger>
   );

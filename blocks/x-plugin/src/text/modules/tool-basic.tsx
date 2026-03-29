@@ -1,4 +1,4 @@
-import "../styles/toolbar.scss";
+import "../styles/tool-basic.scss";
 
 import {
   IconBold,
@@ -19,12 +19,10 @@ import type { FC } from "react";
 import { Fragment } from "react";
 
 import type { RenderToolbarContext } from "../../toolbar/utils/schedule";
+import { FontColorTool } from "./tool-color";
+import { LinkTool } from "./tool-link";
 
-export const renderTextToolbar = (key: string, context: RenderToolbarContext) => {
-  return <TextTool key={key} context={context} />;
-};
-
-export const TextTool: FC<{
+export const TextTools: FC<{
   context: RenderToolbarContext;
 }> = props => {
   const { keys } = props.context;
@@ -42,9 +40,11 @@ export const TextTool: FC<{
       <div className={cs("block-kit-x-toolbar-item", keys[STRIKE_KEY] && "active")}>
         <IconStrikethrough />
       </div>
+      <LinkTool context={props.context} />
       <div className={cs("block-kit-x-toolbar-item", keys[INLINE_CODE_KEY] && "active")}>
         <IconCode />
       </div>
+      <FontColorTool context={props.context} />
     </Fragment>
   );
 };

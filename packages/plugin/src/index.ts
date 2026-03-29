@@ -59,6 +59,7 @@ export { FloatToolbar, Toolbar, ToolBarMixin } from "./toolbar";
 export type { ToolbarContextType } from "./toolbar/context/provider";
 export { ToolbarContext, useToolbarContext } from "./toolbar/context/provider";
 export { PASS_FOCUS_KEY } from "./toolbar/types";
+export { BACKGROUND as BACKGROUND_PRESET, COLOR as COLOR_PRESET } from "./toolbar/utils/constant";
 export { filterLineMarkMap, filterMarkMap } from "./toolbar/utils/marks";
 export { UnderlinePlugin } from "./underline/index";
 export { UNDERLINE_KEY } from "./underline/types";

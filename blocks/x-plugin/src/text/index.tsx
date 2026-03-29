@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 
 import { createComplexTextEditor } from "../shared/utils/text";
 import type { RenderToolbarContext } from "../toolbar/utils/schedule";
-import { renderTextToolbar } from "./modules/toolbar";
+import { TextTools } from "./modules/tool-basic";
 import { TEXT_KEY } from "./types";
 
 export class TextXPlugin extends BlockXPlugin {
@@ -18,6 +18,6 @@ export class TextXPlugin extends BlockXPlugin {
   }
 
   public renderToolbar(context: RenderToolbarContext): ReactNode {
-    return renderTextToolbar(this.key, context);
+    return <TextTools key={this.key} context={context} />;
   }
 }

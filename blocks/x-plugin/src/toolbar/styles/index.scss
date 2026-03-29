@@ -19,3 +19,9 @@
   user-select: none;
   z-index: 99999;
 }
+
+.block-kit-x-toolbar-dropdown {
+  @include frame-box;
+
+  color: var(--color-text-1);
+}
