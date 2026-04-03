@@ -96,9 +96,15 @@ export class URI {
   /**
    * 设置路径
    * @param path /get/email
+   * @param normalize 是否归一化路径
    */
-  public setPath(path: string): this {
-    this.path = path.startsWith("/") ? path : "/" + path;
+  public setPath(path: string, normalize = true): this {
+    let pathname = path;
+    // 确保路径以 / 开头 (而是否存在尾 / 都是合法的)
+    !path.startsWith("/") && (pathname = "/" + path);
+    // 替换连续的 / 为一个 /
+    normalize && (pathname = pathname.replace(/\/{2,}/g, "/"));
+    this.path = pathname;
     return this;
   }
 

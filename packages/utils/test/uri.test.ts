@@ -82,4 +82,24 @@ describe("uri", () => {
     const clone = uri.clone();
     expect(clone.format()).toBe(uri.format());
   });
+
+  it("uri normalize", () => {
+    const uri = new URI();
+    uri.setPath("search");
+    expect(uri.format()).toBe("/search");
+    uri.setPath("/search///");
+    expect(uri.format()).toBe("/search/");
+    uri.setPath("search/");
+    expect(uri.format()).toBe("/search/");
+    uri.setPath("search/s1");
+    expect(uri.format()).toBe("/search/s1");
+    uri.setPath("search//s1");
+    expect(uri.format()).toBe("/search/s1");
+    uri.setPath("search///s1");
+    expect(uri.format()).toBe("/search/s1");
+    uri.setPath("search", false);
+    expect(uri.format()).toBe("/search");
+    uri.setPath("/search///", false);
+    expect(uri.format()).toBe("/search///");
+  });
 });

@@ -45,7 +45,7 @@ export const isNil = (value: unknown): value is undefined | null => {
  * - Object.create(null) => true
  * - (new function (){}) => true
  * @param {unknown} value
- * @returns {boolean}
+ * @returns {boolean} Object.prototype.toString(v) === "[object Object]"
  */
 export const isObject = <T = Record<string, unknown>>(value: unknown): value is T => {
   return opt.call(value) === "[object Object]";
@@ -153,7 +153,7 @@ export const isBoolean = (value: unknown): value is boolean => {
  * - (function() {}) => false
  * - Object.create(null) => true
  * @param {unknown} value
- * @returns {boolean}
+ * @returns {boolean} v && typeof v === "object"
  */
 export const isObjectLike = <T = Record<string, unknown>>(value: unknown): value is T => {
   return !!value && typeof value === "object";

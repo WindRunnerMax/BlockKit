@@ -58,7 +58,7 @@ const App: FC = () => {
   return (
     <BlockKitX editor={block} readonly={false}>
       <div className="block-kit-editable-container">
-        <div className="block-kit-mount-dom" ref={onRef}></div>
+        <div className="block-kit-x-mount-dom" ref={onRef}></div>
         <EditableX placeholder="Input Placeholder..."></EditableX>
       </div>
     </BlockKitX>

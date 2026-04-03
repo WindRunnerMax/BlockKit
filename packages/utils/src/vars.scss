@@ -24,6 +24,9 @@
   scrollbar-color: #ddd transparent;
   scrollbar-width: thin;
 
+  // overscroll-behavior: contain;
+  // scrollbar-gutter: stable;
+
   // https://caniuse.com/?search=-webkit-scrollbar
   &::-webkit-scrollbar {
     height: 6px;
