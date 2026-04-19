@@ -88,7 +88,7 @@ export const Selector: FC<{
       onChange: onConfirm,
     });
     MountNode.mount(editor, props.id, el);
-    document.addEventListener(EDITOR_EVENT.CLICK, closeOptions, { once: true });
+    editor.event.once(EDITOR_EVENT.CLICK_GLOBAL, closeOptions);
   };
 
   return (

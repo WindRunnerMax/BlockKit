@@ -41,6 +41,7 @@ export class URI {
    * @returns protocol + hostname + port
    */
   public get origin(): string {
+    if (this.protocol === ":") return "//" + this.host;
     const protocol = this.protocol ? this.protocol + "//" : "";
     return protocol + this.host;
   }

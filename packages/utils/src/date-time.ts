@@ -61,11 +61,11 @@ export class DateTime extends Date {
 
   /**
    * 格式化时间日期
-   * - yyyy 年 MM 月 dd 日 hh 小时 mm 分 ss 秒 S 毫秒
+   * - yyyy[year] MM[month] dd[date] hh[hour] mm[minute] ss[second]
    * @param fmt [?=yyyy-MM-dd]
    */
   public format(fmt = "yyyy-MM-dd"): string {
-    const preset: O.Map<string | number> = {
+    const preset: O.Map<number> = {
       "M+": this.getMonth() + 1, // 月份
       "d+": this.getDate(), // 日
       "h+": this.getHours(), // 小时

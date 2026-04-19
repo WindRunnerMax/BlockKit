@@ -36,10 +36,11 @@
       "@block-kit/x-react/dist/es/*": ["./blocks/x-react/src/*"],
       "@block-kit/x-plugin": ["./blocks/x-plugin/src"],
       "@block-kit/variable": ["./examples/variable/src"],
-      "@block-kit/stream": ["./examples/stream/src"],
+      "@block-kit/stream": ["./examples/stream/src"]
     }
   },
-  "include": ["packages/*/src"],
+  "include": [],
+  "exclude": ["**/node_modules/**"],
   "ts-node": {
     "compilerOptions": {
       "module": "commonjs"

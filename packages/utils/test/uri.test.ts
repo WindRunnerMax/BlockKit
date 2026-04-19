@@ -83,6 +83,14 @@ describe("uri", () => {
     expect(clone.format()).toBe(uri.format());
   });
 
+  it("non protocol", () => {
+    const uri = new URI();
+    uri.setHostname("www.baidu.com").setPath("/xx");
+    expect(uri.href).toBe("www.baidu.com/xx");
+    const uri2 = uri.clone().setProtocol("");
+    expect(uri2.href).toBe("//www.baidu.com/xx");
+  });
+
   it("uri normalize", () => {
     const uri = new URI();
     uri.setPath("search");
