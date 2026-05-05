@@ -41,6 +41,16 @@ describe("list", () => {
       expect(() => json.apply(["a", "b", "c"], [{ p: ["0"], lm: 0 }])).toThrow();
     });
 
+    it("prevent clone ops", () => {
+      const obj = {};
+      const applied1 = json.apply(["a", "b", "c"], [{ p: [0], li: obj }]);
+      const applied2 = json.apply(["a", "b", "c"], [{ p: [0], li: obj }], {
+        preventCloneOps: true,
+      });
+      expect(applied1[0]).not.toBe(obj);
+      expect(applied2[0]).toBe(obj);
+    });
+
     it("throws when specifying a string as a list move target", () => {
       // @ts-expect-error type error
       expect(() => json.apply(["a", "b", "c"], [{ p: [1], lm: "0" }])).toThrow();

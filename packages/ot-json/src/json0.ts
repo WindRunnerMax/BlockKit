@@ -92,10 +92,15 @@ export class JSONType {
    * @param snapshot
    * @param ops
    */
-  public apply<T extends P.Any>(snapshot: T, ops: Op[]): T {
+  public apply<T extends P.Any>(
+    snapshot: T,
+    ops: Op[],
+    options?: { preventCloneOps?: boolean }
+  ): T {
+    const { preventCloneOps = false } = options || {};
     const json0 = JSONType.prototype;
     json0.checkValidOps(ops);
-    ops = clone(ops);
+    ops = preventCloneOps ? ops : clone(ops);
 
     const container = { data: snapshot };
 

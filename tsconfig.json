@@ -9,6 +9,7 @@
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": false,
     "declaration": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,

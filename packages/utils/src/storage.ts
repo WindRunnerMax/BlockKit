@@ -22,7 +22,7 @@ const convert = (key: string): string => prefix + String(key) + suffix;
 /**
  * 序列化
  * @param {T} origin
- * @param {number} ttl
+ * @param {number} ttl ms
  * @returns {string | null}
  * */
 const serialize = <T = string>(origin: T, ttl?: number | null): string | null => {
