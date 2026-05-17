@@ -289,6 +289,7 @@ export class Perform {
     newData.children && (newData.children = []);
     const delChange = this.atom.updateText(block.id, del);
     const newBlockChange = this.atom.create(newData);
+    // 如果有子节点, 则将新节点作为当前节点的首个子节点, 否则作为当前节点的下一个兄弟节点
     const parentId = block.children.length ? block.id : block.data.parent;
     const index = block.children.length ? 0 : block.index + 1;
     const insertBlockChange = this.atom.insert(parentId, index, newBlockChange);
@@ -358,6 +359,36 @@ export class Perform {
     for (const state of rests) {
       const moveChange = this.atom.move(state.id, lastState.id, startIndex++);
       changes.push(moveChange);
+    }
+    return this.editor.state.apply(changes, options);
+  }
+
+  /**
+   * 应用行内标记
+   * @param sel
+   * @param attributes
+   */
+  public applyMarks(sel: Range, attributes: AttributeMap, options?: ApplyOptions) {
+    if (sel.isEmpty()) return null;
+    const changes: BatchApplyChange = [];
+    const applied: Set<string> = new Set();
+    for (let i = 0, n = sel.length; i < n; ++i) {
+      const entry = sel.at(i);
+      const state = entry && this.editor.state.getBlock(entry.id);
+      if (!entry || !state || applied.has(state.id)) continue;
+      if ((i === 0 || i === n - 1) && Entry.isText(entry)) {
+        const delta = new Delta().retain(entry.start).retain(entry.len, attributes);
+        changes.push(this.atom.updateText(entry.id, delta));
+        applied.add(state.id);
+        continue;
+      }
+      const pending = Entry.isBlock(entry) ? state.getTreeNodes() : [state];
+      for (const node of pending) {
+        if (!isTextLikeBlockType(node) || applied.has(node.id)) continue;
+        const delta = new Delta().retain(node.length, attributes);
+        changes.push(this.atom.updateText(node.id, delta));
+        applied.add(node.id);
+      }
     }
     return this.editor.state.apply(changes, options);
   }

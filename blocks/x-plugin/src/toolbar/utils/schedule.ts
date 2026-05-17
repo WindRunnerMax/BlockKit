@@ -10,6 +10,7 @@ import type { ReactNode } from "react";
 
 export type RenderToolbarContext = {
   range: Range;
+  editor: BlockEditor;
   keys: O.Map<string>;
   isTextRange: boolean;
   isBlockRange: boolean;
@@ -30,13 +31,16 @@ export const getToolbarContext = (
 ): RenderToolbarContext => {
   const blocks = editor.state.blocks;
   const isMixedRange = !range.isTextRange && !range.isBlockRange;
-  let keys: O.Map<string> | null = null;
   let isEmptyKeys = false;
+  let keys: O.Map<string> | null = null;
+
   for (let k = 0, n = range.nodes.length; k < n; k++) {
     const entry = range.nodes[k];
-    const parentState = blocks[entry.id];
-    if (!entry || !parentState) continue;
-    const flat = parentState.getTreeNodes();
+    const current = blocks[entry.id];
+    if (!entry || !current || (Entry.isText(entry) && !entry.len)) {
+      continue;
+    }
+    const flat = current.getTreeNodes();
     for (let i = 0; i < flat.length; i++) {
       const state = flat[i];
       if (!state) continue;
@@ -54,8 +58,10 @@ export const getToolbarContext = (
       }
     }
   }
+
   return {
     range,
+    editor,
     forceUpdate,
     isMixedRange,
     keys: keys || {},

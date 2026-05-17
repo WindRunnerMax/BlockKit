@@ -31,6 +31,7 @@ export class BulletXPlugin extends BlockXPlugin {
       const state = this.editor.state.getBlock(firstPoint.id);
       if (!state || state.type !== BULLET_KEY) return void 0;
       const data = state.data;
+      // 存在缩进时, 表现为连续的同级节点回车创建同级节点, 存在子节点则作为当前节点的首个子节点
       inheritLineProperties(this.editor, e, context, sel, data);
     }
   }

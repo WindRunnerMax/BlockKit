@@ -10,8 +10,8 @@ import { BlockXPlugin } from "@block-kit/x-react";
 
 import { BlockConvert } from "../shared/modules/block-convert";
 import { createComplexTextEditor } from "../shared/utils/text";
+import { CodeHLPlugin } from "./modules/hl-plugin";
 import { CODE_KEY, DEFINE_CODE_TYPE } from "./types";
-import { CodeHLPlugin } from "./utils/hl-plugin";
 import { CodeBlock } from "./view/code-block";
 
 export class CodeXPlugin extends BlockXPlugin {

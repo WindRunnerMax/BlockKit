@@ -239,7 +239,7 @@ export class History {
   @Bind
   protected onContentChange(event: ContentChangeEvent) {
     const { changes, previous, source, id } = event;
-    if (isEmptyChanges(changes) || source === APPLY_SOURCE.HISTORY) {
+    if (isEmptyChanges(changes) || source === APPLY_SOURCE.HISTORY || event.options.client) {
       return void 0;
     }
     if (event.source === APPLY_SOURCE.REMOTE || event.options.undoable === false) {

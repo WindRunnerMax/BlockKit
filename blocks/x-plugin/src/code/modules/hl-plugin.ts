@@ -3,7 +3,7 @@ import { EditorPlugin } from "@block-kit/react";
 import type { ReactNode } from "react";
 import { createElement } from "react";
 
-import { CODE_HL_KEY, CODE_HL_LINE_NUM } from "./constant";
+import { CODE_HL_KEY, CODE_HL_LINE_NUM } from "../utils/constant";
 
 export class CodeHLPlugin extends EditorPlugin {
   public key = CODE_HL_KEY;

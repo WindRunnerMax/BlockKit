@@ -4,7 +4,7 @@ import { Trigger } from "@arco-design/web-react";
 import { IconDown } from "@arco-design/web-react/icon";
 import { BACKGROUND_KEY, FONT_COLOR_KEY } from "@block-kit/plugin";
 import { BACKGROUND_PRESET as BACKGROUND, COLOR_PRESET as COLOR } from "@block-kit/plugin";
-import { cs } from "@block-kit/utils";
+import { cs, NIL } from "@block-kit/utils";
 import type { FC } from "react";
 
 import { FontColorIcon } from "../../shared/icons/font-color";
@@ -13,7 +13,12 @@ import type { RenderToolbarContext } from "../../toolbar/utils/schedule";
 export const FontColorTool: FC<{
   context: RenderToolbarContext;
 }> = props => {
-  const { keys } = props.context;
+  const { keys, forceUpdate, editor, range } = props.context;
+
+  const onExec = (key: string, value: string) => {
+    editor.perform.applyMarks(range, { [key]: keys[key] === value ? NIL : value });
+    forceUpdate();
+  };
 
   return (
     <Trigger
@@ -33,6 +38,7 @@ export const FontColorTool: FC<{
                 )}
                 key={it}
                 style={{ color: it ? it : void 0 }}
+                onClick={() => onExec(FONT_COLOR_KEY, it)}
               >
                 <div className="block-kit-x-picker-item">
                   <FontColorIcon></FontColorIcon>
@@ -50,6 +56,7 @@ export const FontColorTool: FC<{
                   !keys[BACKGROUND_KEY] && !it && "active"
                 )}
                 key={it}
+                onClick={() => onExec(BACKGROUND_KEY, it)}
               >
                 <div
                   style={{ background: it ? it : void 0 }}
