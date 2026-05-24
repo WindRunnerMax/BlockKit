@@ -49,6 +49,7 @@ export const Link: FC<{
     }
     setVisible(false);
     refreshMarks();
+    editor.selection.updateDOMSelection();
   };
 
   const onDelete = () => {

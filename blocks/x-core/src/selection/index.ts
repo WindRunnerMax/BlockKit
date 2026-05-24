@@ -169,6 +169,18 @@ export class Selection {
   }
 
   /**
+   * 折叠当前选区
+   * @param forward [?=false] 是否向前折叠
+   * @param force [?=false] 是否强制更新 DOM 选区
+   */
+  public collapse(forward = false, force = false) {
+    const range = this.current;
+    if (!range) return void 0;
+    const collapsedRange = range.collapse(forward);
+    this.set(collapsedRange, force);
+  }
+
+  /**
    * 检查时间片执行次数限制
    */
   protected limit() {
@@ -202,8 +214,8 @@ export class Selection {
    */
   @Bind
   protected onEditorSelectionBlur() {
-    // 由于块级选区存在, 焦点若不在则需要重置模型选区
-    document.hasFocus() && this.set(null);
+    // 由于块级选区存在, 非纯文本选区模式下, 焦点若不在则需要重置模型选区
+    document.hasFocus() && this.current && !this.current.isTextRange && this.set(null);
   }
 
   /**

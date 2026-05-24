@@ -24,6 +24,7 @@ import { LinkTool } from "./tool-link";
 
 export const TextTools: FC<{
   context: RenderToolbarContext;
+  filterXSS?: (link: string) => string;
 }> = props => {
   const { keys, forceUpdate, editor, range } = props.context;
 
@@ -58,7 +59,7 @@ export const TextTools: FC<{
       >
         <IconStrikethrough />
       </div>
-      <LinkTool context={props.context} />
+      <LinkTool context={props.context} filterXSS={props.filterXSS} />
       <div
         className={cs("block-kit-x-toolbar-item", keys[INLINE_CODE_KEY] && "active")}
         onClick={() => onExec(INLINE_CODE_KEY)}

@@ -30,11 +30,10 @@ export class ToolbarXPlugin extends BlockXPlugin {
 
   public onCaretWeakUp() {
     const state = this.editor.state;
-    const isFocused = state.isFocused();
     const isReadonly = state.isReadonly();
     const isWakeUp = this.context.isWakeUp;
     const isMouseDown = this.context.isMouseDown;
-    WAKE_UP: if (!isReadonly && isFocused && !isMouseDown && isWakeUp) {
+    WAKE_UP: if (!isReadonly && !isMouseDown && isWakeUp) {
       const range = this.editor.selection.get();
       const rect = this.editor.rect.getCaretRect();
       if (!range || !rect) break WAKE_UP;

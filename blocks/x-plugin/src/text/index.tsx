@@ -6,10 +6,15 @@ import type { ReactNode } from "react";
 import { createComplexTextEditor } from "../shared/utils/text";
 import type { RenderToolbarContext } from "../toolbar/utils/schedule";
 import { TextTools } from "./modules/tool-basic";
+import type { TextXPluginOptions } from "./types";
 import { TEXT_KEY } from "./types";
 
 export class TextXPlugin extends BlockXPlugin {
   public key: string = TEXT_KEY;
+
+  public constructor(public options: TextXPluginOptions = {}) {
+    super();
+  }
 
   public destroy(): void {}
 
@@ -18,6 +23,6 @@ export class TextXPlugin extends BlockXPlugin {
   }
 
   public renderToolbar(context: RenderToolbarContext): ReactNode {
-    return <TextTools key={this.key} context={context} />;
+    return <TextTools key={this.key} context={context} filterXSS={this.options.filterXSS} />;
   }
 }

@@ -102,20 +102,33 @@ export class DateTime extends Date {
 
   /**
    * 精确的时间差 取绝对值
+   * - minus (this - param) 当前时间小于参数时间
    * - years / months / days 累计所有时间差计算
    * - hours / minutes / seconds 独立按天时间差计算
-   * @param newDate
    */
   public diff(newDate: DateTime) {
-    // 先转为秒
-    const diffTime = Math.abs(newDate.getTime() - this.getTime()) / 1000;
-    const years = Math.floor(diffTime / 31536000);
-    const months = Math.floor(diffTime / 2592000);
-    const days = Math.floor(diffTime / 86400);
-    const hours = Math.floor(diffTime / 3600) - 24 * days;
-    const minutes = Math.floor((diffTime % 3600) / 60);
-    const seconds = Math.floor(diffTime % 60);
-    return { years, months, days, hours, minutes, seconds };
+    const thisTime = this.getTime();
+    const newDateTime = newDate.getTime();
+    const minus = thisTime < newDateTime;
+    const total = Math.abs(thisTime - newDateTime) / 1000;
+    const years = Math.floor(total / 31536000);
+    const months = Math.floor(total / 2592000);
+    const days = Math.floor(total / 86400);
+    const hours = Math.floor(total / 3600) - 24 * days;
+    const minutes = Math.floor((total % 3600) / 60);
+    const seconds = Math.floor(total % 60);
+    type DiffResult = {
+      /** this 时间是否小于 param 时间 */ minus: boolean;
+      /** 年差绝对值 */ years: number;
+      /** 月差绝对值 */ months: number;
+      /** 日差绝对值 */ days: number;
+      /** 天内小时差绝对值 */ hours: number;
+      /** 天内分钟差绝对值 */ minutes: number;
+      /** 天内秒差绝对值 */ seconds: number;
+      /** 总秒差绝对值 */ total: number;
+    };
+    const result: DiffResult = { minus, years, months, days, hours, minutes, seconds, total };
+    return result;
   }
 
   /**

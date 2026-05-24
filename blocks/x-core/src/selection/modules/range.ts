@@ -22,9 +22,9 @@ export class Range {
   public readonly isCollapsed: boolean;
   /** 选区 Map 索引 */
   public readonly map: O.Map<RangeEntry> = {};
-  /** 块级结构选区 */
+  /** 纯块级结构选区 */
   public readonly isBlockRange: boolean;
-  /** 文本结构选区 */
+  /** 纯文本结构选区 */
   public readonly isTextRange: boolean;
 
   /** 构造函数 */
@@ -108,6 +108,18 @@ export class Range {
    */
   public clone() {
     return new Range(this.nodes.slice());
+  }
+
+  /**
+   * 折叠当前选区
+   * @param forward [?=false] 是否向前折叠
+   */
+  public collapse(forward = false) {
+    const point = forward ? this.getFirstPoint() : this.getLastPoint();
+    if (!point) return null;
+    return new Range([
+      Point.isBlock(point) ? Entry.fromPoint(point) : Entry.fromPoint(point, point.offset, 0),
+    ]);
   }
 
   /**
