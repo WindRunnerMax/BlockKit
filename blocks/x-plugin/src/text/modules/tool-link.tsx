@@ -84,7 +84,7 @@ export const LinkTool: FC<{
       editor.perform.applyMarks(
         sel,
         { [LINK_TEMP_KEY]: TRULY },
-        { autoCaret: false, undoable: false }
+        { autoCaret: false, undoable: false, client: true }
       );
       editor.event.once(EDITOR_EVENT.SELECTION_CHANGE, () => {
         // 这里是需要等待渲染后再执行, 否则会导致选区校正无法获取 LineNode
@@ -92,7 +92,7 @@ export const LinkTool: FC<{
           editor.perform.applyMarks(
             sel,
             { [LINK_TEMP_KEY]: NIL },
-            { autoCaret: false, undoable: false }
+            { autoCaret: false, undoable: false, client: true }
           );
         });
       });

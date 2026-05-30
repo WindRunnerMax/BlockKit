@@ -11,8 +11,14 @@
   }
 }
 
-.token.operator {
-  background-color: transparent !important;
+/* stylelint-disable-next-line no-duplicate-selectors */
+.block-kit-x-codeblock {
+  /* stylelint-disable-next-line no-invalid-position-at-import-rule */
+  @import 'prismjs/themes/prism.min';
+
+  .token.operator {
+    background-color: transparent !important;
+  }
 }
 
 .block-kit-x-codeblock-langs {

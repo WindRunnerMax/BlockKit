@@ -1,6 +1,5 @@
 // eslint-disable-next-line simple-import-sort/imports
 import Prism from "prismjs";
-import "prismjs/themes/prism.min.css";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-java";
 import { CODE_HL_KEY, DEFAULT_LANGUAGE } from "./constant";
