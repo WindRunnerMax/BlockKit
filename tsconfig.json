@@ -12,6 +12,7 @@
     "emitDecoratorMetadata": false,
     "declaration": true,
     "strict": true,
+    "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",

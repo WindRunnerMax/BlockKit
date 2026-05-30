@@ -64,6 +64,7 @@ export default async () => {
           extract: "_.css",
           minimize: true,
           extensions: [".css", ".scss"],
+          use: [["sass", { impl: require("sass") }]],
         }),
         importPlugin({
           libraryName: "@arco-design/web-react",
@@ -108,6 +109,7 @@ export default async () => {
           extract: "_.css",
           minimize: true,
           extensions: [".css", ".scss"],
+          use: [["sass", { impl: require("sass") }]],
         }),
         importPlugin({
           libraryName: "@arco-design/web-react",
