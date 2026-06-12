@@ -1,7 +1,12 @@
 import { isNumber, isString } from "./is";
 import type { O } from "./types";
 
-export class DateTime extends Date {
+export class DateTime {
+  /**
+   * Raw Date Object
+   */
+  public readonly raw: Date;
+
   /**
    * 构造函数
    */
@@ -27,19 +32,21 @@ export class DateTime extends Date {
     p6?: number,
     p7?: number
   ) {
-    // 无参构建
+    // 内建 Date 对象, 避免直接继承 Date, 导致 ES6 类编译降级问题
+    // 该情况在主流浏览器不会出问题, 目前仅发现在 Google Bot 中抛出异常
+    // 无参数构建
     if (p1 === void 0) {
-      super();
+      this.raw = new Date();
       return this;
     }
     // 第一个参数为 Date 或者 Number 且无第二个参数
     if (p1 instanceof Date || (isNumber(p1) && p2 === void 0)) {
-      super(p1);
+      this.raw = new Date(p1);
       return this;
     }
     // 第一和第二个参数都为 Number
     if (isNumber(p1) && isNumber(p2)) {
-      super(p1, p2, p3 || 1, p4 || 0, p5 || 0, p6 || 0, p7 || 0);
+      this.raw = new Date(p1, p2, p3 || 1, p4 || 0, p5 || 0, p6 || 0, p7 || 0);
       return this;
     }
     // 第一个参数为 String
@@ -49,11 +56,11 @@ export class DateTime extends Date {
       // ISO/RFC 时间格式则直接解析
       // 2024-12-12T13:53:51.829Z / Sat Jun 21 2025 20:05:06 GMT+0800
       if (p1.indexOf("T") > -1) {
-        super(p1);
+        this.raw = new Date(p1);
         return this;
       }
       const normalize = p1.replace(/\d+-\d+-\d+/, m => m.replace(/-/g, "/"));
-      super(normalize);
+      this.raw = new Date(normalize);
       return this;
     }
     throw new Error("No suitable parameters");
@@ -65,15 +72,16 @@ export class DateTime extends Date {
    * @param fmt [?=yyyy-MM-dd]
    */
   public format(fmt = "yyyy-MM-dd"): string {
+    const raw = this.raw;
     const preset: O.Map<number> = {
-      "M+": this.getMonth() + 1, // 月份
-      "d+": this.getDate(), // 日
-      "h+": this.getHours(), // 小时
-      "m+": this.getMinutes(), // 分
-      "s+": this.getSeconds(), // 秒
+      "M+": raw.getMonth() + 1, // 月份
+      "d+": raw.getDate(), // 日
+      "h+": raw.getHours(), // 小时
+      "m+": raw.getMinutes(), // 分
+      "s+": raw.getSeconds(), // 秒
     };
     if (/(y+)/.test(fmt)) {
-      fmt = fmt.replace(RegExp.$1, this.getFullYear().toString().slice(-RegExp.$1.length));
+      fmt = fmt.replace(RegExp.$1, raw.getFullYear().toString().slice(-RegExp.$1.length));
     }
     for (const k of Object.keys(preset)) {
       if (new RegExp(`(${k})`).test(fmt)) {
@@ -94,9 +102,10 @@ export class DateTime extends Date {
    * @param days 日
    */
   public add(years: number = 0, months: number = 0, days: number = 0): DateTime {
-    if (days) this.setDate(this.getDate() + days);
-    if (months) this.setMonth(this.getMonth() + months);
-    if (years) this.setFullYear(this.getFullYear() + years);
+    const raw = this.raw;
+    if (days) raw.setDate(raw.getDate() + days);
+    if (months) raw.setMonth(raw.getMonth() + months);
+    if (years) raw.setFullYear(raw.getFullYear() + years);
     return this;
   }
 
@@ -107,8 +116,8 @@ export class DateTime extends Date {
    * - hours / minutes / seconds 独立按天时间差计算
    */
   public diff(newDate: DateTime) {
-    const thisTime = this.getTime();
-    const newDateTime = newDate.getTime();
+    const thisTime = this.raw.getTime();
+    const newDateTime = newDate.raw.getTime();
     const minus = thisTime < newDateTime;
     const total = Math.abs(thisTime - newDateTime) / 1000;
     const years = Math.floor(total / 31536000);
@@ -136,9 +145,10 @@ export class DateTime extends Date {
    * @param n
    */
   public nextMonth(n: number = 1) {
-    this.setMonth(this.getMonth() + n);
-    this.setDate(1);
-    this.setHours(0, 0, 0, 0);
+    const raw = this.raw;
+    raw.setMonth(raw.getMonth() + n);
+    raw.setDate(1);
+    raw.setHours(0, 0, 0, 0);
     return this;
   }
 
@@ -147,8 +157,9 @@ export class DateTime extends Date {
    * @param n
    */
   public nextDay(n: number = 1) {
-    this.setDate(this.getDate() + n);
-    this.setHours(0, 0, 0, 0);
+    const raw = this.raw;
+    raw.setDate(raw.getDate() + n);
+    raw.setHours(0, 0, 0, 0);
     return this;
   }
 
@@ -157,8 +168,9 @@ export class DateTime extends Date {
    * @param n
    */
   public nextHour(n: number = 1) {
-    this.setHours(this.getHours() + n);
-    this.setMinutes(0, 0, 0);
+    const raw = this.raw;
+    raw.setHours(raw.getHours() + n);
+    raw.setMinutes(0, 0, 0);
     return this;
   }
 
@@ -167,8 +179,9 @@ export class DateTime extends Date {
    * @param n
    */
   public nextMinute(n: number = 1) {
-    this.setMinutes(this.getMinutes() + n);
-    this.setSeconds(0, 0);
+    const raw = this.raw;
+    raw.setMinutes(raw.getMinutes() + n);
+    raw.setSeconds(0, 0);
     return this;
   }
 
@@ -177,7 +190,8 @@ export class DateTime extends Date {
    * @param n
    */
   public deferMonth(n: number = 1) {
-    this.setMonth(this.getMonth() + n);
+    const raw = this.raw;
+    raw.setMonth(raw.getMonth() + n);
     return this;
   }
 
@@ -186,7 +200,8 @@ export class DateTime extends Date {
    * @param n
    */
   public deferDay(n: number = 1) {
-    this.setDate(this.getDate() + n);
+    const raw = this.raw;
+    raw.setDate(raw.getDate() + n);
     return this;
   }
 
@@ -195,7 +210,8 @@ export class DateTime extends Date {
    * @param n
    */
   public deferHour(n: number = 1) {
-    this.setHours(this.getHours() + n);
+    const raw = this.raw;
+    raw.setHours(raw.getHours() + n);
     return this;
   }
 
@@ -204,7 +220,8 @@ export class DateTime extends Date {
    * @param n
    */
   public deferMinute(n: number = 1) {
-    this.setMinutes(this.getMinutes() + n);
+    const raw = this.raw;
+    raw.setMinutes(raw.getMinutes() + n);
     return this;
   }
 
@@ -212,13 +229,21 @@ export class DateTime extends Date {
    * 克隆当前时间日期
    */
   public clone(): DateTime {
-    return new DateTime(this.getTime());
+    const raw = this.raw;
+    return new DateTime(raw.getTime());
+  }
+
+  /**
+   * 获取时间戳
+   */
+  public getTime(): number {
+    return this.raw.getTime();
   }
 
   /**
    * 转换为 DateTime
    */
   public static from(date: Date | DateTime): DateTime {
-    return new DateTime(date);
+    return new DateTime(date.getTime());
   }
 }
