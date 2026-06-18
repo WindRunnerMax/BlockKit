@@ -66,6 +66,7 @@ export class History {
       id: item.id,
       delta: inverted,
       // 如果直接取编辑器选区也可以, 但不够准确, 存在用户移动光标的场景
+      // 或者入栈时记录变更前和变更后选区, 在实际执行 undo/redo 时交换选区
       range: this.transformRange(item.range, inverted),
     });
     this.lastRecord = 0;

@@ -301,7 +301,7 @@ invert2 = undoable.transform(invert2, true); // [{retain:1},{delete:1}]
 invert1 = undoable.transform(invert1, true); // [{delete:1}]
 ```
 
-上述的算法实现其实存在一个问题，我们的`undoable op`是一直处于原始状态，而实际上由于假设`inverted`内容会实际应用到`base`，因此这里的`undoable`同样也需要做变换。在下面的例子上若不做`undoable transform`的话，则`invert2`的结果则是`retain: 3, delete: 1`，此时的基准是`00031000`则删除的字符是`3`，此时明显是错误的，而在做了`transform`之后是`retain: 4, delete: 1`则能正确删除`1`字符。
+上述的算法实现其实存在一个问题，我们的`undoable op`是一直处于原始状态，而实际上由于假设`inverted`内容会实际应用到`base`，因此这里的`undoable`同样也需要做变换。在下面的例子上若不做`undoable transform`的话，则`invert1`的结果则是`retain: 3, delete: 1`，此时的基准是`00031000`则删除的字符是`3`，此时明显是错误的，而在做了`transform`之后是`retain: 4, delete: 1`则能正确删除`1`字符。
 
 ```js
 const Delta = Quill.imports.delta;
@@ -582,18 +582,21 @@ base = base.compose(undoable); // { insert: " ", attributes: { src: "http" } }
 base = base.compose(invert1); // []
 ```
 
-在通常情况下这里并没有什么问题，而`invert`的数据中如果存在`attributes`则可能出现问题，在下面的例子中，假如我们不进行`undoable.transform`的操作，则会导致最终的结果是`src: mock`，但是别忘了我们的`undoable`是`src: http`，这里的`http`是不应该被替换的，因此这里的`transform`操作是非常重要的，当我们依照先前的`History`协同基础设计上将其做操作变换，然后再进行`compose`应用`inverted`结果，就可以得到正确的`src: http`属性。
+看起来上述并没有什么问题，但是这并不是完善的解决方案。在下面的例子中，新的`op`如果存在位置偏移则会出现问题，假如我们不进行`transform`的操作，则会导致`invert1`只执行`delete`，此时会删除插入的`insert("1")`操作，而非实际操作`blob`状态。
+
+当然即使执行了`transform`操作，也会由于实际并没有`invert`插入`1`字符的操作，导致最终的`base`会滞留这个插入操作。这本身是符合预期的，这就像远程的`Op`操作一样，即使将本地的`undo`栈全部执行完毕，也会将所有的远程`Op`保留在草稿内。
 
 ```js
+// https://quilljs.com/playground/snow
 const Delta = Quill.imports.delta;
-let base = new Delta().insert(" ", { src: "mock" });
-const op1 = new Delta().retain(1, { src: "blob" });
-let invert1 = op1.invert(base); // { retain: 1, attrs: { src: "mock" } }
+let base = new Delta();
+const op1 = new Delta().insert(" ", { src: "blob" });
+let invert1 = op1.invert(base); // { delete: 1 }
 base = base.compose(op1); // { insert: " ", attributes: { src: "blob" } }
-const undoable = new Delta().retain(1, { src: "http" });
-base = base.compose(undoable); // { insert: " ", attributes: { src: "http" } }
-invert1 = undoable.transform(invert1, true); // []
-base = base.compose(invert1); // { insert: " ", attrs: { src: "http" } }
+const undoable = new Delta().insert("1").retain(1, { src: "http" });
+base = base.compose(undoable); // { insert:"1" }, { insert: " ", attributes: { src: "http" } }
+invert1 = undoable.transform(invert1); // { retain: 1 }, { delete: 1 }
+base = base.compose(invert1); // { insert: "1" }
 ```
 
 ## 行末零宽字符

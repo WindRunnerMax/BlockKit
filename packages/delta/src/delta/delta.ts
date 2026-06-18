@@ -70,7 +70,7 @@ export class Delta {
   }
 
   /**
-   * 保留操作
+   * 指针操作
    * @param length
    * @param attributes
    * @link https://www.npmjs.com/package/quill-delta/v/4.2.2#retain
@@ -87,7 +87,7 @@ export class Delta {
   }
 
   /**
-   * 应用 Op
+   * 追加 Op
    * @param newOp
    * @link https://www.npmjs.com/package/quill-delta/v/4.2.2#push
    */
@@ -135,7 +135,7 @@ export class Delta {
   }
 
   /**
-   * 裁剪末尾 Ops
+   * 裁剪末尾空 Op
    * @link https://www.npmjs.com/package/quill-delta/v/4.2.2#chop
    */
   public chop(): this {
@@ -458,8 +458,7 @@ export class Delta {
 
   /**
    * 反转增量 invert
-   * - 参数为变更应用前的状态快照, 以记录原属性值
-   * @param base previous snapshot
+   * @param base 变更应用前的状态快照, 以记录原属性值
    * @example inverted = delta.invert(base)
    * @example base.compose(delta).compose(inverted) === base
    * @link https://www.npmjs.com/package/quill-delta/v/4.2.2#invert

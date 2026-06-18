@@ -16,4 +16,25 @@ describe("history remote", () => {
     expect(undoStack.length).toEqual(1);
     expect(undoStack[0]).toEqual(new Delta().delete(1));
   });
+
+  it("remote op index", async () => {
+    const editor = new Editor({
+      delta: new Delta().insert("000000"),
+    });
+    // @ts-expect-error protected readonly property
+    editor.history.DELAY = 0;
+    // @ts-expect-error protected readonly property
+    const undoStack = editor.history.undoStack;
+    editor.state.apply(new Delta().retain(3).insert("1"));
+    editor.state.apply(new Delta().retain(3).insert("2"));
+    expect(undoStack.map(it => it.delta.ops)).toEqual([
+      [{ retain: 3 }, { delete: 1 }],
+      [{ retain: 3 }, { delete: 1 }],
+    ]);
+    editor.state.apply(new Delta().retain(4).insert("3"), { undoable: false });
+    expect(undoStack.map(it => it.delta.ops)).toEqual([
+      [{ retain: 4 }, { delete: 1 }],
+      [{ retain: 3 }, { delete: 1 }],
+    ]);
+  });
 });
