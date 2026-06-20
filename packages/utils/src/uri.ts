@@ -2,18 +2,36 @@ import { isNil } from "./is";
 import type { O } from "./types";
 
 export class URI {
-  /** 锚点 */
+  /**
+   * 锚点
+   * - #id / ""
+   */
   public hash: string;
-  /** 端口 */
+  /**
+   * 端口
+   * - 80 / ""
+   */
   public port: string;
-  /** 路径 */
+  /**
+   * 路径
+   * - "/path" / ""
+   */
   public path: string;
-  /** 主机名 */
+  /**
+   * 主机名
+   * - example.com / ""
+   */
   public hostname: string;
-  /** 协议 */
+  /**
+   * 协议
+   * - https: / ""
+   */
   public protocol: string;
-  /** 查询参数 */
-  protected _search: Record<string, string[]>;
+  /**
+   * 查询参数
+   * - Query Object -> { [q]: [v1, v2] }
+   */
+  public params: Record<string, string[]>;
 
   /**
    * 构造函数
@@ -22,7 +40,7 @@ export class URI {
     this.path = "";
     this.port = "";
     this.hash = "";
-    this._search = {};
+    this.params = {};
     this.hostname = "";
     this.protocol = "";
   }
@@ -48,11 +66,11 @@ export class URI {
 
   /**
    * 查询参数
-   * @returns ?key=value&key=value
+   * @returns ?key=value&key=value / ""
    */
   public get search(): string {
     const nodes: string[] = [];
-    for (const [key, value] of Object.entries(this._search)) {
+    for (const [key, value] of Object.entries(this.params)) {
       value.forEach(v => nodes.push(key + "=" + v));
     }
     if (!nodes.length) return "";
@@ -103,7 +121,7 @@ export class URI {
     let pathname = path;
     // 确保路径以 / 开头 (而是否存在尾 / 都是合法的)
     !path.startsWith("/") && (pathname = "/" + path);
-    // 替换连续的 / 为一个 /
+    // 替换连续的 /[///] 为一个 /
     normalize && (pathname = pathname.replace(/\/{2,}/g, "/"));
     this.path = pathname;
     return this;
@@ -123,20 +141,22 @@ export class URI {
   }
 
   /**
-   * 获取查询参数
+   * 获取 key 下首个查询参数
    * @param key
+   * @returns 查询参数值 value
    */
   public get(key: string): string | null {
-    const value = this._search[key];
+    const value = this.params[key];
     return value && value.length ? value[0] : null;
   }
 
   /**
-   * 获取所有查询参数
+   * 获取 key 下所有查询参数
    * @param key
+   * @returns 查询参数值数组 ["value1", "value2"]
    */
   public getAll(key: string): string[] {
-    const value = this._search[key];
+    const value = this.params[key];
     return value || [];
   }
 
@@ -149,7 +169,7 @@ export class URI {
     if (!key || isNil(value)) {
       return this;
     }
-    this._search[key] = [value];
+    this.params[key] = [value];
     return this;
   }
 
@@ -162,10 +182,10 @@ export class URI {
     if (!key || isNil(value)) {
       return this;
     }
-    if (!this._search[key]) {
-      this._search[key] = [];
+    if (!this.params[key]) {
+      this.params[key] = [];
     }
-    this._search[key].push(value);
+    this.params[key].push(value);
     return this;
   }
 
@@ -173,8 +193,31 @@ export class URI {
    * 删除完整查询参数
    * @param key
    */
-  public omit(key: string): this {
-    delete this._search[key];
+  public remove(key: string): this {
+    delete this.params[key];
+    return this;
+  }
+
+  /**
+   * 删除单个查询参数
+   * @param key
+   */
+  public omit(key: string, value: string): this {
+    const list = this.params[key];
+    if (list) {
+      this.params[key] = list.filter(v => v !== value);
+    }
+    return this;
+  }
+
+  /**
+   * 迭代查询参数
+   * @param callback 回调函数
+   */
+  public forEach(callback: (key: string, value: string[]) => void): this {
+    for (const [key, list] of Object.entries(this.params)) {
+      callback(key, list);
+    }
     return this;
   }
 
@@ -202,7 +245,7 @@ export class URI {
     instance.setPort(this.port);
     instance.setPath(this.path);
     instance.setHash(this.hash);
-    for (const [key, value] of Object.entries(this._search)) {
+    for (const [key, value] of Object.entries(this.params)) {
       value.forEach(v => instance.append(key, v));
     }
     return instance;
