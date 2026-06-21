@@ -15,7 +15,7 @@ export const LinkTool: FC<{
   context: RenderToolbarContext;
   filterXSS?: (link: string) => string;
 }> = props => {
-  const { keys, editor, forceUpdate } = props.context;
+  const { keys, editor, forceUpdate, range } = props.context;
   const [form] = useForm();
   const [visible, setVisible] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
@@ -104,6 +104,9 @@ export const LinkTool: FC<{
     if (!href) return void 0;
     window.open(href, "_blank");
   };
+
+  // 非文本选区则不显示链接 Toolbar
+  if (!range.isTextRange) return null;
 
   return (
     <Trigger

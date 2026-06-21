@@ -20,6 +20,9 @@ export const FontColorTool: FC<{
     forceUpdate();
   };
 
+  // 非文本选区则不显示颜色 Toolbar
+  if (!range.isTextRange) return null;
+
   return (
     <Trigger
       trigger="click"

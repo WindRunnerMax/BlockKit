@@ -9,7 +9,7 @@ import type { ReactBlockContext } from "@block-kit/x-react";
 import { BlockXPlugin } from "@block-kit/x-react";
 
 import { BlockConvert } from "../shared/modules/block-convert";
-import { createComplexTextEditor } from "../shared/utils/text";
+import { createComplexTextEditor, getBasicTextEditorPlugins } from "../shared/utils/text";
 import { CodeHLPlugin } from "./modules/hl-plugin";
 import { CODE_KEY, DEFINE_CODE_TYPE } from "./types";
 import { CodeBlock } from "./view/code-block";
@@ -44,7 +44,10 @@ export class CodeXPlugin extends BlockXPlugin {
 
   public willCreateTextEditor(context: CreateTextEditorContext): TextEditor {
     return createComplexTextEditor(context, {
-      registerHook: () => [new CodeHLPlugin()],
+      registerHook: (instance: TextEditor) => [
+        ...getBasicTextEditorPlugins(instance),
+        new CodeHLPlugin(),
+      ],
     });
   }
 

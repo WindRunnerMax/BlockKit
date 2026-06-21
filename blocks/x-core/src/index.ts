@@ -20,6 +20,7 @@ export {
 export { getBlockEndTextNode, getBlockStartTextNode } from "./model/utils/dom";
 export { STATE_TO_RENDER } from "./model/utils/weak-map";
 export { CorePlugin } from "./plugin/modules/implement";
+export { Priority } from "./plugin/modules/priority";
 export type {
   RequiredPlugin as DefinedPlugin,
   PluginRequiredKeyFunc as DefinedPluginKeyFunc,

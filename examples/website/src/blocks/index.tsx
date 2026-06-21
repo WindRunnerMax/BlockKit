@@ -8,6 +8,7 @@ import {
   CodeXPlugin,
   HeadingXPlugin,
   IndentXPlugin,
+  NavigatorXPlugin,
   OrderedXPlugin,
   QuoteXPlugin,
   TableXPlugin,
@@ -42,6 +43,7 @@ const App: FC = () => {
       new OrderedXPlugin(),
       new TableXPlugin(),
       new ToolbarXPlugin({ offsetTop: -8 }),
+      new NavigatorXPlugin(),
     ]);
     return instance;
   }, []);

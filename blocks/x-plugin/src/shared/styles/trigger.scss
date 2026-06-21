@@ -1,0 +1,14 @@
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.block-kit-x-trigger-popup {
+  animation: fade-in 0.3s ease-in-out;
+  position: absolute;
+}
