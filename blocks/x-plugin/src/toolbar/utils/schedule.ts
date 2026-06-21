@@ -24,6 +24,11 @@ type PluginWithRenderToolbar = CorePlugin & {
 
 export const EDITOR_TOOLBAR_PLUGIN_CACHE = new WeakMap<BlockEditor, PluginWithRenderToolbar[]>();
 
+/**
+ * 计算 toolbar 上下文
+ * @param editor
+ * @param range
+ */
 export const getToolbarContext = (
   editor: BlockEditor,
   range: Range,
@@ -70,6 +75,10 @@ export const getToolbarContext = (
   };
 };
 
+/**
+ * 获取 toolbar 插件
+ * @param editor
+ */
 export const getToolbarPlugins = (editor: BlockEditor) => {
   const cache = EDITOR_TOOLBAR_PLUGIN_CACHE.get(editor);
   if (cache) return cache;
@@ -79,6 +88,11 @@ export const getToolbarPlugins = (editor: BlockEditor) => {
   return toolbarPlugins;
 };
 
+/**
+ * 过滤/组合 一组 ops 的 marks
+ * @param keys
+ * @param ops
+ */
 export const filterMarkMap = (keys: O.Map<string> | null, ops: Op[]): O.Map<string> | null => {
   const firstOp = ops[0];
   if (!firstOp || !firstOp.attributes) return {};

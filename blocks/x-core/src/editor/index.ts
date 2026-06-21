@@ -1,5 +1,6 @@
 import { LOG_LEVEL, Logger } from "@block-kit/core";
 
+import { Clipboard } from "../clipboard";
 import { Event } from "../event";
 import { History } from "../history";
 import { Input } from "../input";
@@ -42,6 +43,8 @@ export class BlockEditor {
   public history: History;
   /** 位置模块 */
   public rect: Rect;
+  /** 剪贴板模块 */
+  public clipboard: Clipboard;
 
   /**
    * 构造函数
@@ -68,6 +71,7 @@ export class BlockEditor {
     this.plugin = new Plugin(this);
     this.history = new History(this);
     this.rect = new Rect(this);
+    this.clipboard = new Clipboard(this);
   }
 
   /**
@@ -114,6 +118,7 @@ export class BlockEditor {
     this.plugin.destroy();
     this.selection.destroy();
     this.history.destroy();
+    this.clipboard.destroy();
     this.state.set(EDITOR_STATE.MOUNTED, false);
   }
 }

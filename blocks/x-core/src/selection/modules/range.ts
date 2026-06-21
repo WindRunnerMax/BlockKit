@@ -26,6 +26,8 @@ export class Range {
   public readonly isBlockRange: boolean;
   /** 纯文本结构选区 */
   public readonly isTextRange: boolean;
+  /** 空选区结构 */
+  public readonly isEmpty: boolean;
 
   /** 构造函数 */
   public constructor(nodes: RangeEntry | RangeEntry[], isBackward?: boolean) {
@@ -53,6 +55,7 @@ export class Range {
     if (firstEntry && Entry.isText(firstEntry) && firstEntry.len === 0) {
       this.isCollapsed = true;
     }
+    this.isEmpty = this.nodes.length === 0;
   }
 
   /**
@@ -94,13 +97,6 @@ export class Range {
     return Entry.isText(last)
       ? Point.create(last.id, last.type, last.start + last.len)
       : Point.create(last.id, last.type);
-  }
-
-  /**
-   * 判断 Range 是否为空
-   */
-  public isEmpty(): boolean {
-    return this.nodes.length === 0;
   }
 
   /**

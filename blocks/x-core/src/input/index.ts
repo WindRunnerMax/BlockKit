@@ -37,7 +37,7 @@ export class Input {
     event.preventDefault();
     const { inputType, data = "" } = event;
     const sel = this.editor.selection.get();
-    if (!sel || sel.isEmpty()) return void 0;
+    if (!sel || sel.isEmpty) return void 0;
     const { WORD } = GRANULARITY;
     const { BACKWARD, FORWARD } = DIRECTION;
     const { EXTEND } = ALERT;

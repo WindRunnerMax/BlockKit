@@ -3,8 +3,9 @@ import { fromDOMRect, relativeTo } from "@block-kit/core";
 import { isHTMLElement } from "@block-kit/utils";
 
 import type { BlockEditor } from "../editor";
+import { Entry } from "../selection/modules/entry";
 import type { Point } from "../selection/modules/point";
-import type { Range } from "../selection/modules/range";
+import { Range } from "../selection/modules/range";
 import { toDOMPoint, toDOMRange } from "../selection/utils/native";
 
 export class Rect {
@@ -44,9 +45,20 @@ export class Rect {
    * @param range
    */
   public getRawRangeRect(range: Range): RectType | null {
-    const domRange = toDOMRange(this.editor, range);
-    if (!domRange) return null;
-    const clientRect = domRange.getBoundingClientRect();
+    if (range.isEmpty) return null;
+    const firstEntry = range.at(0)!;
+    // 首节点为文本节点时, 直接获取 Rect
+    if (Entry.isText(firstEntry)) {
+      const domRange = toDOMRange(this.editor, new Range(firstEntry));
+      if (!domRange) return null;
+      const clientRect = domRange.getBoundingClientRect();
+      return fromDOMRect(clientRect);
+    }
+    // 块节点则直接取首节点块的 Rect
+    const state = this.editor.state.getBlock(firstEntry.id);
+    const dom = this.editor.model.getBlockNode(state);
+    if (!dom) return null;
+    const clientRect = dom.getBoundingClientRect();
     return fromDOMRect(clientRect);
   }
 

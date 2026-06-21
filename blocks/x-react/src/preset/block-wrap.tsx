@@ -27,7 +27,7 @@ const BlockXWrapView: FC<BlockXWrapViewProps> = props => {
   const [selected, setSelected] = useSafeState(false);
 
   /**
-   * 设置行 DOM 节点
+   * 设置 Wrap Block DOM 节点
    */
   const setModel = (ref: HTMLElement | null) => {
     if (ref) {

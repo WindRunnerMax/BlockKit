@@ -175,7 +175,7 @@ export class Perform {
    * @param sel
    */
   public deleteBackward(sel: Range): ContentChangeEvent | null {
-    if (!sel || sel.isEmpty()) return null;
+    if (!sel || sel.isEmpty) return null;
     if (!sel.isCollapsed || Entry.isBlock(sel.at(0)!)) {
       return this.deleteFragment(sel);
     }
@@ -217,7 +217,7 @@ export class Perform {
    * @param sel
    */
   public deleteForward(sel: Range): ContentChangeEvent | null {
-    if (!sel || sel.isEmpty()) return null;
+    if (!sel || sel.isEmpty) return null;
     if (!sel.isCollapsed || Entry.isBlock(sel.at(0)!)) {
       return this.deleteFragment(sel);
     }
@@ -260,7 +260,7 @@ export class Perform {
    */
   public insertBreak(sel: Range, data?: BlockDataField) {
     const result: [PerformResult, PerformResult] = [null, null];
-    if (!sel || sel.isEmpty()) return result;
+    if (!sel || sel.isEmpty) return result;
     const changes: BatchApplyChange = [];
     const options: ApplyOptions = {};
     if (!sel.isCollapsed) {
@@ -306,7 +306,7 @@ export class Perform {
    * @param sel
    */
   public indent(sel: Range): ContentChangeEvent | null {
-    if (!sel || sel.isEmpty()) return null;
+    if (!sel || sel.isEmpty) return null;
     const firstPoint = sel.getFirstPoint()!;
     const firstState = this.editor.state.getBlock(firstPoint.id);
     const prevState = firstState && firstState.prev();
@@ -330,7 +330,7 @@ export class Perform {
    * @param sel
    */
   public unindent(sel: Range): ContentChangeEvent | null {
-    if (!sel || sel.isEmpty()) return null;
+    if (!sel || sel.isEmpty) return null;
     const firstPoint = sel.getFirstPoint()!;
     const firstState = this.editor.state.getBlock(firstPoint.id);
     if (!firstState) return null;
@@ -369,7 +369,7 @@ export class Perform {
    * @param attributes
    */
   public applyMarks(sel: Range, attributes: AttributeMap, options?: ApplyOptions) {
-    if (sel.isEmpty()) return null;
+    if (sel.isEmpty) return null;
     const changes: BatchApplyChange = [];
     const applied: Set<string> = new Set();
     for (let i = 0, n = sel.length; i < n; ++i) {

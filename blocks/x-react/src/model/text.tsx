@@ -45,7 +45,7 @@ const TextView: FC<{
   const [lines, setLines] = useSafeState(() => state.getLines());
 
   /**
-   * 设置 Block DOM 节点
+   * 设置 Text Block DOM 节点 [文本编辑器]
    */
   const setModel = (ref: HTMLDivElement | null) => {
     if (ref) {
