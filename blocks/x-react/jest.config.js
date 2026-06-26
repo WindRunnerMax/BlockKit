@@ -7,8 +7,19 @@ module.exports = {
     "\\.(css|less|scss|sass)$": "<rootDir>/test/config/styles.ts",
   },
   transform: {
-    "\\.tsx?$": "ts-jest",
-    "\\.jsx?$": "babel-jest",
+    "\\.(js|jsx|ts|tsx)$": [
+      "@swc/jest",
+      {
+        jsc: {
+          parser: { syntax: "typescript", jsx: true, decorators: true },
+          transform: {
+            legacyDecorator: true,
+            decoratorMetadata: true,
+            react: { runtime: "automatic" },
+          },
+        },
+      },
+    ],
   },
   transformIgnorePatterns: ["<rootDir>/node_modules/"],
   collectCoverage: false,

@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import { Scroll } from "../src/scroll";
 
 describe("scroll", () => {

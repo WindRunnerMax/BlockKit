@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import { isDOMComment, isDOMElement, isDOMNode, isDOMText, isHTMLElement } from "../src/dom";
 
 describe("dom", () => {

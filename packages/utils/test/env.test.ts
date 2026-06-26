@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import { IS_DOM_ENV, IS_NODE_ENV, IS_TEST } from "../src/env";
 
 describe("env", () => {

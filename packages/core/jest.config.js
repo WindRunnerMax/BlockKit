@@ -5,15 +5,18 @@ module.exports = {
     "src/(.*)$": "<rootDir>/src/$1",
   },
   transform: {
-    "\\.ts$": "ts-jest",
-    "\\.js$": "babel-jest",
+    "\\.(js|ts)$": [
+      "@swc/jest",
+      {
+        jsc: {
+          parser: { syntax: "typescript", decorators: true },
+          transform: { legacyDecorator: true, decoratorMetadata: true },
+        },
+      },
+    ],
   },
   transformIgnorePatterns: ["<rootDir>/node_modules/"],
   collectCoverage: false,
   testEnvironment: "jsdom",
-  // https://jestjs.io/docs/configuration#globalsetup-string
-  // globalSetup: "./test/config/setup.ts", // fn
-  // https://jestjs.io/docs/configuration#setupfilesafterenv-array
-  // setupFilesAfterEnv: ["./test/config/setup.ts"], // iife
   testMatch: ["<rootDir>/test/**/*.test.ts"],
 };
