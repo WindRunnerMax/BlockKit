@@ -1,7 +1,7 @@
-import type { NavigatorContext } from "./index";
+import type { NavigatorContext, NavigatorResult } from "./index";
 
 declare module "@block-kit/x-react/dist/es/plugin" {
   export interface BlockXPlugin {
-    renderNavigator?(context: NavigatorContext): React.ReactNode;
+    renderNavigator?(context: NavigatorContext): NavigatorResult;
   }
 }

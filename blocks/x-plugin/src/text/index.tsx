@@ -1,8 +1,11 @@
+import { Priority } from "@block-kit/react";
 import type { CreateTextEditorContext } from "@block-kit/x-core";
 import type { TextEditor } from "@block-kit/x-core";
 import { BlockXPlugin } from "@block-kit/x-react";
 import type { ReactNode } from "react";
 
+import type { NavigatorResult } from "../navigator/types";
+import { TextIcon } from "../shared/icons/text";
 import { createComplexTextEditor } from "../shared/utils/text";
 import type { RenderToolbarContext } from "../toolbar/utils/schedule";
 import { TextTools } from "./modules/tool-basic";
@@ -24,5 +27,12 @@ export class TextXPlugin extends BlockXPlugin {
 
   public renderToolbar(context: RenderToolbarContext): ReactNode {
     return <TextTools key={this.key} context={context} filterXSS={this.options.filterXSS} />;
+  }
+
+  @Priority(99999)
+  public renderNavigator(): NavigatorResult {
+    return {
+      icon: { el: <TextIcon /> },
+    };
   }
 }

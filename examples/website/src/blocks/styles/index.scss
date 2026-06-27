@@ -39,7 +39,11 @@ body[arco-theme='dark'] {
 
 div[data-node],
 div.block-kit-x-editable > div[data-placeholder] {
-  line-height: 1.8;
+  line-height: 1.5;
+}
+
+div[data-block] {
+  margin: 3px 0;
 }
 
 div[data-text-block],

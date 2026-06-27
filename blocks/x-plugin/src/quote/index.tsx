@@ -1,8 +1,9 @@
 import "./styles/index.scss";
 
-import type { ReactBlockContext } from "@block-kit/x-react";
+import type { ReactBlockContext, ReactBlockWrapContext } from "@block-kit/x-react";
 import { BlockXModel, BlockXPlugin } from "@block-kit/x-react";
 
+import type { NavigatorResult } from "../navigator/types";
 import { QUOTE_KEY } from "./types/index";
 
 export class QuoteXPlugin extends BlockXPlugin {
@@ -22,5 +23,9 @@ export class QuoteXPlugin extends BlockXPlugin {
         <BlockXModel editor={this.editor} state={state}></BlockXModel>
       </div>
     );
+  }
+
+  public renderNavigator(context: ReactBlockWrapContext): NavigatorResult {
+    if (context.state.type === QUOTE_KEY) return {};
   }
 }

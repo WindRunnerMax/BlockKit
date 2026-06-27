@@ -12,6 +12,10 @@ export class NavigatorXPlugin extends BlockXPlugin {
 
   @Priority(9999999)
   public renderBlockWrap(context: ReactBlockWrapContext): ReactNode {
-    return <NavMenu context={context}>{context.children}</NavMenu>;
+    return (
+      <NavMenu editor={this.editor} context={context}>
+        {context.children}
+      </NavMenu>
+    );
   }
 }

@@ -1,18 +1,22 @@
 import "../styles/trigger.scss";
 
-import { cs } from "@block-kit/utils";
+import { cs, isUndef } from "@block-kit/utils";
 import type { FC, ReactElement } from "react";
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import type { TriggerContextRef } from "../hooks/use-trigger";
+
 export const Trigger: FC<{
   children: ReactElement;
   popup: () => React.ReactNode;
+  onContextRef: TriggerContextRef;
+  popupVisible?: boolean;
+  setPopupVisible?: (visible: boolean) => void;
   popupClassName?: string;
   duration?: number;
   disabled?: boolean;
   getPopupContainer?: () => HTMLElement;
-  onMouseEnter?: (e: React.MouseEvent) => void;
   popupAlign?: { top: number; left: number };
 }> = props => {
   const { popupAlign } = props;
@@ -21,7 +25,10 @@ export const Trigger: FC<{
   const timer = useRef<NodeJS.Timeout | null>(null);
   const nodeRef = useRef<HTMLElement | null>(null);
   const popupRef = useRef<HTMLElement | null>(null);
-  const [popupVisible, setPopupVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  const popupVisible = isUndef(props.popupVisible) ? visible : props.popupVisible;
+  const setPopupVisible = isUndef(props.setPopupVisible) ? setVisible : props.setPopupVisible;
 
   useEffect(() => {
     isMounted.current = true;
@@ -58,19 +65,17 @@ export const Trigger: FC<{
     }
   };
 
-  const setPopupVisibleState = (visible: boolean, delay = 0) => {
+  const setPopupVisibleState = (visibleState: boolean, delay = 0) => {
     const currentVisible = popupVisible;
 
-    if (visible !== currentVisible) {
+    if (visibleState !== currentVisible) {
       delayToDo(delay, async () => {
-        setPopupVisible(visible);
+        setPopupVisible(visibleState);
       });
     }
   };
 
-  const onMouseEnter = (e: React.MouseEvent) => {
-    props.onMouseEnter && props.onMouseEnter(e);
-    if (e.nativeEvent.cancelBubble) return;
+  const onMouseEnter = () => {
     const mouseEnterDelay = props.duration;
     clearDelayTimer();
     setPopupVisibleState(true, mouseEnterDelay);
@@ -103,11 +108,10 @@ export const Trigger: FC<{
     }
   };
 
-  const childNode = React.cloneElement(props.children, {
-    ref: onChildRef,
-    onMouseEnter,
-    onMouseLeave,
-  });
+  const childNode = props.children;
+  props.onContextRef.current.onMouseEnter = onMouseEnter;
+  props.onContextRef.current.onMouseLeave = onMouseLeave;
+  props.onContextRef.current.onChildRef = onChildRef;
 
   const popupNode = !!rect.current && (
     <span

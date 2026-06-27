@@ -41,7 +41,7 @@
       "@block-kit/stream": ["./examples/stream/src"]
     }
   },
-  "include": [],
+  "include": ["**/src/**/*"],
   "exclude": ["**/node_modules/**"],
   "ts-node": {
     "compilerOptions": {
