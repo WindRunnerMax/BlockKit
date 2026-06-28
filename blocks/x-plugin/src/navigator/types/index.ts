@@ -1,10 +1,19 @@
 import { PRIORITY_KEY } from "@block-kit/core";
+import type { BlockEditor } from "@block-kit/x-core";
 import type { ReactBlockWrapContext } from "@block-kit/x-react";
 
 export const NAVIGATOR_KEY = "navigator" as const;
 export const NAV_PRIORITY_KEY = `${PRIORITY_KEY}renderNavigator`;
 
-export type NavigatorContext = ReactBlockWrapContext;
+export type NavigatorOptions = {
+  plugins?: NavigatorPlugin[];
+};
+
+export type NavigatorContext = {
+  block: ReactBlockWrapContext;
+  editor: BlockEditor;
+  closePopup: () => void;
+};
 
 export type NavigatorPlugin = {
   [NAV_PRIORITY_KEY]?: number;

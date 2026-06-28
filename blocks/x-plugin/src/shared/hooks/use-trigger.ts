@@ -3,21 +3,19 @@ import type { MutableRefObject } from "react";
 import { useRef } from "react";
 
 export type TriggerContext = {
-  onMouseLeave: (e: MouseEvent) => void;
-  onMouseEnter: (e: MouseEvent) => void;
+  onMouseLeave: (e: MouseEvent | React.MouseEvent) => void;
+  onMouseEnter: (e: MouseEvent | React.MouseEvent) => void;
   onChildRef: (ref: HTMLElement | null) => void;
 };
 
 export type TriggerContextRef = MutableRefObject<TriggerContext>;
 
-const DEFAULT_TRIGGER_CONTEXT: TriggerContext = {
-  onMouseLeave: NOOP,
-  onMouseEnter: NOOP,
-  onChildRef: NOOP,
-};
-
 export const useTriggerContext = () => {
-  const ref = useRef<TriggerContext>(Object.assign({}, DEFAULT_TRIGGER_CONTEXT));
+  const ref = useRef<TriggerContext>({
+    onMouseLeave: NOOP,
+    onMouseEnter: NOOP,
+    onChildRef: NOOP,
+  });
 
   return ref;
 };

@@ -28,7 +28,7 @@ export class QuoteXPlugin extends BlockXPlugin {
   public renderNavigator(): NavigatorResult {
     return {
       icon: ctx => {
-        if (ctx.state.type === QUOTE_KEY) return null;
+        if (ctx.block.state.type === QUOTE_KEY) return null;
       },
     };
   }
