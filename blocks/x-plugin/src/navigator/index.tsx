@@ -3,7 +3,7 @@ import type { ReactBlockWrapContext } from "@block-kit/x-react";
 import { BlockXPlugin } from "@block-kit/x-react";
 import type { ReactNode } from "react";
 
-import { NavMenu } from "./components/nav-menu";
+import { NavTrigger } from "./components/nav-trigger";
 import { NAVIGATOR_KEY } from "./types";
 
 export class NavigatorXPlugin extends BlockXPlugin {
@@ -13,9 +13,9 @@ export class NavigatorXPlugin extends BlockXPlugin {
   @Priority(9999999)
   public renderBlockWrap(context: ReactBlockWrapContext): ReactNode {
     return (
-      <NavMenu editor={this.editor} context={context}>
+      <NavTrigger editor={this.editor} context={context}>
         {context.children}
-      </NavMenu>
+      </NavTrigger>
     );
   }
 }

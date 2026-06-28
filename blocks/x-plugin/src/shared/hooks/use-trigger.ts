@@ -3,8 +3,8 @@ import type { MutableRefObject } from "react";
 import { useRef } from "react";
 
 export type TriggerContext = {
-  onMouseLeave: () => void;
-  onMouseEnter: () => void;
+  onMouseLeave: (e: MouseEvent) => void;
+  onMouseEnter: (e: MouseEvent) => void;
   onChildRef: (ref: HTMLElement | null) => void;
 };
 

@@ -1,16 +1,20 @@
 import "../styles/trigger.scss";
 
-import { cs, isUndef } from "@block-kit/utils";
+import { cs, isDOMElement, isUndef } from "@block-kit/utils";
+import type { P } from "@block-kit/utils/dist/es/types";
 import type { FC, ReactElement } from "react";
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { cloneElement, Fragment, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import type { TriggerContextRef } from "../hooks/use-trigger";
+import { getPopupPosition } from "../utils/trigger";
 
+// https://github.com/arco-design/arco-design/blob/main/components/Trigger/index.tsx
 export const Trigger: FC<{
   children: ReactElement;
   popup: () => React.ReactNode;
-  onContextRef: TriggerContextRef;
+  onContextRef?: TriggerContextRef;
+  position?: "left" | "lt";
   popupVisible?: boolean;
   setPopupVisible?: (visible: boolean) => void;
   popupClassName?: string;
@@ -18,15 +22,17 @@ export const Trigger: FC<{
   disabled?: boolean;
   getPopupContainer?: () => HTMLElement;
   popupAlign?: { top: number; left: number };
+  uncontrolled?: boolean;
 }> = props => {
   const { popupAlign } = props;
   const isMounted = useRef(false);
   const rect = useRef<DOMRect | null>(null);
-  const timer = useRef<NodeJS.Timeout | null>(null);
   const nodeRef = useRef<HTMLElement | null>(null);
+  const timer = useRef<NodeJS.Timeout | null>(null);
   const popupRef = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
 
+  const position = props.position || "left";
   const popupVisible = isUndef(props.popupVisible) ? visible : props.popupVisible;
   const setPopupVisible = isUndef(props.setPopupVisible) ? setVisible : props.setPopupVisible;
 
@@ -65,7 +71,7 @@ export const Trigger: FC<{
     }
   };
 
-  const setPopupVisibleState = (visibleState: boolean, delay = 0) => {
+  const setPopupVisibleState = (visibleState: boolean, delay = 300) => {
     const currentVisible = popupVisible;
 
     if (visibleState !== currentVisible) {
@@ -75,7 +81,11 @@ export const Trigger: FC<{
     }
   };
 
-  const onMouseEnter = () => {
+  const onMouseEnter = (e: MouseEvent | React.MouseEvent) => {
+    // 鼠标进入时更新弹窗位置信息
+    if (isDOMElement(e.target)) {
+      rect.current = e.target.getBoundingClientRect();
+    }
     const mouseEnterDelay = props.duration;
     clearDelayTimer();
     setPopupVisibleState(true, mouseEnterDelay);
@@ -104,22 +114,38 @@ export const Trigger: FC<{
   const onChildRef = (ref: HTMLElement | null) => {
     if (ref) {
       nodeRef.current = ref;
-      rect.current = ref.getBoundingClientRect();
     }
   };
 
-  const childNode = props.children;
-  props.onContextRef.current.onMouseEnter = onMouseEnter;
-  props.onContextRef.current.onMouseLeave = onMouseLeave;
-  props.onContextRef.current.onChildRef = onChildRef;
+  let childNode: ReactElement;
+  if (props.uncontrolled && props.onContextRef) {
+    childNode = props.children;
+    props.onContextRef.current.onChildRef = onChildRef;
+    props.onContextRef.current.onMouseEnter = onMouseEnter;
+    props.onContextRef.current.onMouseLeave = onMouseLeave;
+  } else {
+    const childProps: P.Any = props.children.props;
+    const onMouseEnterBridge = (e: React.MouseEvent) => {
+      onMouseEnter(e);
+      childProps.onMouseEnter && childProps.onMouseEnter(e);
+    };
+    const onMouseLeaveBridge = () => {
+      onMouseLeave();
+      childProps.onMouseLeave && childProps.onMouseLeave();
+    };
+    childNode = cloneElement(props.children, {
+      ref: onChildRef,
+      onMouseEnter: onMouseEnterBridge,
+      onMouseLeave: onMouseLeaveBridge,
+    });
+  }
 
-  const popupNode = !!rect.current && (
+  const popupContainer = props.getPopupContainer ? props.getPopupContainer() : document.body;
+
+  const popupNode = !!rect.current && popupVisible && (
     <span
       className={cs("block-kit-x-trigger-popup", props.popupClassName)}
-      style={{
-        top: rect.current.top + (popupAlign ? popupAlign.top : 0),
-        left: rect.current.left + (popupAlign ? popupAlign.left : 0),
-      }}
+      style={getPopupPosition(rect, position, popupContainer, popupAlign)}
       ref={popupRef}
       onMouseEnter={onPopupMouseEnter}
       onMouseLeave={onPopupMouseLeave}
@@ -127,8 +153,6 @@ export const Trigger: FC<{
       {props.popup()}
     </span>
   );
-
-  const popupContainer = props.getPopupContainer ? props.getPopupContainer() : document.body;
 
   const popupPortal = popupVisible ? createPortal(popupNode, popupContainer) : null;
 
