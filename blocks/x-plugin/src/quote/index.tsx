@@ -1,6 +1,6 @@
 import "./styles/index.scss";
 
-import type { ReactBlockContext, ReactBlockWrapContext } from "@block-kit/x-react";
+import type { ReactBlockContext } from "@block-kit/x-react";
 import { BlockXModel, BlockXPlugin } from "@block-kit/x-react";
 
 import type { NavigatorResult } from "../navigator/types";
@@ -25,7 +25,11 @@ export class QuoteXPlugin extends BlockXPlugin {
     );
   }
 
-  public renderNavigator(context: ReactBlockWrapContext): NavigatorResult {
-    if (context.state.type === QUOTE_KEY) return {};
+  public renderNavigator(): NavigatorResult {
+    return {
+      icon: ctx => {
+        if (ctx.state.type === QUOTE_KEY) return null;
+      },
+    };
   }
 }

@@ -12,14 +12,17 @@ export const getPopupPosition = (
   const box = rect.current;
   const left = box.left + offsetLeft;
   let top = box.top + offsetTop;
+  // 处理 position 位置
   if (position === "left") {
     top = top + box.height / 2;
   }
+  // 处理 container 容器偏移量
   if (container === document.body) {
     top = top + document.documentElement.scrollTop;
   } else {
     top = top - container.scrollTop;
   }
+  // 处理 transform 位置变换
   const TRANSFORM = {
     lt: `translate(-100%, 0)`,
     left: `translate(-100%, -50%)`,

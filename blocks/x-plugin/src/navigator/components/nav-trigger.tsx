@@ -1,14 +1,13 @@
-import "../styles/nav-menu.scss";
+import "../styles/nav-trigger.scss";
 
-import { cs, isHTMLElement, isUndef, preventNativeEvent } from "@block-kit/utils";
+import { cs, isHTMLElement, isUndef } from "@block-kit/utils";
 import type { BlockEditor } from "@block-kit/x-core";
 import type { ReactBlockWrapContext } from "@block-kit/x-react";
 import type { FC, ReactElement } from "react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { Trigger } from "../../shared/component/trigger";
 import { useTriggerContext } from "../../shared/hooks/use-trigger";
-import type { NavigatorResult } from "../types";
 import { getNavigatorPlugins } from "../utils/schedule";
 import { NavMenu } from "./nav-menu";
 
@@ -17,6 +16,8 @@ export const NavTrigger: FC<{
   context: ReactBlockWrapContext;
 }> = props => {
   const trigger = useTriggerContext();
+  const [iconVisible, setIconVisible] = useState(false);
+  const [menuPopupVisible, setMenuPopupVisible] = useState(false);
 
   const onNavRef = (ref: HTMLElement | null) => {
     if (!ref) return;
@@ -26,26 +27,37 @@ export const NavTrigger: FC<{
     firstChild.onmouseleave = e => trigger.current.onMouseLeave(e);
   };
 
-  const result: NavigatorResult = useMemo(() => {
+  const result = useMemo(() => {
     const plugins = getNavigatorPlugins(props.editor);
-    for (const plugin of plugins) {
-      const res = plugin.renderNavigator(props.context);
+    for (const func of plugins.icons) {
+      const res = func(props.context);
       if (!isUndef(res)) return res;
     }
     return null;
   }, [props.context, props.editor]);
 
-  if (!result || !result.icon) {
+  if (!result || !result.el) {
     return props.children as ReactElement;
   }
 
+  const closePopup = () => {
+    setMenuPopupVisible(false);
+    setIconVisible(false);
+  };
+
   const MenuIcon = (
-    <NavMenu editor={props.editor} context={props.context} nav={result}>
+    <NavMenu
+      popupVisible={menuPopupVisible}
+      setPopupVisible={setMenuPopupVisible}
+      closePopup={closePopup}
+      editor={props.editor}
+      context={props.context}
+    >
       <div
-        className={cs("block-kit-x-nav-icon", result.icon.className)}
-        onMouseDown={preventNativeEvent}
+        className={cs("block-kit-x-nav-icon", result.className)}
+        onMouseDown={e => e.preventDefault()}
       >
-        {result.icon.el}
+        {result.el}
       </div>
     </NavMenu>
   );
@@ -53,13 +65,19 @@ export const NavTrigger: FC<{
   return (
     <Trigger
       uncontrolled
+      popupVisible={iconVisible}
+      setPopupVisible={setIconVisible}
       onContextRef={trigger}
       popup={() => MenuIcon}
-      position={result.icon.position}
-      popupAlign={result.icon.popupAlign || { top: 0, left: -5 }}
+      position={result.position}
+      popupAlign={result.popupAlign || { top: 0, left: -5 }}
       duration={300}
     >
-      <div className={cs("block-kit-x-nav")} data-nav-menu ref={onNavRef}>
+      <div
+        className={cs("block-kit-x-nav", menuPopupVisible && iconVisible && "block-kit-x-active")}
+        data-nav-menu
+        ref={onNavRef}
+      >
         {props.children}
       </div>
     </Trigger>

@@ -1,0 +1,24 @@
+@import '../../../node_modules/@block-kit/utils/dist/style/vars';
+
+.block-kit-x-nav-icon {
+  @include frame-box;
+
+  align-items: center;
+  box-sizing: border-box;
+  color: rgb(var(--arcoblue-6));
+  cursor: pointer;
+  display: flex;
+  font-size: 16px;
+  height: 30px;
+  justify-content: center;
+  width: 30px;
+
+  &:hover {
+    background-color: var(--color-fill-1);
+  }
+}
+
+.block-kit-x-nav.block-kit-x-active {
+  background-color: rgba(var(--arcoblue-6), 0.2);
+  border-radius: 4px;
+}

@@ -83,8 +83,9 @@ export const Trigger: FC<{
 
   const onMouseEnter = (e: MouseEvent | React.MouseEvent) => {
     // 鼠标进入时更新弹窗位置信息
-    if (isDOMElement(e.target)) {
-      rect.current = e.target.getBoundingClientRect();
+    const target = e.currentTarget || e.target;
+    if (isDOMElement(target)) {
+      rect.current = target.getBoundingClientRect();
     }
     const mouseEnterDelay = props.duration;
     clearDelayTimer();

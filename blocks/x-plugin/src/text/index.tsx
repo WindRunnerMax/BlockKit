@@ -32,7 +32,7 @@ export class TextXPlugin extends BlockXPlugin {
   @Priority(99999)
   public renderNavigator(): NavigatorResult {
     return {
-      icon: { el: <TextIcon /> },
+      icon: () => ({ el: <TextIcon /> }),
     };
   }
 }
