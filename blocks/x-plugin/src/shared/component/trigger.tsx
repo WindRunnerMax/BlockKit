@@ -1,6 +1,6 @@
 import "../styles/trigger.scss";
 
-import { cs, isDOMElement, isUndef } from "@block-kit/utils";
+import { cs, isDOMElement, isUndef, sleep } from "@block-kit/utils";
 import type { P } from "@block-kit/utils/dist/es/types";
 import type { FC, ReactElement } from "react";
 import React, { cloneElement, Fragment, useEffect, useRef, useState } from "react";
@@ -100,11 +100,14 @@ export const Trigger: FC<{
     }
   };
 
-  const onPopupMouseEnter = () => {
+  const onPopupMouseEnter = async () => {
+    // 原生事件和合成事件执行顺序存在问题, 在非受控模式下暂缓执行
+    if (props.uncontrolled) await sleep(10);
     clearDelayTimer();
   };
 
   const onPopupMouseLeave = () => {
+    console.log("onPopupMouseLave");
     const mouseLeaveDelay = props.duration;
     clearDelayTimer();
     if (popupVisible) {
