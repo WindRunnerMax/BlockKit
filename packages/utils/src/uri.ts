@@ -1,6 +1,10 @@
 import { isNil } from "./is";
 import type { O } from "./types";
 
+/** 默认基准 URL */
+export const DEF_BASE_URL = "ftp://-";
+
+/** URI 类 */
 export class URI {
   /**
    * 锚点
@@ -225,7 +229,9 @@ export class URI {
    * 输出格式化链接
    */
   public format(): string {
-    return this.origin + this.path + this.search + this.hash;
+    const origin = this.origin;
+    const newOrigin = origin === DEF_BASE_URL ? "" : origin;
+    return newOrigin + this.path + this.search + this.hash;
   }
 
   /**
@@ -266,13 +272,13 @@ export class URI {
   }
 
   /**
-   * 解析完整链接
+   * 解析链接
    * @param uri
-   * @param baseUrl
+   * @example /search?q=1&q=2&w=3#world
    * @example https://www.google.com:333/search?q=1&q=2&w=3#world
    */
-  public static parse(this: typeof URI, uri: string, baseUrl?: string): URI {
-    const url = new URL(uri, baseUrl);
+  public static parse(this: typeof URI, uri: string): URI {
+    const url = new URL(uri, DEF_BASE_URL);
     const instance = new this();
     instance.setProtocol(url.protocol);
     instance.setHostname(url.hostname);

@@ -110,4 +110,14 @@ describe("uri", () => {
     uri.setPath("/search///", false);
     expect(uri.format()).toBe("/search///");
   });
+
+  it("parse relative path", () => {
+    const uri = URI.parse("/search?q=1&q=2&w=3#world");
+    expect(uri.hash).toBe("#world");
+    expect(uri.path).toBe("/search");
+    expect(uri.search).toBe("?q=1&q=2&w=3");
+    expect(uri.protocol).toBe("ftp:");
+    expect(uri.host).toBe("-");
+    expect(uri.format()).toBe("/search?q=1&q=2&w=3#world");
+  });
 });

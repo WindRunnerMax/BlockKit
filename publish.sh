@@ -4,8 +4,9 @@
 set -e # -x
 dir=$(pwd)
 bash_args="$@"
+dist_dir="dist"
 prefix="@block-kit"
-packages=(delta utils core react plugin)
+packages=(utils delta core react plugin)
 # npm version patch --no-git-tag-version
 version=$(echo "console.log(require(\"./package.json\").version)" | node)
 export BUILD_VERSION=$version
@@ -29,15 +30,11 @@ echo_notice "Version: $version"
 
 if ! check_argument "--emit" || check_argument "--build-only"; then
   echo_notice "Notice: Current Version Will Not Publish To NPM"
-fi 
-
-if check_argument "--emit" && ! check_argument "--skip-login"; then
-  npm login --registry https://registry.npmjs.org/
 fi
 
 for item in "${packages[@]}"; do
   package="$prefix/$item"
-  pnpm --filter "${package}" exec rm -rf dist
+  pnpm --filter "${package}" exec rm -rf $dist_dir
   pnpm run --filter "${package}" build
   pnpm run --filter "${package}" lint:ts
   pnpm run --filter "${package}" test
@@ -47,10 +44,17 @@ if check_argument "--build-only"; then
   exit 0
 fi
 
+if check_argument "--emit" && ! check_argument "--skip-login"; then
+  npm login --registry https://registry.npmjs.org/
+fi
+
 for item in "${packages[@]}"; do
-  cd $dir
-  path="./packages/$item"
+  path="$dir/packages/$item"
+  cache_dir="$path/node_modules/.cache/npm"
   cd $path
+  rm -rf $cache_dir
+  mkdir -p $cache_dir
+  cp -r "$dist_dir" "$cache_dir"
   echo "const fs = require('fs');
       const json = require('./package.json');
       json.version = '$version';
@@ -58,22 +62,12 @@ for item in "${packages[@]}"; do
       for(const [key, value] of Object.entries(dep)) {
         if(key.startsWith('$prefix/')) dep[key] = '$version';
       }
-      fs.writeFileSync('./package.json', JSON.stringify(json, null, 2));
+      fs.writeFileSync('$cache_dir/package.json', JSON.stringify(json, null, 2));
     " | node
-  set +e
+  cd $cache_dir
   if check_argument "--emit"; then
     npm publish --registry=https://registry.npmjs.org/ --access public
   else
     npm publish --registry=https://registry.npmjs.org/ --dry-run
   fi
-  set -e
-  echo "const fs = require('fs');
-      const json = require('./package.json');
-      json.version = '1.0.0';
-      const dep = json.dependencies || {};
-      for(const [key, value] of Object.entries(dep)) {
-        if(key.startsWith('$prefix/')) dep[key] = 'workspace: *';
-      }
-      fs.writeFileSync('./package.json', JSON.stringify(json, null, 2));
-    " | node
 done
