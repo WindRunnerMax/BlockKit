@@ -116,8 +116,14 @@ describe("uri", () => {
     expect(uri.hash).toBe("#world");
     expect(uri.path).toBe("/search");
     expect(uri.search).toBe("?q=1&q=2&w=3");
-    expect(uri.protocol).toBe("ftp:");
-    expect(uri.host).toBe("-");
+    expect(uri.protocol).toBe("");
+    expect(uri.host).toBe("");
     expect(uri.format()).toBe("/search?q=1&q=2&w=3#world");
+  });
+
+  it("uri query stringify", () => {
+    const search = URI.stringifyParams({ q: "1", w: "2", e: null, z: undefined });
+    expect(search).toBe("?q=1&w=2");
+    expect(URI.stringifyParams({})).toBe("");
   });
 });

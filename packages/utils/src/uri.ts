@@ -1,9 +1,6 @@
 import { isNil } from "./is";
 import type { O } from "./types";
 
-/** 默认基准 URL */
-export const DEF_BASE_URL = "ftp://-";
-
 /** URI 类 */
 export class URI {
   /**
@@ -35,7 +32,7 @@ export class URI {
    * 查询参数
    * - Query Object -> { [q]: [v1, v2] }
    */
-  public params: Record<string, string[]>;
+  public readonly params: O.Map<string[]>;
 
   /**
    * 构造函数
@@ -63,14 +60,15 @@ export class URI {
    * @returns protocol + hostname + port
    */
   public get origin(): string {
-    if (this.protocol === ":") return "//" + this.host;
+    const host = this.host;
+    if (this.protocol === ":") return "//" + host;
     const protocol = this.protocol ? this.protocol + "//" : "";
-    return protocol + this.host;
+    return protocol + host;
   }
 
   /**
    * 查询参数
-   * @returns ?key=value&key=value / ""
+   * @returns "" / ?key=value&key=value
    */
   public get search(): string {
     const nodes: string[] = [];
@@ -229,9 +227,7 @@ export class URI {
    * 输出格式化链接
    */
   public format(): string {
-    const origin = this.origin;
-    const newOrigin = origin === DEF_BASE_URL ? "" : origin;
-    return newOrigin + this.path + this.search + this.hash;
+    return this.origin + this.path + this.search + this.hash;
   }
 
   /**
@@ -278,10 +274,14 @@ export class URI {
    * @example https://www.google.com:333/search?q=1&q=2&w=3#world
    */
   public static parse(this: typeof URI, uri: string): URI {
-    const url = new URL(uri, DEF_BASE_URL);
     const instance = new this();
-    instance.setProtocol(url.protocol);
-    instance.setHostname(url.hostname);
+    // 默认基准 URL, 支持解析相对路径
+    const DEF_BASE_URL = "ftp://u";
+    const url = new URL(uri, DEF_BASE_URL);
+    if (url.origin !== DEF_BASE_URL) {
+      instance.setProtocol(url.protocol);
+      instance.setHostname(url.hostname);
+    }
     instance.setPort(url.port);
     instance.setPath(url.pathname);
     instance.setHash(url.hash);
@@ -340,9 +340,10 @@ export class URI {
    * @example {} => ""
    * @example { q: "1", w: "2" } => "?q=1&w=2"
    */
-  public static stringifyParams(params: O.Map<string | number>): string {
+  public static stringifyParams(params: O.Map<string | number | null | undefined>): string {
     const init: O.Map<string> = {};
     for (const [key, value] of Object.entries(params)) {
+      if (isNil(value)) continue;
       init[key] = String(value);
     }
     const search = new URLSearchParams(init).toString();
