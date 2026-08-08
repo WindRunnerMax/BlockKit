@@ -30,9 +30,9 @@ export class URI {
   public protocol: string;
   /**
    * 查询参数
-   * - Query Object -> { [q]: [v1, v2] }
+   * - URI Params
    */
-  public readonly params: O.Map<string[]>;
+  public readonly params: URIParams;
 
   /**
    * 构造函数
@@ -41,9 +41,9 @@ export class URI {
     this.path = "";
     this.port = "";
     this.hash = "";
-    this.params = {};
     this.hostname = "";
     this.protocol = "";
+    this.params = new URIParams();
   }
 
   /**
@@ -61,6 +61,7 @@ export class URI {
    */
   public get origin(): string {
     const host = this.host;
+    if (!host) return "";
     if (this.protocol === ":") return "//" + host;
     const protocol = this.protocol ? this.protocol + "//" : "";
     return protocol + host;
@@ -71,12 +72,7 @@ export class URI {
    * @returns "" / ?key=value&key=value
    */
   public get search(): string {
-    const nodes: string[] = [];
-    for (const [key, value] of Object.entries(this.params)) {
-      value.forEach(v => nodes.push(key + "=" + v));
-    }
-    if (!nodes.length) return "";
-    return "?" + nodes.join("&");
+    return this.params.format();
   }
 
   /**
@@ -89,9 +85,14 @@ export class URI {
 
   /**
    * 设置协议
+   * - 协议设置为 : 时, 则表示为 //host:port/path
    * @param protocol https
    */
   public setProtocol(protocol: string): this {
+    if (!protocol) {
+      this.protocol = "";
+      return this;
+    }
     this.protocol = protocol.endsWith(":") ? protocol : protocol + ":";
     return this;
   }
@@ -120,12 +121,8 @@ export class URI {
    * @param normalize 是否归一化路径
    */
   public setPath(path: string, normalize = true): this {
-    let pathname = path;
-    // 确保路径以 / 开头 (而是否存在尾 / 都是合法的)
-    !path.startsWith("/") && (pathname = "/" + path);
-    // 替换连续的 /[///] 为一个 /
-    normalize && (pathname = pathname.replace(/\/{2,}/g, "/"));
-    this.path = pathname;
+    const pathname = normalize ? URI.resolvePath(path) : path;
+    this.path = pathname.startsWith("/") ? pathname : "/" + pathname;
     return this;
   }
 
@@ -139,87 +136,6 @@ export class URI {
       return this;
     }
     this.hash = hash.startsWith("#") ? hash : "#" + hash;
-    return this;
-  }
-
-  /**
-   * 获取 key 下首个查询参数
-   * @param key
-   * @returns 查询参数值 value
-   */
-  public get(key: string): string | null {
-    const value = this.params[key];
-    return value && value.length ? value[0] : null;
-  }
-
-  /**
-   * 获取 key 下所有查询参数
-   * @param key
-   * @returns 查询参数值数组 ["value1", "value2"]
-   */
-  public getAll(key: string): string[] {
-    const value = this.params[key];
-    return value || [];
-  }
-
-  /**
-   * 分配查询参数
-   * @param key
-   * @param value
-   */
-  public assign(key: string, value: string): this {
-    if (!key || isNil(value)) {
-      return this;
-    }
-    this.params[key] = [value];
-    return this;
-  }
-
-  /**
-   * 追加查询参数
-   * @param key
-   * @param value
-   */
-  public append(key: string, value: string): this {
-    if (!key || isNil(value)) {
-      return this;
-    }
-    if (!this.params[key]) {
-      this.params[key] = [];
-    }
-    this.params[key].push(value);
-    return this;
-  }
-
-  /**
-   * 删除完整查询参数
-   * @param key
-   */
-  public remove(key: string): this {
-    delete this.params[key];
-    return this;
-  }
-
-  /**
-   * 删除单个查询参数
-   * @param key
-   */
-  public omit(key: string, value: string): this {
-    const list = this.params[key];
-    if (list) {
-      this.params[key] = list.filter(v => v !== value);
-    }
-    return this;
-  }
-
-  /**
-   * 迭代查询参数
-   * @param callback 回调函数
-   */
-  public forEach(callback: (key: string, value: string[]) => void): this {
-    for (const [key, list] of Object.entries(this.params)) {
-      callback(key, list);
-    }
     return this;
   }
 
@@ -241,14 +157,15 @@ export class URI {
    * 克隆 URI 实例
    */
   public clone(): URI {
-    const instance = new URI();
+    const Constructor = this.constructor as typeof URI;
+    const instance = new Constructor();
     instance.setProtocol(this.protocol);
     instance.setHostname(this.hostname);
     instance.setPort(this.port);
     instance.setPath(this.path);
     instance.setHash(this.hash);
-    for (const [key, value] of Object.entries(this.params)) {
-      value.forEach(v => instance.append(key, v));
+    for (const [key, value] of Object.entries(this.params.raw)) {
+      instance.params.assign(key, value);
     }
     return instance;
   }
@@ -258,12 +175,16 @@ export class URI {
    * @param location
    */
   public static from(location: Location): URI {
-    const instance = URI.parseParams(location.search);
+    const instance = new URI();
     instance.setPath(location.pathname);
     instance.setProtocol(location.protocol);
     instance.setHostname(location.hostname);
     instance.setPort(location.port);
     instance.setHash(location.hash);
+    const search = new URLSearchParams(location.search);
+    for (const [key, value] of search.entries()) {
+      instance.params.append(key, value);
+    }
     return instance;
   }
 
@@ -278,29 +199,17 @@ export class URI {
     // 默认基准 URL, 支持解析相对路径
     const DEF_BASE_URL = "ftp://u";
     const url = new URL(uri, DEF_BASE_URL);
-    if (url.origin !== DEF_BASE_URL) {
-      instance.setProtocol(url.protocol);
+    const isAbsoluteURL = url.origin !== DEF_BASE_URL || uri.startsWith(DEF_BASE_URL);
+    const isProtocolRelative = uri.startsWith("//");
+    if (isAbsoluteURL) {
+      instance.setProtocol(isProtocolRelative ? ":" : url.protocol);
       instance.setHostname(url.hostname);
     }
     instance.setPort(url.port);
     instance.setPath(url.pathname);
     instance.setHash(url.hash);
     for (const [key, value] of url.searchParams.entries()) {
-      instance.append(key, value);
-    }
-    return instance;
-  }
-
-  /**
-   * 解析查询参数 search
-   * @param query
-   * @example ?q=1&w=3
-   */
-  public static parseParams(query: ConstructorParameters<typeof URLSearchParams>["0"]): URI {
-    const search = new URLSearchParams(query);
-    const instance = new URI();
-    for (const [key, value] of search.entries()) {
-      instance.append(key, value);
+      instance.params.append(key, value);
     }
     return instance;
   }
@@ -311,7 +220,7 @@ export class URI {
    * @param template
    * @example ("/user/123", "/user/:id") => { id: "123" }
    */
-  public static parsePathParams(path: string, template: string): Record<string, string> {
+  public static parsePathParams(path: string, template: string): O.Map<string> {
     const pathValue = path.startsWith("/") ? path.slice(1) : path;
     const templateValue = template.startsWith("/") ? template.slice(1) : template;
     const keys = templateValue.split("/");
@@ -335,12 +244,166 @@ export class URI {
   }
 
   /**
+   * 合并查询路径片段
+   * - 类似 path.join 合并 URL 路径的实现
+   * - 确保路径以 / 开头, 而是否存在尾 / 都是合法的
+   * - 确保连续的 /[///] 为一个 /
+   * @param args
+   */
+  public static resolvePath(...args: Array<string | number | undefined | null>): string {
+    const pathname = "/" + args.filter(p => !isNil(p)).join("/");
+    return pathname.replace(/\/{2,}/g, "/");
+  }
+}
+
+/** URI 查询参数 */
+export class URIParams {
+  /**
+   * 查询参数
+   * - Query Object -> { [q]: [v1, v2] }
+   */
+  public readonly raw: O.Map<string[]>;
+
+  /**
+   * 构造函数
+   */
+  public constructor() {
+    this.raw = {};
+  }
+
+  /**
+   * 获取 key 下首个查询参数
+   * @param key
+   * @returns 查询参数值 value
+   */
+  public get(key: string): string | null {
+    const value = this.raw[key];
+    return value && value.length ? value[0] : null;
+  }
+
+  /**
+   * 获取 key 下所有查询参数
+   * @param key
+   * @returns 查询参数值数组 ["value1", "value2"]
+   */
+  public getAll(key: string): string[] {
+    const value = this.raw[key];
+    return value || [];
+  }
+
+  /**
+   * 分配查询参数
+   * @param key
+   * @param value
+   */
+  public assign(key: string, value: string | string[]): this {
+    if (!key || isNil(value)) return this;
+    this.raw[key] = Array.isArray(value) ? value.slice() : [value];
+    return this;
+  }
+
+  /**
+   * 追加查询参数
+   * @param key
+   * @param value
+   */
+  public append(key: string, value: string): this {
+    if (!key || isNil(value)) return this;
+    if (!this.raw[key]) this.raw[key] = [];
+    this.raw[key].push(value);
+    return this;
+  }
+
+  /**
+   * 删除完整查询参数
+   * @param key
+   */
+  public remove(key: string): this {
+    delete this.raw[key];
+    return this;
+  }
+
+  /**
+   * 删除单个查询参数
+   * @param key
+   */
+  public omit(key: string, value: string): this {
+    const list = this.raw[key];
+    if (list) {
+      this.raw[key] = list.filter(v => v !== value);
+    }
+    const newList = this.raw[key];
+    if (newList && !newList.length) {
+      delete this.raw[key];
+    }
+    return this;
+  }
+
+  /**
+   * 迭代查询参数
+   * @param callback 回调函数
+   */
+  public forEach(callback: (key: string, value: string[]) => void): this {
+    for (const [key, list] of Object.entries(this.raw)) {
+      callback(key, list);
+    }
+    return this;
+  }
+
+  /**
+   * 输出格式化查询参数
+   * @returns "" / ?key=value&key=value
+   */
+  public format(): string {
+    const nodes: string[] = [];
+    const encode = encodeURIComponent;
+    for (const [key, value] of Object.entries(this.raw)) {
+      value.forEach(v => nodes.push(encode(key) + "=" + encode(v)));
+    }
+    if (!nodes.length) return "";
+    return "?" + nodes.join("&");
+  }
+
+  /**
+   * 输出格式化查询参数
+   */
+  public toString(): string {
+    return this.format();
+  }
+
+  /**
+   * 克隆 URIParams 实例
+   */
+  public clone(): URIParams {
+    const Constructor = this.constructor as typeof URIParams;
+    const instance = new Constructor();
+    for (const [key, value] of Object.entries(this.raw)) {
+      instance.assign(key, value);
+    }
+    return instance;
+  }
+
+  /**
+   * 解析查询参数 search
+   * @param query
+   * @example ?q=1&w=3
+   */
+  public static parse(query: ConstructorParameters<typeof URLSearchParams>["0"]): URIParams {
+    const search = new URLSearchParams(query);
+    const instance = new URIParams();
+    for (const [key, value] of search.entries()) {
+      instance.append(key, value);
+    }
+    return instance;
+  }
+
+  /**
    * 生成 URI Search 参数
    * @param params
    * @example {} => ""
    * @example { q: "1", w: "2" } => "?q=1&w=2"
    */
-  public static stringifyParams(params: O.Map<string | number | null | undefined>): string {
+  public static stringify(params: O.Map<string | number | null | undefined>): string {
     const init: O.Map<string> = {};
     for (const [key, value] of Object.entries(params)) {
       if (isNil(value)) continue;

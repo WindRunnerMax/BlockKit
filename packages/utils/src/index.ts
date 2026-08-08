@@ -84,5 +84,5 @@ export type { ThrottledFn } from "./throttle";
 export { throttle } from "./throttle";
 export type { Func, Primitive, Reflex } from "./types";
 export type { Array as ArrayType, Object as ObjectType, String as StringType } from "./types";
-export { URI } from "./uri";
+export { URI, URIParams } from "./uri";
 export { getId, getUniqueId } from "./uuid";
