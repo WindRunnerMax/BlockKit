@@ -174,8 +174,8 @@ export class URI {
    * 从 Location 解析
    * @param location
    */
-  public static from(location: Location): URI {
-    const instance = new URI();
+  public static from(this: typeof URI, location: Location): URI {
+    const instance = new this();
     instance.setPath(location.pathname);
     instance.setProtocol(location.protocol);
     instance.setHostname(location.hostname);
@@ -248,11 +248,35 @@ export class URI {
    * - 类似 path.join 合并 URL 路径的实现
    * - 确保路径以 / 开头, 而是否存在尾 / 都是合法的
    * - 确保连续的 /[///] 为一个 /
-   * @param args
+   * @param arg0 路径片段或配置对象
+   * @param args 路径片段数组
    */
-  public static resolvePath(...args: Array<string | number | undefined | null>): string {
-    const pathname = "/" + args.filter(p => !isNil(p)).join("/");
-    return pathname.replace(/\/{2,}/g, "/");
+  public static resolvePath(
+    arg0:
+      | string
+      | number
+      | undefined
+      | null
+      | {
+          /** 是否移除尾 /, 默认 false */
+          removeTail?: boolean;
+        },
+    ...args: Array<string | number | undefined | null>
+  ): string {
+    let config: Exclude<typeof arg0, string | number | symbol> = null;
+    const fragments = args.slice();
+    if (typeof arg0 === "object" && arg0) {
+      config = arg0;
+    } else {
+      fragments.unshift(arg0);
+    }
+    const { removeTail = false } = config || {};
+    let pathname = "/" + fragments.filter(p => !isNil(p)).join("/");
+    pathname = pathname.replace(/\/{2,}/g, "/");
+    if (removeTail && pathname.endsWith("/") && pathname !== "/") {
+      pathname = pathname.slice(0, -1);
+    }
+    return pathname;
   }
 }
 
@@ -388,9 +412,12 @@ export class URIParams {
    * @param query
    * @example ?q=1&w=3
    */
-  public static parse(query: ConstructorParameters<typeof URLSearchParams>["0"]): URIParams {
+  public static parse(
+    this: typeof URIParams,
+    query: ConstructorParameters<typeof URLSearchParams>["0"]
+  ): URIParams {
     const search = new URLSearchParams(query);
-    const instance = new URIParams();
+    const instance = new this();
     for (const [key, value] of search.entries()) {
       instance.append(key, value);
     }

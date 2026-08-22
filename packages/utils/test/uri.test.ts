@@ -151,6 +151,22 @@ describe("uri", () => {
     expect(p2).toBe("/search/s1/s2");
     const p3 = URI.resolvePath("/search/", "/s1//", "s2//");
     expect(p3).toBe("/search/s1/s2/");
+    const p4 = URI.resolvePath("/");
+    expect(p4).toBe("/");
+    const p5 = URI.resolvePath("////");
+    expect(p5).toBe("/");
+    expect(URI.resolvePath("/s/")).toBe("/s/");
+  });
+
+  it("uri resolve path config", () => {
+    expect(URI.resolvePath({ removeTail: true }, "")).toBe("/");
+    expect(URI.resolvePath({ removeTail: false }, "")).toBe("/");
+    expect(URI.resolvePath({ removeTail: true }, "///")).toBe("/");
+    expect(URI.resolvePath({ removeTail: false }, "///")).toBe("/");
+    expect(URI.resolvePath({ removeTail: true }, "/s/")).toBe("/s");
+    expect(URI.resolvePath({ removeTail: true }, "/s")).toBe("/s");
+    expect(URI.resolvePath({ removeTail: true }, "/s/////")).toBe("/s");
+    expect(URI.resolvePath({ removeTail: false }, "/s/////")).toBe("/s/");
   });
 
   it("relative path verification", () => {
