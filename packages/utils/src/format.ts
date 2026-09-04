@@ -26,7 +26,7 @@ export class Format {
   public static number(
     number: number,
     locale: string = "en-US",
-    options?: Func.Constructor<typeof Intl.NumberFormat>["1"]
+    options?: Func.InstanceArgs<typeof Intl.NumberFormat>["1"]
   ): string {
     return new Intl.NumberFormat(locale, options).format(number);
   }

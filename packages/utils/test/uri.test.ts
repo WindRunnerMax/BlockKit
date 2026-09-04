@@ -113,9 +113,9 @@ describe("uri", () => {
     uri.setPath("search");
     expect(uri.format()).toBe("/search");
     uri.setPath("/search///");
-    expect(uri.format()).toBe("/search/");
+    expect(uri.format()).toBe("/search");
     uri.setPath("search/");
-    expect(uri.format()).toBe("/search/");
+    expect(uri.format()).toBe("/search");
     uri.setPath("search/s1");
     expect(uri.format()).toBe("/search/s1");
     uri.setPath("search//s1");
@@ -150,23 +150,25 @@ describe("uri", () => {
     const p2 = URI.resolvePath("/search", "////s1", "s2");
     expect(p2).toBe("/search/s1/s2");
     const p3 = URI.resolvePath("/search/", "/s1//", "s2//");
-    expect(p3).toBe("/search/s1/s2/");
+    expect(p3).toBe("/search/s1/s2");
     const p4 = URI.resolvePath("/");
     expect(p4).toBe("/");
     const p5 = URI.resolvePath("////");
     expect(p5).toBe("/");
-    expect(URI.resolvePath("/s/")).toBe("/s/");
+    expect(URI.resolvePath("/s/")).toBe("/s");
   });
 
-  it("uri resolve path config", () => {
-    expect(URI.resolvePath({ removeTail: true }, "")).toBe("/");
-    expect(URI.resolvePath({ removeTail: false }, "")).toBe("/");
-    expect(URI.resolvePath({ removeTail: true }, "///")).toBe("/");
-    expect(URI.resolvePath({ removeTail: false }, "///")).toBe("/");
-    expect(URI.resolvePath({ removeTail: true }, "/s/")).toBe("/s");
-    expect(URI.resolvePath({ removeTail: true }, "/s")).toBe("/s");
-    expect(URI.resolvePath({ removeTail: true }, "/s/////")).toBe("/s");
-    expect(URI.resolvePath({ removeTail: false }, "/s/////")).toBe("/s/");
+  it("uri resolve path 2", () => {
+    expect(URI.resolvePath("")).toBe("/");
+    expect(URI.resolvePath("")).toBe("/");
+    expect(URI.resolvePath("///")).toBe("/");
+    expect(URI.resolvePath("///")).toBe("/");
+    expect(URI.resolvePath("/s/")).toBe("/s");
+    expect(URI.resolvePath("/s")).toBe("/s");
+    expect(URI.resolvePath("/s/////")).toBe("/s");
+    expect(URI.resolvePath("/s/////")).toBe("/s");
+    expect(URI.resolvePath("/././")).toBe("/");
+    expect(URI.resolvePath("/././")).toBe("/");
   });
 
   it("relative path verification", () => {

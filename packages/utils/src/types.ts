@@ -320,23 +320,23 @@ export namespace Func {
    */
   export type Return<T extends Func.Any> = T extends (...args: any[]) => infer R ? R : any;
   /**
-   * Constructor
-   * @example Constructor<new () => void> => []
-   * @example Constructor<new (a: A, b: B) => void> => [a: A, b: B]
-   * @example Constructor<new (a: A, b: B, ...rest: C[]) => void> => [a: A, b: B, ...rest: C[]]
+   * InstanceArgs: Obtain the parameters of a constructor function type in a tuple
+   * @example InstanceArgs<new () => void> => []
+   * @example InstanceArgs<new (a: A, b: B) => void> => [a: A, b: B]
+   * @example InstanceArgs<new (a: A, b: B, ...rest: C[]) => void> => [a: A, b: B, ...rest: C[]]
    */
-  export type Constructor<T extends AnyClass> = T extends abstract new (...args: infer P) => any
+  export type InstanceArgs<T extends AnyClass> = T extends abstract new (...args: infer P) => any
     ? P
     : never;
   /**
-   * Parameters
-   * @example Parameters<() => void> => []
-   * @example Parameters<(a: A, b: B) => void> => [a: A, b: B]
-   * @example Parameters<(a: A, b: B, ...rest: C[]) => void> => [a: A, b: B, ...rest: C[]]
+   * InstanceReturn: Obtain the parameters of a constructor function type in a tuple
+   * @example InstanceReturn<new () => void> => []
+   * @example InstanceReturn<new () => String> => String
+   * @example InstanceReturn<new () => Number> => Number
    */
-  export type Parameters<T extends (...args: any) => any> = T extends (...args: infer P) => any
-    ? P
-    : never;
+  export type InstanceReturn<T extends AnyClass> = T extends abstract new (...args: any) => infer R
+    ? R
+    : any;
 }
 
 /**
