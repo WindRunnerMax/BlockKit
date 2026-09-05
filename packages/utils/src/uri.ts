@@ -246,13 +246,13 @@ export class URI {
   /**
    * 合并查询路径片段
    * - 类似 path.join 合并 URL 路径的实现
-   * - 确保路径以 / 开头, 默认移除尾部 /
+   * - 确保路径以 / 开头, 并移除尾部 /
    * - 确保连续的 /[///] 为一个 /
    * @param args 路径片段数组
    */
   public static resolvePath(...args: Array<string | number | undefined | null>): string {
     let pathname = "/" + args.filter(p => !isNil(p)).join("/");
-    pathname = pathname.replace(/\.\//g, "/").replace(/\/{2,}/g, "/");
+    pathname = pathname.replace(/\/{2,}/g, "/");
     if (pathname.endsWith("/") && pathname !== "/") {
       pathname = pathname.slice(0, -1);
     }
@@ -300,8 +300,10 @@ export class URIParams {
    * @param key
    * @param value
    */
-  public set(key: string, value: string | string[]): this {
-    return this.assign(key, value);
+  public assign(key: string, value: string | string[]): this {
+    if (!key || isNil(value)) return this;
+    this.raw[key] = Array.isArray(value) ? value.slice() : [value];
+    return this;
   }
 
   /**
@@ -309,10 +311,8 @@ export class URIParams {
    * @param key
    * @param value
    */
-  public assign(key: string, value: string | string[]): this {
-    if (!key || isNil(value)) return this;
-    this.raw[key] = Array.isArray(value) ? value.slice() : [value];
-    return this;
+  public set(key: string, value: string | string[]): this {
+    return this.assign(key, value);
   }
 
   /**

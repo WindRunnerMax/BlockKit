@@ -167,8 +167,9 @@ describe("uri", () => {
     expect(URI.resolvePath("/s")).toBe("/s");
     expect(URI.resolvePath("/s/////")).toBe("/s");
     expect(URI.resolvePath("/s/////")).toBe("/s");
-    expect(URI.resolvePath("/././")).toBe("/");
-    expect(URI.resolvePath("/././")).toBe("/");
+    expect(URI.resolvePath("/././")).toBe("/./.");
+    expect(URI.resolvePath("/./ss/.../")).toBe("/./ss/...");
+    expect(URI.resolvePath("/./../.../")).toBe("/./../...");
   });
 
   it("relative path verification", () => {
