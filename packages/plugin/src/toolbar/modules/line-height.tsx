@@ -22,7 +22,10 @@ export const LineHeight: FC = () => {
       popupAlign={{ bottom: 10 }}
       getPopupContainer={e => e.parentElement || document.body}
       popup={() => (
-        <div className="block-kit-toolbar-dropdown" onClick={refreshMarks}>
+        <div
+          className="block-kit-toolbar-dropdown block-kit-toolbar-dropdown-scroll"
+          onClick={refreshMarks}
+        >
           <div
             className="block-kit-toolbar-height-item kit-toolbar-node"
             onClick={() => editor.command.exec(LINE_HEIGHT_KEY, { value: NIL })}

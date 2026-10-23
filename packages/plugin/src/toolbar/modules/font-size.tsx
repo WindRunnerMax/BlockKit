@@ -23,7 +23,10 @@ export const FontSize: FC = () => {
       trigger="click"
       getPopupContainer={e => e.parentElement || document.body}
       popup={() => (
-        <div className="block-kit-toolbar-dropdown" onClick={refreshMarks}>
+        <div
+          className="block-kit-toolbar-dropdown block-kit-toolbar-dropdown-scroll"
+          onClick={refreshMarks}
+        >
           <div
             className="block-kit-toolbar-height-item kit-toolbar-node"
             onClick={() => editor.command.exec(FONT_SIZE_KEY, { value: NIL })}

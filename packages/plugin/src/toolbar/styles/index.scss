@@ -57,3 +57,23 @@
     }
   }
 }
+
+.block-kit-toolbar-dropdown-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-color: var(--color-fill-4) transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-fill-4);
+    border-radius: 3px;
+  }
+}
