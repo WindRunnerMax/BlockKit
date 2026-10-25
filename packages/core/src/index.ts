@@ -28,6 +28,8 @@ export type {
 } from "./event/bus/";
 export { EDITOR_EVENT } from "./event/bus/";
 export { History } from "./history";
+export type { HistoryEffect } from "./history/types";
+export { HISTORY_EFFECT } from "./history/types";
 export { Input } from "./input";
 export {
   isArrowDown,

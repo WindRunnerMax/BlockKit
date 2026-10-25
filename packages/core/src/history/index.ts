@@ -9,7 +9,8 @@ import { isRedo, isUndo } from "../input/utils/hot-key";
 import { Range } from "../selection/modules/range";
 import { RawRange } from "../selection/modules/raw-range";
 import { APPLY_SOURCE } from "../state/types";
-import type { StackItem } from "./types";
+import type { HistoryEffect, StackItem } from "./types";
+import { HISTORY_EFFECT } from "./types";
 
 export class History {
   /** 延时 */
@@ -224,20 +225,21 @@ export class History {
    * @param event
    */
   @Bind
-  protected onContentChange(event: ContentChangeEvent) {
+  protected onContentChange(event: ContentChangeEvent): HistoryEffect {
     const { changes, previous, source, id } = event;
     if (!changes.ops.length || source === APPLY_SOURCE.HISTORY) {
-      return void 0;
+      return HISTORY_EFFECT.NONE;
     }
     if (event.source === APPLY_SOURCE.REMOTE || event.options.undoable === false) {
       this.transformStack(this.undoStack, changes);
       this.transformStack(this.redoStack, changes);
-      return void 0;
+      return HISTORY_EFFECT.NONE;
     }
     this.redoStack = [];
     let inverted = changes.invert(previous);
     let undoRange = this.currentRange;
     let idSet = new Set<string>([id]);
+    let effect: HistoryEffect = HISTORY_EFFECT.APPEND;
     const timestamp = Date.now();
     if (
       // 如果触发时间在 delay 时间片内或者批量执行时, 需要合并上一个记录
@@ -250,16 +252,20 @@ export class History {
         undoRange = item.range;
         idSet = item.id.add(id);
       }
+      effect = HISTORY_EFFECT.MERGE;
     } else {
       this.lastRecord = timestamp;
     }
     if (!inverted.ops.length) {
-      return void 0;
+      return effect === HISTORY_EFFECT.MERGE ? HISTORY_EFFECT.MERGE_DROP : HISTORY_EFFECT.NONE;
     }
     this.undoStack.push({ delta: inverted, range: undoRange, id: idSet });
     if (this.undoStack.length > this.STACK_SIZE) {
       this.undoStack.shift();
+      // 合并不会改变栈长度, 只有新开一格时才有可能触发丢弃
+      effect === HISTORY_EFFECT.APPEND && (effect = HISTORY_EFFECT.APPEND_DROP);
     }
+    return effect;
   }
 
   /**
