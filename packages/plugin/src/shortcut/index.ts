@@ -55,6 +55,7 @@ export class Shortcut extends CorePlugin {
 
   @Bind
   protected onKeydown(event: KeyboardEvent): void {
+    if (event.isComposing) return void 0;
     const keys = this.getKeys();
     const payload: F.Args<ShortcutFunc>["1"] = {
       keys,

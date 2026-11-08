@@ -16,7 +16,8 @@
   "scripts": {
     "build": "rm -rf dist && rollup -c rollup.config.js",
     "lint:ts": "tsc -p tsconfig.build.json --noEmit",
-    "lint:circular": "madge --extensions js --circular ./dist"
+    "lint:circular": "madge --extensions js --circular ./dist",
+    "test": "jest --config jest.config.js"
   },
   "author": "WindRunnerMax",
   "license": "MIT",
@@ -61,6 +62,10 @@
     "rollup-plugin-postcss": "4.0.2",
     "rollup-plugin-typescript2": "0.32.1",
     "sass-loader": "13.3.3",
-    "tslib": "2.8.1"
+    "tslib": "2.8.1",
+    "@swc/jest": "0.2.39",
+    "@types/jest": "29.4.0",
+    "jest": "29.4.1",
+    "jest-environment-jsdom": "29.7.0"
   }
 }

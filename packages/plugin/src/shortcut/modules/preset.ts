@@ -12,6 +12,7 @@ import { ORDER_LIST_KEY } from "../../order-list/types";
 import { QUOTE_KEY } from "../../quote/types";
 import { isKeyCode } from "../../shared/utils/is";
 import type { ShortcutFuncMap } from "../types";
+import { matchLineMarker } from "../utils/marker";
 
 export const PRESET_SHORTCUT: ShortcutFuncMap = {
   [BOLD_KEY]: (event, payload) => {
@@ -29,27 +30,18 @@ export const PRESET_SHORTCUT: ShortcutFuncMap = {
     }
   },
   [LIST_TYPE_KEY]: (event, payload) => {
-    if (isKeyCode(event, KEY_CODE.SPACE) && payload.sel && payload.sel.isCollapsed) {
+    if (isKeyCode(event, KEY_CODE.SPACE) && payload.sel) {
       const { editor, sel } = payload;
-      const line = editor.state.block.getLine(sel.start.line);
-      const firstLeaf = line && line.getFirstLeaf();
-      const text = firstLeaf && firstLeaf.getText();
-      if (text === "1.") {
-        editor.perform.deleteForward(
-          Range.fromTuple([sel.start.line, 0], [sel.start.line, text.length])
-        );
-        editor.command.exec(ORDER_LIST_KEY, { value: TRULY });
-        event.preventDefault();
-        return true;
-      }
-      if (text === "-" || text === "*") {
-        editor.perform.deleteForward(
-          Range.fromTuple([sel.start.line, 0], [sel.start.line, text.length])
-        );
-        editor.command.exec(BULLET_LIST_KEY, { value: TRULY });
-        event.preventDefault();
-        return true;
-      }
+      // 行首为 `1.` / `-` / `*` 且光标仍在标记区时, 转换为对应的列表类型
+      const match = matchLineMarker(editor, sel, ["1.", "-", "*"]);
+      if (!match) return void 0;
+      editor.perform.deleteForward(
+        Range.fromTuple([sel.start.line, 0], [sel.start.line, match.marker.length])
+      );
+      const key = match.marker === "1." ? ORDER_LIST_KEY : BULLET_LIST_KEY;
+      editor.command.exec(key, { value: TRULY });
+      event.preventDefault();
+      return true;
     }
   },
   [DIVIDER_KEY]: (event, payload) => {
@@ -72,40 +64,36 @@ export const PRESET_SHORTCUT: ShortcutFuncMap = {
     }
   },
   [QUOTE_KEY]: (event, payload) => {
-    if (isKeyCode(event, KEY_CODE.SPACE) && payload.sel && payload.sel.isCollapsed) {
+    if (isKeyCode(event, KEY_CODE.SPACE) && payload.sel) {
       const { editor, sel } = payload;
-      const line = editor.state.block.getLine(sel.start.line);
-      const firstLeaf = line && line.getFirstLeaf();
-      const text = firstLeaf && firstLeaf.getText();
-      if (text === ">") {
-        editor.perform.deleteForward(
-          Range.fromTuple([sel.start.line, 0], [sel.start.line, text.length])
-        );
-        editor.command.exec(QUOTE_KEY, { value: TRULY });
-        event.preventDefault();
-        return true;
-      }
+      // 行首为 `>` 且光标仍在标记区时, 转换为引用
+      const match = matchLineMarker(editor, sel, [">"]);
+      if (!match) return void 0;
+      editor.perform.deleteForward(
+        Range.fromTuple([sel.start.line, 0], [sel.start.line, match.marker.length])
+      );
+      editor.command.exec(QUOTE_KEY, { value: TRULY });
+      event.preventDefault();
+      return true;
     }
   },
   [HEADING_KEY]: (event, payload) => {
-    if (isKeyCode(event, KEY_CODE.SPACE) && payload.sel && payload.sel.isCollapsed) {
+    if (isKeyCode(event, KEY_CODE.SPACE) && payload.sel) {
       const { editor, sel } = payload;
-      const line = editor.state.block.getLine(sel.start.line);
-      const firstLeaf = line && line.getFirstLeaf();
-      const text = firstLeaf && firstLeaf.getText();
+      // 行首为 `#` 系列且光标仍在标记区时, 转换为对应级别的标题
       const HEADING_MAP: O.Map<string> = {
         "#": "1",
         "##": "2",
         "###": "3",
       };
-      if (text && HEADING_MAP[text]) {
-        editor.perform.deleteForward(
-          Range.fromTuple([sel.start.line, 0], [sel.start.line, text.length])
-        );
-        editor.command.exec(HEADING_KEY, { value: "h" + HEADING_MAP[text] });
-        event.preventDefault();
-        return true;
-      }
+      const match = matchLineMarker(editor, sel, Object.keys(HEADING_MAP));
+      if (!match) return void 0;
+      editor.perform.deleteForward(
+        Range.fromTuple([sel.start.line, 0], [sel.start.line, match.marker.length])
+      );
+      editor.command.exec(HEADING_KEY, { value: "h" + HEADING_MAP[match.marker] });
+      event.preventDefault();
+      return true;
     }
   },
 };

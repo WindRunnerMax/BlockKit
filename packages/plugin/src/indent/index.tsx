@@ -38,6 +38,7 @@ export class IndentPlugin extends EditorPlugin {
 
   @Bind
   protected onKeydown(event: KeyboardEvent): void {
+    if (event.isComposing) return void 0;
     if (!isKeyCode(event, KEY_CODE.TAB)) return void 0;
     const sel = this.editor.selection.get();
     if (!sel) return void 0;

@@ -29,6 +29,7 @@ export class SuggestModule {
 
   @Bind
   public onKeydown(event: KeyboardEvent): void {
+    if (event.isComposing) return void 0;
     if (isKeyCode(event, KEY_CODE.D2) && event.shiftKey) {
       const sel = this.editor.selection.get();
       const caretRect = this.editor.rect.getRawCaretRect();

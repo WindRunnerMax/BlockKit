@@ -83,7 +83,7 @@ export class OrderListPlugin extends EditorPlugin {
   @Bind
   protected onKeyDown(event: KeyboardEvent, context: EventContext) {
     const sel = this.editor.selection.get();
-    if (!sel) return void 0;
+    if (!sel || event.isComposing) return void 0;
     const block = this.editor.state.block;
     const startLine = block.getLine(sel.start.line);
     if (!startLine) return void 0;
