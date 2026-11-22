@@ -22,7 +22,7 @@
 ### 编辑器示例组
 
 - examples/website: 主示例站，演示 React/Vue 的编辑器与块结构编辑器效果
-- packages/tools: 示例工具，提供 Word、PDF、Markdown 等导出依赖
+- packages/tools: 示例工具依赖，提供 Word、PDF、Markdown 等导出依赖
 - examples/common: 独立的 HTML/TS 脚本调试示例
 - examples/variable: 轻量级富文本输入框，支持变量插值、下拉选择框、类型标签等
 - examples/stream: Markdown 流式增量渲染算法，顶层块归档 + 尾部块 diff 压缩
@@ -49,7 +49,6 @@
 
 ## 注意事项
 
-- 踩坑记录可参考 NOTE.md，注意其内容较多，架构调整前考虑阅读相关章节
 - 不要开启子 agent（Agent/Task 工具），所有任务由主 agent 直接完成
 - 使用浏览器 CDP 通信时，优先复用系统已安装的 Chrome 浏览器，以 headless 模式运行
   - 若是创建了调试脚本，放在 /tmp 目录下，不需要主动删除

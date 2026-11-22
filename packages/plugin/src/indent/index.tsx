@@ -7,15 +7,19 @@ import { EditorPlugin } from "@block-kit/react";
 import { Bind, KEY_CODE } from "@block-kit/utils";
 
 import { isKeyCode } from "../shared/utils/is";
+import type { IndentOptions } from "./types";
 import { INDENT_LEVEL_KEY } from "./types";
 
 export class IndentPlugin extends EditorPlugin {
   public key = INDENT_LEVEL_KEY;
+  protected offset: number;
 
-  constructor(protected editor: Editor) {
+  constructor(protected editor: Editor, options?: IndentOptions) {
     super();
     // 保证优先级需要大于相关插件, 例如有序列表插件
     editor.event.on(EDITOR_EVENT.KEY_DOWN, this.onKeydown, 90);
+    const config = options || {};
+    this.offset = config.offset && config.offset > 0 ? config.offset : 25;
   }
 
   public destroy(): void {
@@ -30,7 +34,7 @@ export class IndentPlugin extends EditorPlugin {
     const attrs = context.attributes;
     const level = Number(attrs[INDENT_LEVEL_KEY]);
     if (!isNaN(level)) {
-      context.style.paddingLeft = `${level * 25}px`;
+      context.style.paddingLeft = `${level * this.offset}px`;
     }
 
     return context.children;

@@ -28,6 +28,7 @@ export {
   MIN_WIDTH,
 } from "./image/types";
 export { IndentPlugin } from "./indent";
+export type { IndentOptions } from "./indent/types";
 export { INDENT_LEVEL_KEY } from "./indent/types";
 export { InlineCodePlugin } from "./inline-code";
 export { INLINE_CODE_KEY } from "./inline-code/types/index";
